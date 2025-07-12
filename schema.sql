@@ -276,7 +276,7 @@ CREATE TABLE system_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- /prisma/migrations/.../migration.sql or via SQL directly
+
 CREATE TABLE vlans (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   vlan_id INTEGER NOT NULL CHECK (vlan_id BETWEEN 1 AND 4094),

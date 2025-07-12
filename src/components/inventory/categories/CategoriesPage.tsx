@@ -1,26 +1,44 @@
-// src/components/inventory/categories/CategoriesPage.tsx
+// src/components/inventory/categories/CategoriesPageContent.tsx
 'use client';
 
-import React from 'react';
-import { AddCategoryModal } from './AddCategoryModal';
-import { UpdateCategoryModal } from './UpdateCategoryModal';
-import { DeleteCategoryDialog } from './DeleteCategoryDialog';
-import { ListCategories } from './ListCategories';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/contexts/LocaleContext';
-import type { InventoryCategory } from '@/types/inventory';
+import { z } from 'zod';
+import { InventoryCategory } from '@/types/inventory';
+import { ContentHeader } from '@/components/ui/content-header';
+import { UpdateEntityModal } from '@/components/ui/modals/UpdateEntityModal';
+import { RemoveEntityDialog } from '@/components/ui/modals/RemoveEntityDialog';
+import { ListCategories } from './ListCategories';
 
-export default function CategoriesPage() {
+export const categorySchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+});
+
+export type CategoryFormData = z.infer<typeof categorySchema>;
+
+const categoryFields = [
+  { name: 'name', label: 'Name', type: 'text' },
+];
+
+export function CategoriesPageContent() {
   const { toast } = useToast();
-  const { t: translate } = useLocale();
+  const { t } = useLocale();
 
-  const [categories, setCategories] = React.useState<InventoryCategory[]>([]);
-  const [editingCategory, setEditingCategory] = React.useState<InventoryCategory | null>(null);
-  const [deletingCategory, setDeletingCategory] = React.useState<InventoryCategory | null>(null);
-  const [searchTerm, setSearchTerm] = React.useState('');
-  const [loading, setLoading] = React.useState(true);
-  const [currentPage, setCurrentPage] = React.useState(1);
-  const itemsPerPage = 10;
+  const [categories, setCategories] = useState<InventoryCategory[]>([]);
+  const [filtered, setFiltered] = useState<InventoryCategory[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [editing, setEditing] = useState<InventoryCategory | null>(null);
+  const [deleting, setDeleting] = useState<InventoryCategory | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isAllSelected, setIsAllSelected] = useState(false);
+  const [isMassDeleteOpen, setIsMassDeleteOpen] = useState(false);
+  const perPage = 10;
 
   const fetchCategories = async () => {
     try {
@@ -28,108 +46,244 @@ export default function CategoriesPage() {
       const res = await fetch('/api/inventory/categories');
       const data = await res.json();
       setCategories(data);
-    } catch (err) {
-      toast({ title: 'Failed to load categories', variant: 'destructive' });
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to load categories',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchCategories();
   }, []);
 
-  const handleAdd = async (category: InventoryCategory) => {
+  useEffect(() => {
+    const filteredResults = categories.filter((c) =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFiltered(filteredResults);
+    setPage(1);
+    setSelectedIds(new Set());
+    setIsAllSelected(false);
+  }, [searchTerm, categories]);
+
+  const handleAdd = async (data: CategoryFormData) => {
     try {
       const res = await fetch('/api/inventory/categories/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: category.name }),
+        body: JSON.stringify(data),
       });
-      const newCategory = await res.json();
-      setCategories(prev => [...prev, newCategory]);
+      if (!res.ok) throw new Error();
+      await fetchCategories();
+      toast({
+        title: 'Category Added',
+        description: `Category "${data.name}" added.`,
+      });
     } catch {
-      toast({ title: 'Failed to add category', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Failed to add category',
+        variant: 'destructive',
+      });
     }
   };
 
-  const handleUpdate = async (updated: InventoryCategory) => {
+  const handleUpdate = async (data: CategoryFormData) => {
+    if (!editing) return;
     try {
-      const res = await fetch(`/api/inventory/categories/update/${updated.id}`, {
+      const res = await fetch(`/api/inventory/categories/update/${editing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: updated.name }),
+        body: JSON.stringify(data),
       });
-      const data = await res.json();
-      setCategories(prev => prev.map(c => (c.id === data.id ? data : c)));
+      if (!res.ok) throw new Error();
+      await fetchCategories();
+      toast({
+        title: 'Category Updated',
+        description: `Category "${data.name}" updated.`,
+      });
     } catch {
-      toast({ title: 'Failed to update category', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Failed to update category',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsEditOpen(false);
+      setEditing(null);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleting) return;
     try {
-      await fetch(`/api/inventory/categories/remove/${id}`, {
+      const res = await fetch(`/api/inventory/categories/remove/${deleting.id}`, {
         method: 'DELETE',
       });
-      setCategories(prev => prev.filter(c => c.id !== id));
+      if (!res.ok) throw new Error();
+      await fetchCategories();
+      toast({
+        title: 'Category Deleted',
+        description: `Category "${deleting.name}" deleted.`,
+        variant: 'destructive',
+      });
     } catch {
-      toast({ title: 'Failed to delete category', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'Failed to delete category',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleteOpen(false);
+      setDeleting(null);
     }
   };
 
-  const filtered = categories.filter(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
-  const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / perPage));
+  const paginated = filtered.slice((page - 1) * perPage, page * perPage);
+
+  const handleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedIds(new Set());
+      setIsAllSelected(false);
+    } else {
+      const allIds = new Set(paginated.map((c) => c.id));
+      setSelectedIds(allIds);
+      setIsAllSelected(true);
+    }
+  };
+
+  const handleSelectItem = (id: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+    setIsAllSelected(newSelected.size === paginated.length && paginated.length > 0);
+  };
+
+  const handleMassDelete = async () => {
+    if (selectedIds.size === 0) return;
+    try {
+      const deletePromises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/inventory/categories/remove/${id}`, { method: 'DELETE' })
+      );
+      const responses = await Promise.all(deletePromises);
+      const failed = responses.filter((res) => !res.ok);
+      if (failed.length > 0) throw new Error();
+      await fetchCategories();
+      toast({
+        title: 'Categories Deleted',
+        description: `${selectedIds.size} category(ies) deleted.`,
+        variant: 'destructive',
+      });
+      setSelectedIds(new Set());
+      setIsAllSelected(false);
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete some categories',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsMassDeleteOpen(false);
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-base font-semibold whitespace-nowrap">
-          {translate('inventory_categories.title', 'Categories')}
-        </h1>
-        <div className="relative w-full max-w-xs flex-1">
-          <input
-            type="search"
-            placeholder={translate('inventory_categories.search_placeholder', 'Search categories...')}
-            className="pl-8 w-full border border-gray-300 rounded px-3 py-2 text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="flex flex-col gap-1">
+      <ContentHeader
+        onSearchChange={setSearchTerm}
+        schema={categorySchema}
+        fields={categoryFields}
+        onAddEntitySubmit={handleAdd}
+      />
+
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-2 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <span className="text-sm text-blue-800">
+            {selectedIds.size} category(ies) selected
+          </span>
+          <button
+            onClick={() => setIsMassDeleteOpen(true)}
+            className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          >
+            Delete Selected
+          </button>
+          <button
+            onClick={() => {
+              setSelectedIds(new Set());
+              setIsAllSelected(false);
+            }}
+            className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+          >
+            Clear Selection
+          </button>
         </div>
-        <AddCategoryModal onAdd={handleAdd} />
-      </div>
+      )}
 
-      <div className="bg-white rounded-md shadow">
-        <ListCategories
-          categories={paginated}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onEdit={setEditingCategory}
-          onDelete={setDeletingCategory}
-          loading={loading}
-          page={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          onRefresh={fetchCategories}
-        />
-      </div>
+      <Card className="border-0 shadow-none">
+        <CardContent className="p-0">
+          <ListCategories
+            categories={paginated}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onEdit={(c) => {
+              setEditing(c);
+              setIsEditOpen(true);
+            }}
+            onDelete={(c) => {
+              setDeleting(c);
+              setIsDeleteOpen(true);
+            }}
+            onRefresh={fetchCategories}
+            page={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+            selectedIds={selectedIds}
+            isAllSelected={isAllSelected}
+            onSelectAll={handleSelectAll}
+            onSelectItem={handleSelectItem}
+            loading={loading}
+          />
+        </CardContent>
+      </Card>
 
-      {editingCategory && (
-        <UpdateCategoryModal
-          category={editingCategory}
-          onUpdate={handleUpdate}
-          onClose={() => setEditingCategory(null)}
+      <UpdateEntityModal
+        entityName="Category"
+        schema={categorySchema}
+        fields={categoryFields}
+        defaultValues={
+          editing
+            ? { name: editing.name }
+            : { name: '' }
+        }
+        open={isEditOpen}
+        onOpenChange={(open) => {
+          setIsEditOpen(open);
+          if (!open) setEditing(null);
+        }}
+        onSubmit={handleUpdate}
+      />
+
+      {isDeleteOpen && (
+        <RemoveEntityDialog
+          entityName={deleting?.name || 'Category'}
+          onConfirm={handleDelete}
         />
       )}
-      {deletingCategory && (
-        <DeleteCategoryDialog
-          category={deletingCategory}
-          onConfirm={() => {
-            handleDelete(deletingCategory.id);
-            setDeletingCategory(null);
-          }}
-          onCancel={() => setDeletingCategory(null)}
+
+      {isMassDeleteOpen && (
+        <RemoveEntityDialog
+          entityName={`${selectedIds.size} selected category(ies)`}
+          onConfirm={handleMassDelete}
         />
       )}
     </div>

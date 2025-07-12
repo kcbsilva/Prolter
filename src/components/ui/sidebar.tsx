@@ -199,16 +199,14 @@ const Sidebar = React.forwardRef<
       sidebarNodeRef.current = node;
     }
     
-    // Update the forwarded ref - handle both function refs and object refs
+    // Update the forwarded ref
     if (typeof ref === 'function') {
       ref(node);
     } else if (ref && typeof ref === 'object' && 'current' in ref) {
-      // Only assign if it's a mutable ref object
       try {
         (ref as React.MutableRefObject<HTMLElement | null>).current = node;
-      } catch (error) {
-        // Silently ignore if ref is read-only
-        console.warn('Unable to assign to ref.current - ref may be read-only');
+      } catch {
+        // Silently ignore read-only refs
       }
     }
   }, [ref, sidebarNodeRef]);

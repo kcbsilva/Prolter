@@ -1,18 +1,15 @@
 // src/components/inventory/categories/ListCategories.tsx
 'use client';
 
-import React from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import * as React from 'react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Edit, Trash2, RefreshCw } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { InventoryCategory } from '@/types/inventory';
 
 interface Props {
@@ -26,6 +23,10 @@ interface Props {
   totalPages: number;
   onPageChange: (page: number) => void;
   onRefresh: () => void;
+  selectedIds?: Set<string>;
+  isAllSelected?: boolean;
+  onSelectAll?: () => void;
+  onSelectItem?: (id: string) => void;
 }
 
 export function ListCategories({
@@ -39,104 +40,96 @@ export function ListCategories({
   totalPages,
   onPageChange,
   onRefresh,
+  selectedIds = new Set(),
+  isAllSelected = false,
+  onSelectAll,
+  onSelectItem,
 }: Props) {
   const iconSize = 'h-3 w-3';
 
-  return (
-    <div className="flex flex-col gap-4 p-6">
-      <div className="overflow-x-auto rounded-md border">
-        <Table>
-          <TableHeader className="bg-muted">
-            <TableRow>
-              <TableHead className="w-16 text-xs">ID</TableHead>
-              <TableHead className="text-xs">Name</TableHead>
-              <TableHead className="text-right w-28 text-xs">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              [...Array(5)].map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-4 w-12 ml-auto" /></TableCell>
-                </TableRow>
-              ))
-            ) : categories.length > 0 ? (
-              categories.map((category) => (
-                <TableRow key={category.id}>
-                  <TableCell className="font-mono text-muted-foreground text-xs">
-                    <span title={category.id}>{category.id.substring(0, 8)}</span>
-                  </TableCell>
-                  <TableCell className="font-medium text-xs">{category.name}</TableCell>
-                  <TableCell className="text-right space-x-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => onEdit(category)}
-                    >
-                      <Edit className={iconSize} />
-                      <span className="sr-only">Edit</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => onDelete(category)}
-                    >
-                      <Trash2 className={iconSize} />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={3} className="text-center text-muted-foreground py-8 text-xs">
-                  {searchTerm
-                    ? 'No categories found matching your search.'
-                    : 'No categories configured yet.'}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+  const columns = [
+    {
+      key: 'checkbox',
+      label: (
+        <Checkbox
+          checked={isAllSelected}
+          onCheckedChange={() => onSelectAll?.()}
+          aria-label="Select all"
+        />
+      ),
+      className: 'w-8 text-center',
+    },
+    { key: 'id', label: 'ID', className: 'w-16 text-xs' },
+    { key: 'name', label: 'Name', className: 'text-xs' },
+    { key: 'actions', label: 'Actions', className: 'w-28 text-xs' },
+  ];
 
-      {/* Pagination + Refresh */}
-      <div className="flex justify-center items-center pt-4">
-        <div className="flex items-center gap-2 text-xs">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page - 1)}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <span>
-            Page {page} of {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page + 1)}
-            disabled={page === totalPages}
-          >
-            Next
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="ml-4"
-            onClick={onRefresh}
-          >
-            <RefreshCw className={`${iconSize} mr-2`} />
-            Refresh
-          </Button>
-        </div>
-      </div>
-    </div>
+  if (loading) {
+    return (
+      <PaginatedSkeletonTable
+        columns={columns}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        onRefresh={onRefresh}
+        entriesCount={0} children={undefined}      />
+    );
+  }
+
+  return (
+    <PaginatedSkeletonTable
+      columns={columns}
+      page={page}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      onRefresh={onRefresh}
+      entriesCount={categories.length}
+    >
+      {categories.length > 0 ? (
+        categories.map((category) => (
+          <TableRow key={category.id}>
+            <TableCell className="text-center">
+              <Checkbox
+                checked={selectedIds.has(category.id)}
+                onCheckedChange={() => onSelectItem?.(category.id)}
+                aria-label={`Select ${category.name}`}
+              />
+            </TableCell>
+            <TableCell className="font-mono text-muted-foreground text-xs">
+              <span title={category.id}>{category.id.substring(0, 8)}</span>
+            </TableCell>
+            <TableCell className="font-medium text-xs">{category.name}</TableCell>
+            <TableCell className="text-right space-x-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={() => onEdit(category)}
+              >
+                <Edit className={iconSize} />
+                <span className="sr-only">Edit</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={() => onDelete(category)}
+              >
+                <Trash2 className={iconSize} />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </TableCell>
+          </TableRow>
+        ))
+      ) : (
+        <TableRow>
+          <TableCell colSpan={4} className="text-center text-muted-foreground py-8 text-xs">
+            {searchTerm
+              ? 'No categories found matching your search.'
+              : 'No categories configured yet.'}
+          </TableCell>
+        </TableRow>
+      )}
+    </PaginatedSkeletonTable>
   );
 }
