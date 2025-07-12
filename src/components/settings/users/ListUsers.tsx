@@ -2,85 +2,60 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
+import type { UserProfile } from '@/types/users';
+import { RemoveUserDialog } from './RemoveUserDialog';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Edit } from 'lucide-react';
-import { useLocale } from '@/contexts/LocaleContext';
-import type { UserProfile, Role } from '@/types/users';
+import { Badge } from '@/components/ui/badge';
+import { Pencil } from 'lucide-react';
 
 interface ListUsersProps {
   userProfiles: UserProfile[];
-  roles: Role[];
   isLoading: boolean;
-  error?: string | null;
-  onEditClick: (profile: UserProfile) => void;
+  error?: string;
+  onEditClick: (user: UserProfile) => void;
 }
 
-export function ListUsers({
-  userProfiles,
-  roles,
-  isLoading,
-  error,
-  onEditClick,
-}: ListUsersProps) {
-  const { t } = useLocale();
-  const iconSize = 'h-3 w-3';
+export function ListUsers({ userProfiles, isLoading, error, onEditClick }: ListUsersProps) {
+  const columns: { key: string; label: string; className?: string }[] = [
+    { key: 'email', label: 'Email' },
+    { key: 'full_name', label: 'Full Name' },
+    { key: 'role', label: 'Role' },
+    { key: 'actions', label: 'Actions', className: 'text-right' },
+  ];
+
+  const renderBadge = (role: string) => {
+    const variant = role === 'admin' ? 'destructive' : 'secondary';
+    return <Badge variant={variant}>{role}</Badge>;
+  };
+
+  const renderRows = () =>
+    userProfiles.map((user) => (
+      <tr key={user.id} className="border-b">
+        <td className="px-4 py-2">{user.email}</td>
+        <td className="px-4 py-2">{user.full_name}</td>
+        <td className="px-4 py-2">{renderBadge(String(user.role))}</td>
+        <td className="px-4 py-2 text-right">
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="outline" onClick={() => onEditClick(user)}>
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <RemoveUserDialog user={user} onSuccess={() => location.reload()} />
+          </div>
+        </td>
+      </tr>
+    ));
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-xs">{t('settings_users.user_table_fullname', 'Full Name')}</TableHead>
-          <TableHead className="text-xs">{t('settings_users.user_table_email', 'Email')}</TableHead>
-          <TableHead className="text-xs">{t('settings_users.user_table_role', 'Role')}</TableHead>
-          <TableHead className="text-xs text-right">{t('settings_users.user_table_actions', 'Actions')}</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {isLoading ? (
-          Array.from({ length: 5 }).map((_, idx) => (
-            <TableRow key={idx}>
-              <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-              <TableCell className="text-right"><Skeleton className="h-4 w-8 ml-auto" /></TableCell>
-            </TableRow>
-          ))
-        ) : error ? (
-          <TableRow>
-            <TableCell colSpan={4} className="text-xs text-destructive text-center py-4">
-              Error: {error}
-            </TableCell>
-          </TableRow>
-        ) : userProfiles.length > 0 ? (
-          userProfiles.map(profile => (
-            <TableRow key={profile.id}>
-              <TableCell className="text-xs">{profile.full_name || 'N/A'}</TableCell>
-              <TableCell className="text-xs">{profile.email || 'N/A'}</TableCell>
-              <TableCell className="text-xs">{profile.role?.name || t('settings_users.no_role_assigned')}</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditClick(profile)}>
-                  <Edit className={iconSize} />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <TableCell colSpan={4} className="text-muted-foreground text-xs text-center py-4">
-              {t('settings_users.no_users_placeholder', 'No users found. Users are typically added via Supabase Auth and then appear here.')}
-            </TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <PaginatedSkeletonTable
+      columns={columns}
+      page={1}
+      totalPages={1}
+      entriesCount={userProfiles.length}
+      onPageChange={() => {}}
+      onRefresh={() => location.reload()}
+    >
+      {isLoading ? null : renderRows()}
+    </PaginatedSkeletonTable>
   );
 }

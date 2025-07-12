@@ -2,31 +2,17 @@
 'use client';
 
 import * as React from 'react';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { PlusCircle, ListChecks } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery } from '@tanstack/react-query';
-import {
-  getRoles,
-  getPermissions,
-  getUserTemplates,
-  getUserProfiles,
-} from '@/services/postgres/users';
-import type { Role, Permission, UserTemplate, UserProfile } from '@/types/users';
+import { getUserProfiles } from '@/services/postgres/users';
+import type { UserProfile } from '@/types/users';
 
 import { ListUsers } from '@/components/settings/users/ListUsers';
 import { AddUserModal } from '@/components/settings/users/AddUserModal';
 import { UpdateUserModal } from '@/components/settings/users/UpdateUserModal';
 import { RemoveUserDialog } from '@/components/settings/users/RemoveUserDialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -39,15 +25,6 @@ export default function UsersPage() {
 
   const [isEditUserModalOpen, setIsEditUserModalOpen] = React.useState(false);
   const [editingUserProfile, setEditingUserProfile] = React.useState<UserProfile | null>(null);
-
-  const {
-    data: roles = [],
-    isLoading: isLoadingRoles,
-    error: rolesError,
-  } = useQuery<Role[], Error>({
-    queryKey: ['roles'],
-    queryFn: getRoles,
-  });
 
   const {
     data: userProfiles = [],
@@ -64,7 +41,6 @@ export default function UsersPage() {
     setIsEditUserModalOpen(true);
   };
 
-  if (rolesError) return <p>Error loading roles: {getErrorMessage(rolesError)}</p>;
   if (userProfilesError) return <p>Error loading users: {getErrorMessage(userProfilesError)}</p>;
 
   return (
@@ -74,11 +50,7 @@ export default function UsersPage() {
       </h1>
 
       <div className="flex justify-end items-center gap-2">
-        <AddUserModal
-          roles={roles}
-          isLoadingRoles={isLoadingRoles}
-          onSuccess={refetchUserProfiles}
-        />
+        <AddUserModal onSuccess={refetchUserProfiles} />
       </div>
 
       <Card>
@@ -96,7 +68,6 @@ export default function UsersPage() {
         <CardContent>
           <ListUsers
             userProfiles={userProfiles}
-            roles={roles}
             isLoading={isLoadingUserProfiles}
             error={getErrorMessage(userProfilesError)}
             onEditClick={handleOpenEditUserModal}
@@ -105,8 +76,6 @@ export default function UsersPage() {
       </Card>
 
       <UpdateUserModal
-        roles={roles}
-        isLoadingRoles={isLoadingRoles}
         userProfile={editingUserProfile}
         open={isEditUserModalOpen}
         onOpenChange={(open) => {
@@ -115,6 +84,8 @@ export default function UsersPage() {
         }}
         onSuccess={refetchUserProfiles}
       />
+
+      <RemoveUserDialog onSuccess={refetchUserProfiles} />
     </div>
   );
 }

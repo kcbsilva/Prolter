@@ -7,48 +7,26 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription as DialogDescriptionComponent,
-  DialogFooter,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2 } from 'lucide-react';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
+import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-
 import { useToast } from '@/hooks/use-toast';
-import { useLocale } from '@/contexts/LocaleContext';
-import { useMutation } from '@tanstack/react-query';
-import { updateUserProfile } from '@/services/postgres/users';
-import type { Role, UserProfile } from '@/types/users';
+import { updateUser } from '@/services/postgres/users';
+import type { UserProfile } from '@/types/users';
 
-const editUserFormSchema = z.object({
-  fullName: z.string().min(1, 'Full name is required.'),
-  roleId: z.string().uuid('Invalid role ID.').nullable().optional(),
+const formSchema = z.object({
+  email: z.string().email(),
+  full_name: z.string().min(1),
+  role: z.enum(['admin', 'user']),
 });
-type EditUserFormValues = z.infer<typeof editUserFormSchema>;
+
+type FormData = z.infer<typeof formSchema>;
 
 interface UpdateUserModalProps {
-  roles: Role[];
-  isLoadingRoles: boolean;
   userProfile: UserProfile | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -56,136 +34,84 @@ interface UpdateUserModalProps {
 }
 
 export function UpdateUserModal({
-  roles,
-  isLoadingRoles,
   userProfile,
   open,
   onOpenChange,
   onSuccess,
 }: UpdateUserModalProps) {
-  const { t } = useLocale();
   const { toast } = useToast();
-  const iconSize = 'h-3 w-3';
 
-  const form = useForm<EditUserFormValues>({
-    resolver: zodResolver(editUserFormSchema),
-    defaultValues: {
-      fullName: '',
-      roleId: null,
+  const resolveRole = (): 'admin' | 'user' => {
+    if (typeof userProfile?.role === 'string' && (userProfile.role === 'admin' || userProfile.role === 'user')) {
+      return userProfile.role;
+    }
+    if (
+      typeof userProfile?.role === 'object' &&
+      (userProfile.role.name === 'admin' || userProfile.role.name === 'user')
+    ) {
+      return userProfile.role.name;
+    }
+    return 'user';
+  };
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    values: {
+      email: userProfile?.email || '',
+      full_name: userProfile?.full_name || '',
+      role: resolveRole(),
+    },
+    resetOptions: {
+      keepDirtyValues: true,
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: { userId: string; profileData: EditUserFormValues }) =>
-      updateUserProfile(data.userId, data.profileData),
-    onSuccess: () => {
-      toast({
-        title: t('settings_users.update_user_success_title'),
-        description: t('settings_users.update_user_success_desc', 'User profile for {name} updated.').replace('{name}', form.getValues('fullName')),
-      });
+  const onSubmit = async (data: FormData) => {
+    if (!userProfile) return;
+    try {
+      await updateUser(userProfile.id, data);
+      toast({ title: 'User updated successfully.' });
       onOpenChange(false);
       onSuccess();
-    },
-    onError: (error: any) => {
+    } catch (error: any) {
       toast({
-        title: t('settings_users.update_user_error_title'),
-        description: error.message || t('settings_users.update_user_error_desc'),
+        title: 'Failed to update user.',
+        description: error.message,
         variant: 'destructive',
       });
-    },
-  });
-
-  React.useEffect(() => {
-    if (open && userProfile) {
-      form.reset({
-        fullName: userProfile.full_name || '',
-        roleId: userProfile.role_id || null,
-      });
     }
-  }, [open, userProfile, form]);
-
-  if (!userProfile) return null;
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-sm">{t('settings_users.edit_user_modal_title')}</DialogTitle>
-          <DialogDescriptionComponent className="text-xs">
-            {t('settings_users.edit_user_modal_desc', 'Update user details for {email}. Email and password cannot be changed here.').replace('{email}', userProfile.email)}
-          </DialogDescriptionComponent>
+          <DialogTitle>Edit User</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((values) => mutation.mutate({ userId: userProfile.id, profileData: values }))}
-            className="space-y-4 py-4"
-          >
-            <FormItem>
-              <FormLabel>{t('settings_users.form_email_label')}</FormLabel>
-              <FormControl>
-                <Input type="email" value={userProfile.email} disabled className="bg-muted" />
-              </FormControl>
-            </FormItem>
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_fullname_label')}</FormLabel>
-                  <FormControl>
-                    <Input placeholder={t('settings_users.form_fullname_placeholder')} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="roleId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_role_label')}</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value || undefined}
-                    disabled={isLoadingRoles}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue
-                          placeholder={
-                            isLoadingRoles
-                              ? t('settings_users.loading_roles_placeholder')
-                              : t('settings_users.select_role_placeholder')
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role.id} value={role.id}>
-                          {role.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline" disabled={mutation.isPending}>
-                  {t('settings_users.form_cancel_button')}
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending && <Loader2 className={`mr-2 ${iconSize} animate-spin`} />}
-                {t('settings_users.form_update_user_button')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4 py-4"
+        >
+          <div>
+            <Label>Email</Label>
+            <Input type="email" {...form.register('email')} />
+          </div>
+          <div>
+            <Label>Full Name</Label>
+            <Input type="text" {...form.register('full_name')} />
+          </div>
+          <div>
+            <Label>Role</Label>
+            <select
+              {...form.register('role')}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <Button type="submit">Save Changes</Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

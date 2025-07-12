@@ -3,92 +3,67 @@
 
 import * as React from 'react';
 import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from '@/components/ui/alert-dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Trash2, Loader2 } from 'lucide-react';
-import { useMutation } from '@tanstack/react-query';
-import { useLocale } from '@/contexts/LocaleContext';
+import { Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { deleteUserProfile } from '@/services/postgres/users';
+import { deleteUser } from '@/services/postgres/users';
 import type { UserProfile } from '@/types/users';
 
 interface RemoveUserDialogProps {
-  user: UserProfile;
-  onDeleted: () => void;
+  user?: UserProfile;
+  onSuccess: () => void;
+  trigger?: React.ReactNode;
 }
 
-export function RemoveUserDialog({ user, onDeleted }: RemoveUserDialogProps) {
-  const { t } = useLocale();
+export function RemoveUserDialog({ user, onSuccess, trigger }: RemoveUserDialogProps) {
   const { toast } = useToast();
-  const iconSize = 'h-3 w-3';
-
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
-  const deleteMutation = useMutation({
-    mutationFn: async () => {
-      return deleteUserProfile(user.id);
-    },
-    onSuccess: () => {
-      toast({
-        title: t('settings_users.delete_user_success_title', 'User deleted'),
-        description: t('settings_users.delete_user_success_desc', 'The user was successfully deleted.'),
-      });
+  const handleDelete = async () => {
+    if (!user) return;
+    try {
+      setLoading(true);
+      await deleteUser(user.id);
+      toast({ title: 'User deleted successfully.' });
       setOpen(false);
-      onDeleted();
-    },
-    onError: (error: any) => {
+      onSuccess();
+    } catch (error: any) {
       toast({
-        title: t('settings_users.delete_user_error_title', 'Error'),
-        description: error.message || t('settings_users.delete_user_error_desc'),
+        title: 'Failed to delete user.',
+        description: error.message,
         variant: 'destructive',
       });
-      setOpen(false);
-    },
-  });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return null;
 
   return (
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-destructive hover:text-destructive"
-          onClick={() => setOpen(true)}
-        >
-          <Trash2 className={iconSize} />
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t('settings_users.delete_user_confirm_title', 'Delete User')}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-xs">
-            {t('settings_users.delete_user_confirm_desc', 'Are you sure you want to delete {email}? This action cannot be undone.')
-              .replace('{email}', user.email)}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{t('settings_users.form_cancel_button', 'Cancel')}</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => deleteMutation.mutate()}
-            className="bg-destructive text-white hover:bg-destructive/90"
-            disabled={deleteMutation.isPending}
-          >
-            {deleteMutation.isPending && <Loader2 className={`mr-2 ${iconSize} animate-spin`} />}
-            {t('settings_users.form_delete_button', 'Delete')}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger || <Button variant="destructive" size="sm"><Trash2 className="w-4 h-4" /></Button>}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Confirm Deletion</DialogTitle>
+        </DialogHeader>
+        <p>Are you sure you want to delete <strong>{user.full_name || user.email}</strong>?</p>
+        <div className="flex justify-end gap-2 mt-4">
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button variant="destructive" onClick={handleDelete} disabled={loading}>
+            Delete
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

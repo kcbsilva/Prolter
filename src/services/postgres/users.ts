@@ -196,7 +196,7 @@ export interface NewUserInput {
   email: string;
   password: string;
   full_name: string;
-  role_id?: string | null;
+  role: 'admin' | 'user';
 }
 
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
@@ -208,17 +208,34 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
       VALUES ($1, $2, $3, $4, NOW(), NOW())
       RETURNING *;
   `;
-  const { rows } = await query(sql, [authUser.id, userData.email, userData.full_name, userData.role_id]);
-  const profile = rows[0] || { id: authUser.id, email: userData.email, full_name: userData.full_name, role_id: userData.role_id, avatar_url: null, created_at: new Date(), updated_at: new Date() };
+  const { rows } = await query(sql, [authUser.id, userData.email, userData.full_name, userData.role]);
+  const profile = rows[0] || { id: authUser.id, email: userData.email, full_name: userData.full_name, role_id: userData.role, avatar_url: null, created_at: new Date(), updated_at: new Date() };
   return {
       id: profile.id.toString(),
       full_name: profile.full_name,
       email: profile.email,
       avatar_url: profile.avatar_url,
-      role_id: profile.role_id ? profile.role_id.toString() : null,
+      role: profile.role ? profile.role.toString() : null,
       created_at: new Date(profile.created_at).toISOString(),
       updated_at: new Date(profile.updated_at).toISOString(),
   };
+}
+
+// --- Delete User ---
+export async function deleteUser(userId: string): Promise<void> {
+  console.log('PostgreSQL service: deleteUser called for ID', userId);
+  await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
+}
+
+export async function updateUser(
+  userId: string,
+  data: { email: string; full_name: string; role: 'admin' | 'user' }
+): Promise<void> {
+  console.log('PostgreSQL service: updateUser called', userId, data);
+  await query(
+    'UPDATE user_profiles SET email = $1, full_name = $2, role_id = $3, updated_at = NOW() WHERE id = $4',
+    [data.email, data.full_name, data.role, userId]
+  );
 }
 
 // Placeholder for sending a password reset email.

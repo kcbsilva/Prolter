@@ -4,203 +4,115 @@
 import * as React from 'react';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription as DialogDescriptionComponent,
-  DialogFooter,
-  DialogClose,
+  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, PlusCircle } from 'lucide-react';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from '@/components/ui/select';
-
+import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-
 import { useToast } from '@/hooks/use-toast';
-import { useLocale } from '@/contexts/LocaleContext';
-import { useMutation } from '@tanstack/react-query';
+import { PlusCircle } from 'lucide-react';
 import { createUser } from '@/services/postgres/users';
-import type { Role } from '@/types/users';
+import bcrypt from 'bcryptjs';
 
-const addUserFormSchema = z.object({
-  email: z.string().email("Invalid email address."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
-  confirmPassword: z.string().min(1, "Please confirm your password."),
-  fullName: z.string().min(1, "Full name is required."),
-  roleId: z.string().uuid("Invalid role ID.").nullable().optional(),
-}).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
-type AddUserFormValues = z.infer<typeof addUserFormSchema>;
+const formSchema = z
+  .object({
+    email: z.string().email(),
+    full_name: z.string().min(1),
+    role: z.enum(['admin', 'user']),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+export type AddUserFormData = z.infer<typeof formSchema>;
 
 interface AddUserModalProps {
-  roles: Role[];
-  isLoadingRoles: boolean;
   onSuccess: () => void;
 }
 
-export function AddUserModal({
-  roles,
-  isLoadingRoles,
-  onSuccess,
-}: AddUserModalProps) {
-  const { t } = useLocale();
+export function AddUserModal({ onSuccess }: AddUserModalProps) {
   const { toast } = useToast();
   const [open, setOpen] = React.useState(false);
-  const iconSize = 'h-3 w-3';
 
-  const form = useForm<AddUserFormValues>({
-    resolver: zodResolver(addUserFormSchema),
+  const form = useForm<AddUserFormData>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
+      full_name: '',
+      role: 'user',
       password: '',
       confirmPassword: '',
-      fullName: '',
-      roleId: null,
     },
   });
 
-  const addUserMutation = useMutation({
-    mutationFn: async (userData: AddUserFormValues) => {
-      const { email, password, fullName, roleId } = userData;
-      return createUser({
-        email,
-        password,
-        full_name: fullName,
-        role_id: roleId || null,
+  const onSubmit = async (data: AddUserFormData) => {
+    try {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      await createUser({
+        email: data.email,
+        full_name: data.full_name,
+        role: data.role,
+        password: hashedPassword,
       });
-    },
-    onSuccess: (user) => {
-      toast({
-        title: t('settings_users.add_user_success_title'),
-        description: t('settings_users.add_user_success_desc', 'User {email} created successfully.').replace('{email}', user?.email || ''),
-      });
-      form.reset();
+      toast({ title: 'User created successfully.' });
       setOpen(false);
       onSuccess();
-    },
-    onError: (error: any) => {
-      toast({
-        title: t('settings_users.add_user_error_title'),
-        description: error.message || t('settings_users.add_user_error_desc'),
-        variant: 'destructive',
-      });
-    },
-  });
+    } catch (error: any) {
+      toast({ title: 'Failed to create user.', description: error.message, variant: 'destructive' });
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-green-600 hover:bg-green-700 text-white">
-          <PlusCircle className={`mr-2 ${iconSize}`} /> {t('settings_users.add_user_button', 'Add User')}
+        <Button variant="default">
+          <PlusCircle className="mr-2 h-4 w-4" /> Add User
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-sm">{t('settings_users.add_user_modal_title')}</DialogTitle>
-          <DialogDescriptionComponent className="text-xs">{t('settings_users.add_user_modal_desc')}</DialogDescriptionComponent>
+          <DialogTitle>Add New User</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit((values) => addUserMutation.mutate(values))} className="space-y-4 py-4">
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_fullname_label')}</FormLabel>
-                  <FormControl><Input placeholder={t('settings_users.form_fullname_placeholder')} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_email_label')}</FormLabel>
-                  <FormControl><Input type="email" placeholder={t('settings_users.form_email_placeholder')} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_password_label')}</FormLabel>
-                  <FormControl><Input type="password" placeholder={t('settings_users.form_password_placeholder')} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_confirm_password_label')}</FormLabel>
-                  <FormControl><Input type="password" placeholder={t('settings_users.form_confirm_password_placeholder')} {...field} /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="roleId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('settings_users.form_role_label')}</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || undefined} disabled={isLoadingRoles}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder={isLoadingRoles ? t('settings_users.loading_roles_placeholder') : t('settings_users.select_role_placeholder')} />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {roles.map(role => (
-                        <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button type="button" variant="outline" disabled={addUserMutation.isPending}>
-                  {t('settings_users.form_cancel_button')}
-                </Button>
-              </DialogClose>
-              <Button type="submit" disabled={addUserMutation.isPending}>
-                {addUserMutation.isPending && <Loader2 className={`mr-2 ${iconSize} animate-spin`} />}
-                {t('settings_users.form_create_user_button')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-4 py-4"
+        >
+          <div>
+            <Label>Email</Label>
+            <Input type="email" {...form.register('email')} />
+          </div>
+          <div>
+            <Label>Full Name</Label>
+            <Input type="text" {...form.register('full_name')} />
+          </div>
+          <div>
+            <Label>Role</Label>
+            <select {...form.register('role')} className="w-full border rounded px-3 py-2">
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <div>
+            <Label>Password</Label>
+            <Input type="password" {...form.register('password')} />
+          </div>
+          <div>
+            <Label>Confirm Password</Label>
+            <Input type="password" {...form.register('confirmPassword')} />
+          </div>
+          <Button type="submit">
+            Create User
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );
