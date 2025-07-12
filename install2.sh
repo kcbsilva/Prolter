@@ -189,6 +189,7 @@ echo -e "🔐 .gpgpass file created ✅"
 #########################################
 echo -e "📁 Step 6/10: Changing file ownership..."
 sudo chown -R prolteradmin:prolteradmin /opt/Prolter
+sudo chown -R prolteradmin:prolteradmin /home/prolteradmin/.npm
 echo -e "📁 Ownership updated ✅"
 
 #########################################

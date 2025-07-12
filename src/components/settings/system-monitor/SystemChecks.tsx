@@ -1,17 +1,16 @@
-// src/components/pages/SystemMonitor/SystemChecks.tsx
+// ✅ FRONTEND: src/components/pages/SystemMonitor/SystemChecks.tsx
 'use client';
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Power, ArrowUpCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { useRouter } from 'next/navigation';
+import { UpdateProlterModal } from '@/components/settings/system/UpdateProlterModal';
 
 interface MonitoredService {
   id: string;
@@ -26,21 +25,12 @@ interface Props {
   isLoading: boolean;
 }
 
-const updateSteps = [
-  { id: 'git', label: 'Getting New Files' },
-  { id: 'build', label: 'Installing New Files' },
-  { id: 'restart', label: 'Restarting Prolter' },
-];
-
 export function SystemChecks({ services, setServices, isLoading }: Props) {
   const { t } = useLocale();
   const { toast } = useToast();
   const router = useRouter();
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [errors, setErrors] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleRestartService = async (serviceId: string) => {
     toast({
@@ -79,7 +69,27 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
 
   const handleUpdateService = async (serviceId: string) => {
     if (serviceId === 'prolter') {
-      setShowUpdateModal(true);
+      try {
+        const res = await fetch('/api/system/update/preflight');
+        const data = await res.json();
+
+        if (!res.ok || data.success === false) {
+          toast({
+            title: 'Permission Issue',
+            description: data.issues?.join('\n') || data.error || 'Unknown error',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        setShowUpdateModal(true);
+      } catch (err: any) {
+        toast({
+          title: 'Preflight Failed',
+          description: err.message,
+          variant: 'destructive',
+        });
+      }
     } else {
       toast({
         title: t('update_started'),
@@ -108,40 +118,6 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
       }
     }
   };
-
-  useEffect(() => {
-    if (!showUpdateModal) return;
-
-    const runUpdateSteps = async () => {
-      setIsUpdating(true);
-      setErrors(null);
-      setCurrentStep(0);
-
-      for (let i = 0; i < updateSteps.length; i++) {
-        const step = updateSteps[i];
-        try {
-          const res = await fetch(`/api/system/update/step/${step.id}`, { method: 'POST' });
-          if (!res.ok) {
-            const data = await res.json();
-            setErrors(data?.error || 'Unknown error');
-            break;
-          }
-          setCurrentStep(i + 1);
-          await new Promise(res => setTimeout(res, 600));
-        } catch (err: any) {
-          setErrors(err.message);
-          break;
-        }
-      }
-
-      setIsUpdating(false);
-      if (currentStep === updateSteps.length - 1) {
-        setTimeout(() => router.push('/login'), 1500);
-      }
-    };
-
-    runUpdateSteps();
-  }, [showUpdateModal]);
 
   return (
     <>
@@ -190,39 +166,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
         </CardContent>
       </Card>
 
-      <Dialog open={showUpdateModal} onOpenChange={setShowUpdateModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Updating Prolter</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Progress value={(currentStep / updateSteps.length) * 100} />
-            <ul className="text-sm list-disc pl-5 space-y-1">
-              {updateSteps.map((step, i) => (
-                <li
-                  key={step.id}
-                  className={i < currentStep ? 'text-green-600' : i === currentStep ? 'text-blue-600' : 'text-muted-foreground'}
-                >
-                  {i < currentStep ? '✅' : i === currentStep ? '🔄' : '⏳'} {step.label}
-                </li>
-              ))}
-            </ul>
-            {errors && (
-              <div className="text-red-600 text-sm border border-red-500 p-2 rounded">
-                ⚠️ Update failed: {errors}
-              </div>
-            )}
-            {!errors && currentStep === updateSteps.length && (
-              <div className="text-green-600 text-sm">✅ Update complete. Redirecting...</div>
-            )}
-            <div className="flex justify-end">
-              <Button onClick={() => setShowUpdateModal(false)} disabled={isUpdating}>
-                Close
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <UpdateProlterModal open={showUpdateModal} onOpenChange={setShowUpdateModal} />
     </>
   );
 }
