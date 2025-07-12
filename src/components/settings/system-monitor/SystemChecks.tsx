@@ -27,9 +27,9 @@ interface Props {
 }
 
 const updateSteps = [
-  { id: 'stop', label: 'Stopping Prolter' },
   { id: 'git', label: 'Getting New Files' },
   { id: 'build', label: 'Installing New Files' },
+  { id: 'stop', label: 'Stopping Prolter' },
   { id: 'start', label: 'Applying Changes' },
 ];
 
@@ -123,6 +123,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
     const runUpdateSteps = async () => {
       setIsUpdating(true);
       setErrors(null);
+      setCurrentStep(0);
 
       for (let i = 0; i < updateSteps.length; i++) {
         const step = updateSteps[i];
@@ -134,7 +135,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
             break;
           }
           setCurrentStep(i + 1);
-          await new Promise(res => setTimeout(res, 500));
+          await new Promise(res => setTimeout(res, 600));
         } catch (err: any) {
           setErrors(err.message);
           break;
@@ -144,7 +145,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
       setIsUpdating(false);
 
       if (currentStep === updateSteps.length - 1) {
-        setTimeout(() => router.push('/login'), 2000);
+        setTimeout(() => router.push('/login'), 1500);
       }
     };
 
