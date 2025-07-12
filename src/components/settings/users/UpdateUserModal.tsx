@@ -16,7 +16,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useToast } from '@/hooks/use-toast';
 import { updateUser } from '@/services/postgres/users';
-import type { UserProfile, Role } from '@/types/users';
+import type { UserProfile } from '@/types/users';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -42,23 +42,8 @@ export function UpdateUserModal({
   const { toast } = useToast();
 
   const resolveRole = (): 'admin' | 'user' => {
-    if (!userProfile) return 'user';
-
-    const role = userProfile.role;
-
-    if (typeof role === 'string' && (role === 'admin' || role === 'user')) {
-      return role;
-    }
-
-    if (
-      typeof role === 'object' &&
-      role &&
-      (role as Role).name === 'admin' || (role as Role).name === 'user'
-    ) {
-      return (role as Role).name as 'admin' | 'user';
-    }
-
-    return 'user';
+    const roleName = typeof userProfile?.role === 'object' ? userProfile?.role?.name : userProfile?.role;
+    return roleName === 'admin' || roleName === 'user' ? roleName : 'user';
   };
 
   const form = useForm<FormData>({
@@ -67,7 +52,7 @@ export function UpdateUserModal({
       email: userProfile?.email ?? '',
       full_name: userProfile?.full_name ?? '',
       role: resolveRole(),
-    } as FormData,
+    },
     resetOptions: {
       keepDirtyValues: true,
     },

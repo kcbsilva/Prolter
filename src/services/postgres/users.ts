@@ -123,10 +123,10 @@ export async function deleteUserTemplate(templateId: string): Promise<void> {
 export async function getUserProfiles(): Promise<UserProfile[]> {
   console.log('PostgreSQL service: getUserProfiles called');
   const { rows } = await query(`
-    SELECT up.id, up.full_name, up.email, up.avatar_url, up.role as role_id, up.created_at, up.updated_at,
-           r.name as role_name, r.description as role_description, r.created_at as role_created_at
-    FROM user_profiles up
-    LEFT JOIN roles r ON up.role = r.id;
+    SELECT up.id, up.full_name, up.email, up.avatar_url, up.role_id, up.created_at, up.updated_at,
+       r.id as role_id, r.name as role_name, r.description as role_description, r.created_at as role_created_at
+      FROM user_profiles up
+      LEFT JOIN roles r ON up.role_id = r.id;
   `);
   return rows.map(profile => ({
     id: profile.id.toString(),
@@ -134,12 +134,14 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
     email: profile.email,
     avatar_url: profile.avatar_url,
     role_id: profile.role_id ? profile.role_id.toString() : null,
-    role: profile.role_id ? {
-      id: profile.role_id.toString(),
-      name: profile.role_name,
-      description: profile.role_description,
-      created_at: new Date(profile.role_created_at).toISOString(),
-    } : undefined,
+    role: profile.role_id
+      ? {
+        id: profile.role_id.toString(),
+        name: profile.role_name,
+        description: profile.role_description,
+        created_at: new Date(profile.role_created_at).toISOString(),
+      }
+      : undefined,
     created_at: new Date(profile.created_at).toISOString(),
     updated_at: new Date(profile.updated_at).toISOString(),
   }));
