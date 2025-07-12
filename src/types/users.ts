@@ -38,12 +38,12 @@ export interface UserTemplateData {
 
 // User profile data extending Supabase auth.users
 export interface UserProfile {
-  id: string; // UUID, matches auth.users.id
-  full_name?: string | null;
-  email?: string | null; // Email will now be directly on user_profiles
-  role_id?: string | null; // UUID, Foreign Key to roles.id
+  id: string;
+  full_name: string;
+  email: string;
   avatar_url?: string | null;
-  role?: Role; // Populated role object
+  role?: Role;
+  role_id?: string | null;
   created_at: string;
   updated_at: string;
 }
