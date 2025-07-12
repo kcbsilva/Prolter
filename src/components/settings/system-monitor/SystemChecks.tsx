@@ -29,8 +29,7 @@ interface Props {
 const updateSteps = [
   { id: 'git', label: 'Getting New Files' },
   { id: 'build', label: 'Installing New Files' },
-  { id: 'stop', label: 'Stopping Prolter' },
-  { id: 'start', label: 'Applying Changes' },
+  { id: 'restart', label: 'Restarting Prolter' },
 ];
 
 export function SystemChecks({ services, setServices, isLoading }: Props) {
@@ -55,7 +54,6 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ service: serviceId }),
       });
-
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Unknown error');
 
@@ -65,9 +63,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
       });
 
       setServices(prev =>
-        prev.map(s =>
-          s.id === serviceId ? { ...s, status: 'Active', error: undefined } : s
-        )
+        prev.map(s => (s.id === serviceId ? { ...s, status: 'Active', error: undefined } : s))
       );
     } catch (err: any) {
       toast({
@@ -75,11 +71,8 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
         description: err.message,
         variant: 'destructive',
       });
-
       setServices(prev =>
-        prev.map(s =>
-          s.id === serviceId ? { ...s, status: 'Inactive', error: err.message } : s
-        )
+        prev.map(s => (s.id === serviceId ? { ...s, status: 'Inactive', error: err.message } : s))
       );
     }
   };
@@ -99,7 +92,6 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ service: serviceId }),
         });
-
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || 'Unknown error');
 
@@ -143,7 +135,6 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
       }
 
       setIsUpdating(false);
-
       if (currentStep === updateSteps.length - 1) {
         setTimeout(() => router.push('/login'), 1500);
       }
@@ -166,35 +157,10 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
                 className="flex items-center justify-between p-2 border rounded-md hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`h-2.5 w-2.5 rounded-full inline-block ${
-                      service.status === 'Active' ? 'bg-green-500' : 'bg-red-500'
-                    }`}
-                  />
+                  <span className={`h-2.5 w-2.5 rounded-full ${service.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`} />
                   <span className="text-xs font-medium">{t(service.nameKey)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  {service.error ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="text-xs font-semibold text-red-600 min-w-[70px] cursor-help">
-                          {t('service_status_error')}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>{service.error}</TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <span
-                      className={`text-xs font-semibold min-w-[70px] text-center ${
-                        service.status === 'Active' ? 'text-green-600' : 'text-red-600'
-                      }`}
-                    >
-                      {service.status === 'Active'
-                        ? t('service_status_active')
-                        : t('service_status_inactive')}
-                    </span>
-                  )}
-
                   <Button
                     variant="outline"
                     size="sm"
@@ -205,7 +171,6 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
                     <Power className="mr-1.5 h-3 w-3" />
                     {t('service_action_restart')}
                   </Button>
-
                   {['ubuntu', 'prolter'].includes(service.id) && (
                     <Button
                       variant="secondary"
@@ -236,20 +201,9 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
               {updateSteps.map((step, i) => (
                 <li
                   key={step.id}
-                  className={
-                    i < currentStep
-                      ? 'text-green-600'
-                      : i === currentStep
-                      ? 'text-blue-600'
-                      : 'text-muted-foreground'
-                  }
+                  className={i < currentStep ? 'text-green-600' : i === currentStep ? 'text-blue-600' : 'text-muted-foreground'}
                 >
-                  {i < currentStep
-                    ? '✅'
-                    : i === currentStep
-                    ? '🔄'
-                    : '⏳'}{' '}
-                  {step.label}
+                  {i < currentStep ? '✅' : i === currentStep ? '🔄' : '⏳'} {step.label}
                 </li>
               ))}
             </ul>
