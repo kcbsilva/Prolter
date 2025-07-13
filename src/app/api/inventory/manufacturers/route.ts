@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const result = await db.query(`
       SELECT id, business_name, business_number, address, telephone, email, created_at
-      FROM manufacturers
+      FROM inventory_manufacturers
       ORDER BY created_at DESC
     `);
 

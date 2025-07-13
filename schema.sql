@@ -397,7 +397,7 @@ CREATE TABLE inventory_categories (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE manufacturers (
+CREATE TABLE inventory_manufacturers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   business_name TEXT NOT NULL,
   business_number TEXT NOT NULL,
