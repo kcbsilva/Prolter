@@ -13,7 +13,7 @@ export async function POST(_: NextRequest, { params }: { params: { step: string 
         output = execSync('cd /opt/Prolter && npm install && npm run build', { encoding: 'utf-8' });
         break;
       case 'restart':
-        execSync('nohup /opt/Prolter/scripts/restart-prolter.sh > /dev/null 2>&1 &');
+        execSync('cd /opt/Prolter && sudo systemctl restart prolter');
         output = 'Restarting in background';
         break;
       default:

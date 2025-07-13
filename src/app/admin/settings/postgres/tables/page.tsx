@@ -20,11 +20,16 @@ import {
 } from '@/components/ui/select';
 import { Table2, PlusCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
+import { PaginatedSkeletonTable } from '@/components/ui/tables/PaginatedSkeletonTable';
 
 interface Database {
   id: string;
   name: string;
+}
+
+interface TableColumn {
+  column_name: string;
+  data_type: string;
 }
 
 export default function PostgresTablesPage() {
@@ -34,6 +39,10 @@ export default function PostgresTablesPage() {
   const [tables, setTables] = useState<string[]>([]);
   const [loadingDbs, setLoadingDbs] = useState<boolean>(true);
   const [loadingTables, setLoadingTables] = useState<boolean>(false);
+
+  const [openTables, setOpenTables] = useState<Record<string, boolean>>({});
+  const [tableDetails, setTableDetails] = useState<Record<string, TableColumn[]>>({});
+  const [loadingTable, setLoadingTable] = useState<string | null>(null);
 
   const iconSize = "h-3 w-3";
 
@@ -55,6 +64,7 @@ export default function PostgresTablesPage() {
 
   useEffect(() => {
     if (!selectedDb) return;
+
     const fetchTables = async () => {
       setLoadingTables(true);
       try {
@@ -67,8 +77,28 @@ export default function PostgresTablesPage() {
         setLoadingTables(false);
       }
     };
+
     fetchTables();
+    setOpenTables({});
+    setTableDetails({});
   }, [selectedDb]);
+
+  const handleToggleTable = async (table: string) => {
+    setOpenTables((prev) => ({ ...prev, [table]: !prev[table] }));
+
+    if (!openTables[table] && !tableDetails[table]) {
+      setLoadingTable(table);
+      try {
+        const res = await fetch(`/api/settings/postgres/table-details?db=${selectedDb}&table=${table}`);
+        const data = await res.json();
+        setTableDetails((prev) => ({ ...prev, [table]: data }));
+      } catch (err) {
+        console.error('Failed to fetch table columns', err);
+      } finally {
+        setLoadingTable(null);
+      }
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -113,14 +143,15 @@ export default function PostgresTablesPage() {
               : t('postgres_tables.select_db_prompt', 'Please select a database to view its tables.')}
           </CardDescription>
         </CardHeader>
+
         <CardContent className="p-0">
           {loadingTables ? (
             <PaginatedSkeletonTable
               columns={[{ key: 'name', label: 'Table Name' }]}
               page={1}
               totalPages={1}
-              onPageChange={() => { }}
-              onRefresh={() => { }}
+              onPageChange={() => {}}
+              onRefresh={() => {}}
             >
               <></>
             </PaginatedSkeletonTable>
@@ -132,11 +163,45 @@ export default function PostgresTablesPage() {
                 </tr>
               </thead>
               <tbody>
-                {tables.map((table) => (
-                  <tr key={table} className="border-t">
-                    <td className="px-4 py-2">{table}</td>
-                  </tr>
-                ))}
+                {tables.map((table) => {
+                  const isOpen = openTables[table] ?? false;
+                  const details = tableDetails[table] ?? [];
+
+                  return (
+                    <React.Fragment key={table}>
+                      <tr
+                        className="border-t cursor-pointer hover:bg-muted/40"
+                        onClick={() => handleToggleTable(table)}
+                      >
+                        <td className="px-4 py-2 flex items-center gap-2">
+                          <span className="text-muted-foreground">
+                            {isOpen ? '▾' : '▸'}
+                          </span>
+                          <span>{table}</span>
+                        </td>
+                      </tr>
+                      {isOpen && (
+                        <tr className="border-t bg-muted/10 text-xs text-muted-foreground">
+                          <td className="px-4 py-2">
+                            {loadingTable === table ? (
+                              <div className="animate-pulse text-muted">Loading columns...</div>
+                            ) : details.length === 0 ? (
+                              <div>No columns found.</div>
+                            ) : (
+                              <ul className="list-disc list-inside space-y-1">
+                                {details.map((col) => (
+                                  <li key={col.column_name}>
+                                    <strong>{col.column_name}</strong> – {col.data_type}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           ) : (
