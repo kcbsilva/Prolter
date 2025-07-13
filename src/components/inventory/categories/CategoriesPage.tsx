@@ -44,14 +44,18 @@ export function CategoriesPageContent() {
     try {
       setLoading(true);
       const res = await fetch('/api/inventory/categories');
+      if (!res.ok) throw new Error('Non-200 response');
       const data = await res.json();
+      if (!Array.isArray(data)) throw new Error('Invalid data format');
       setCategories(data);
-    } catch {
+    } catch (error) {
+      console.error('[CATEGORY_FETCH_ERROR]', error);
       toast({
         title: 'Error',
         description: 'Failed to load categories',
         variant: 'destructive',
       });
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -71,18 +75,22 @@ export function CategoriesPageContent() {
     setIsAllSelected(false);
   }, [searchTerm, categories]);
 
-  const handleAdd = async (data: CategoryFormData) => {
+  const handleAdd = async (data: { [x: string]: any }) => {
     try {
+      const formData: CategoryFormData = categorySchema.parse(data);
+
       const res = await fetch('/api/inventory/categories/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       });
+
       if (!res.ok) throw new Error();
+
       await fetchCategories();
       toast({
         title: 'Category Added',
-        description: `Category "${data.name}" added.`,
+        description: `Category "${formData.name}" added.`,
       });
     } catch {
       toast({
@@ -93,19 +101,24 @@ export function CategoriesPageContent() {
     }
   };
 
-  const handleUpdate = async (data: CategoryFormData) => {
+  const handleUpdate = async (data: { [x: string]: any }) => {
     if (!editing) return;
+
     try {
+      const formData: CategoryFormData = categorySchema.parse(data);
+
       const res = await fetch(`/api/inventory/categories/update/${editing.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formData),
       });
+
       if (!res.ok) throw new Error();
+
       await fetchCategories();
       toast({
         title: 'Category Updated',
-        description: `Category "${data.name}" updated.`,
+        description: `Category "${formData.name}" updated.`,
       });
     } catch {
       toast({
@@ -257,14 +270,10 @@ export function CategoriesPageContent() {
       </Card>
 
       <UpdateEntityModal
-        entityName="Category"
+        title="Category"
         schema={categorySchema}
         fields={categoryFields}
-        defaultValues={
-          editing
-            ? { name: editing.name }
-            : { name: '' }
-        }
+        defaultValues={editing ? { name: editing.name } : { name: '' }}
         open={isEditOpen}
         onOpenChange={(open) => {
           setIsEditOpen(open);
@@ -273,19 +282,24 @@ export function CategoriesPageContent() {
         onSubmit={handleUpdate}
       />
 
-      {isDeleteOpen && (
-        <RemoveEntityDialog
-          entityName={deleting?.name || 'Category'}
-          onConfirm={handleDelete}
-        />
-      )}
+      <RemoveEntityDialog
+        entity={deleting}
+        title={`Delete ${deleting?.name || 'Category'}?`}
+        onConfirm={handleDelete}
+        onOpenChange={(open) => {
+          setIsDeleteOpen(open);
+          if (!open) setDeleting(null);
+        }}
+      />
 
-      {isMassDeleteOpen && (
-        <RemoveEntityDialog
-          entityName={`${selectedIds.size} selected category(ies)`}
-          onConfirm={handleMassDelete}
-        />
-      )}
+      <RemoveEntityDialog
+        entity={selectedIds.size > 0}
+        title={`Delete ${selectedIds.size} selected category(ies)?`}
+        onConfirm={handleMassDelete}
+        onOpenChange={(open) => {
+          setIsMassDeleteOpen(open);
+        }}
+      />
     </div>
   );
 }

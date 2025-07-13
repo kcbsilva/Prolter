@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useForm, Path } from 'react-hook-form'; // 👈 include Path
+import { useForm, Path, DefaultValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z, ZodObject } from 'zod';
 
@@ -31,26 +31,25 @@ interface FieldConfig {
 export interface UpdateEntityModalProps<T extends ZodObject<any>> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  entity: any | null;
   title: string;
   schema: T;
   fields: FieldConfig[];
+  defaultValues: z.infer<T>;
   onSubmit: (data: z.infer<T>) => Promise<void>;
 }
 
 export function UpdateEntityModal<T extends ZodObject<any>>({
   open,
   onOpenChange,
-  entity,
   title,
   schema,
   fields,
+  defaultValues,
   onSubmit,
 }: UpdateEntityModalProps<T>) {
   const form = useForm<z.infer<T>>({
     resolver: zodResolver(schema),
-    defaultValues: entity || {},
-    values: entity || {},
+    defaultValues: defaultValues as DefaultValues<z.infer<T>>, // ✅ Fix
   });
 
   const handleSubmit = async (data: z.infer<T>) => {
@@ -71,7 +70,7 @@ export function UpdateEntityModal<T extends ZodObject<any>>({
               <FormField
                 key={field.name}
                 control={form.control}
-                name={field.name as Path<z.infer<T>>} // ✅ correct type
+                name={field.name as Path<z.infer<T>>}
                 render={({ field: f }) => (
                   <FormItem>
                     <FormLabel>{field.label}</FormLabel>
