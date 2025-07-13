@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import { ContentHeader } from '@/components/ui/content-header';
 import { RemoveEntityDialog } from '@/components/ui/modals/RemoveEntityDialog';
-import { UpdateSupplierModal } from './UpdateSupplierModal'; // Import the correct modal
+import { UpdateSupplierModal } from './UpdateSupplierModal';
 import { supplierSchema, supplierFields } from './supplierSchema';
 import { ListSuppliers } from './ListSuppliers';
 import { useEntityPage } from '@/hooks/use-entity-page';
@@ -61,21 +61,24 @@ export function SuppliersPageContent() {
         </CardContent>
       </Card>
 
-      {/* Use the correct UpdateSupplierModal component */}
-      <UpdateSupplierModal
-        supplier={editing}
-        onUpdate={onUpdate}
-        open={!!editing}
-        onOpenChange={(open) => !open && setEditing(null)}
-      />
+      {editing && (
+        <UpdateSupplierModal
+          supplier={editing}
+          onUpdate={onUpdate}
+          open={!!editing}
+          onOpenChange={(open) => !open && setEditing(null)}
+        />
+      )}
 
-      <RemoveEntityDialog
-        entity={removing}
-        title="Delete Supplier"
-        description="Are you sure you want to delete this supplier? This action cannot be undone."
-        onOpenChange={(open) => !open && setRemoving(null)}
-        onConfirm={onDelete}
-      />
+      {removing && (
+        <RemoveEntityDialog
+          entity={removing}
+          title={t('inventory_suppliers.delete_title', 'Delete Supplier')}
+          description={t('inventory_suppliers.delete_description', 'Are you sure you want to delete this supplier? This action cannot be undone.')}
+          onOpenChange={(open) => !open && setRemoving(null)}
+          onConfirm={onDelete}
+        />
+      )}
     </div>
   );
 }

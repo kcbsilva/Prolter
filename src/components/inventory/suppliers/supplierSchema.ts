@@ -9,6 +9,8 @@ export const supplierSchema = z.object({
   email: z.string().email('Valid email is required'),
 });
 
+export type SupplierFormData = z.infer<typeof supplierSchema>;
+
 export const supplierFields = [
   { name: 'businessName', label: 'Business Name', type: 'text' },
   { name: 'businessNumber', label: 'Business Number', type: 'text' },

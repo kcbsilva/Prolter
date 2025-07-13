@@ -24,13 +24,26 @@ function SupplierRow({
   supplier,
   onEdit,
   onDelete,
+  selected,
+  toggleSelected,
 }: {
   supplier: Supplier;
   onEdit: (supplier: Supplier) => void;
   onDelete: (supplier: Supplier) => void;
+  selected: string[];
+  toggleSelected: (id: string) => void;
 }) {
+  const isChecked = selected.includes(supplier.id);
   return (
-    <TableRow key={supplier.id}>
+    <TableRow key={supplier.id} data-id={supplier.id}>
+      <TableCell className="text-center">
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={() => toggleSelected(supplier.id)}
+          className="accent-orange-500"
+        />
+      </TableCell>
       <TableCell className="text-center text-xs">{supplier.id}</TableCell>
       <TableCell className="text-left text-xs">{supplier.businessName}</TableCell>
       <TableCell className="text-left text-xs">{supplier.businessNumber}</TableCell>
@@ -77,6 +90,7 @@ export function ListSuppliers({
       toggleAll={toggleAll}
       isAllSelected={isAllSelected}
       columns={[
+        { key: 'checkbox', label: '', className: 'w-6' },
         { key: 'id', label: 'ID' },
         { key: 'businessName', label: 'Business Name' },
         { key: 'businessNumber', label: 'Business Number' },
@@ -87,30 +101,32 @@ export function ListSuppliers({
       ]}
       page={1}
       totalPages={1}
-      onPageChange={() => { }}
+      onPageChange={() => {}}
       onRefresh={() => window.location.reload()}
     >
       {loading
         ? Array.from({ length: 10 }).map((_, idx) => (
-          <TableRow key={idx}>
-            {[...Array(6)].map((_, i) => (
-              <TableCell key={i}>
-                <Skeleton className="h-4 w-24" />
+            <TableRow key={idx}>
+              {[...Array(7)].map((_, i) => (
+                <TableCell key={i}>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+              ))}
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-16 ml-auto" />
               </TableCell>
-            ))}
-            <TableCell className="text-center">
-              <Skeleton className="h-4 w-16 ml-auto" />
-            </TableCell>
-          </TableRow>
-        ))
+            </TableRow>
+          ))
         : suppliers.map((supplier) => (
-          <SupplierRow
-            key={supplier.id}
-            supplier={supplier}
-            onEdit={onEdit}
-            onDelete={onDelete}
-          />
-        ))}
+            <SupplierRow
+              key={supplier.id}
+              supplier={supplier}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              selected={selected}
+              toggleSelected={toggleSelected}
+            />
+          ))}
     </PaginatedSkeletonTable>
   );
 }

@@ -25,34 +25,36 @@ interface Props {
 export function RemoveSupplierDialog({ supplier, onConfirm, onCancel }: Props) {
   const { t } = useLocale();
 
+  const supplierName = supplier?.businessName || '';
+
   return (
-    <AlertDialog open={!!supplier} onOpenChange={(open) => {
-      if (!open) onCancel();
-    }}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {t('inventory_suppliers.delete_confirm_title', 'Are you sure?')}
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-xs">
-            {t(
-              'inventory_suppliers.delete_confirm_description',
-              'This will permanently delete supplier "{businessName}". This action cannot be undone.'
-            ).replace('{businessName}', supplier?.businessName || '')}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>
-            {t('inventory_suppliers.form_cancel_button', 'Cancel')}
-          </AlertDialogCancel>
-          <AlertDialogAction
-            className={buttonVariants({ variant: 'destructive' })}
-            onClick={onConfirm}
-          >
-            {t('inventory_suppliers.delete_confirm_delete', 'Delete')}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
+    <AlertDialog open={!!supplier} onOpenChange={(open) => !open && onCancel()}>
+      {!!supplier && (
+        <AlertDialogContent aria-describedby="remove-supplier-description">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('inventory_suppliers.delete_confirm_title', 'Are you sure?')}
+            </AlertDialogTitle>
+            <AlertDialogDescription id="remove-supplier-description" className="text-xs">
+              {t(
+                'inventory_suppliers.delete_confirm_description',
+                'This will permanently delete supplier "{businessName}". This action cannot be undone.'
+              ).replace('{businessName}', supplierName)}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={onCancel}>
+              {t('inventory_suppliers.form_cancel_button', 'Cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className={buttonVariants({ variant: 'destructive' })}
+              onClick={onConfirm}
+            >
+              {t('inventory_suppliers.delete_confirm_delete', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      )}
     </AlertDialog>
   );
 }

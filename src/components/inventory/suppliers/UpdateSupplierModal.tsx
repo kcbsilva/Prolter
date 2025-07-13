@@ -21,28 +21,22 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { Supplier } from '@/types/inventory';
-
-const supplierSchema = z.object({
-  businessName: z.string().min(1, 'Business name is required'),
-  businessNumber: z.string().min(3, 'Business number is required'),
-  address: z.string().min(3, 'Address is required'),
-  email: z.string().email('Valid email is required'),
-  telephone: z.string().min(6, 'Telephone is required'),
-});
-
-export type UpdateSupplierFormData = z.infer<typeof supplierSchema>;
+import { useLocale } from '@/contexts/LocaleContext';
+import { supplierSchema, SupplierFormData } from './supplierSchema';
+import { Loader2 } from 'lucide-react';
 
 interface Props {
   supplier: Supplier | null;
-  onUpdate: (data: UpdateSupplierFormData) => Promise<void>;
+  onUpdate: (data: SupplierFormData) => Promise<void>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function UpdateSupplierModal({ supplier, onUpdate, open, onOpenChange }: Props) {
-  const form = useForm<UpdateSupplierFormData>({
+  const { t } = useLocale();
+
+  const form = useForm<SupplierFormData>({
     resolver: zodResolver(supplierSchema),
     defaultValues: {
       businessName: '',
@@ -65,95 +59,69 @@ export function UpdateSupplierModal({ supplier, onUpdate, open, onOpenChange }: 
     }
   }, [supplier, form]);
 
-  const handleSubmit = async (data: UpdateSupplierFormData) => {
+  const handleSubmit = async (data: SupplierFormData) => {
     await onUpdate(data);
     form.reset();
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={(isOpen) => !form.formState.isSubmitting && onOpenChange(isOpen)}>
+      <DialogContent aria-describedby="update-supplier-description" className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-sm">Edit Supplier</DialogTitle>
-          <DialogDescription className="text-xs">Update supplier details.</DialogDescription>
+          <DialogTitle className="text-sm">
+            {t('inventory_suppliers.edit_title', 'Edit Supplier')}
+          </DialogTitle>
+          <DialogDescription id="update-supplier-description" className="text-xs">
+            {t('inventory_suppliers.edit_description', 'Update supplier details.')}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="grid gap-4 py-4">
-            <FormField
-              control={form.control}
-              name="businessName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Business Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Business Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="businessNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Business Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="CNPJ / Registration #" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Full Address" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="Email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="telephone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Telephone</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Telephone" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {[
+              { name: 'businessName', label: 'Business Name', placeholder: 'Business Name' },
+              { name: 'businessNumber', label: 'Business Number', placeholder: 'CNPJ / Reg #' },
+              { name: 'address', label: 'Address', placeholder: 'Full Address' },
+              { name: 'email', label: 'Email', placeholder: 'Email', type: 'email' },
+              { name: 'telephone', label: 'Telephone', placeholder: 'Telephone' },
+            ].map((field) => (
+              <FormField
+                key={field.name}
+                control={form.control}
+                name={field.name as keyof SupplierFormData}
+                render={({ field: f }) => (
+                  <FormItem>
+                    <FormLabel>{t(`inventory_suppliers.${field.name}`, field.label)}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={field.placeholder}
+                        type={field.type || 'text'}
+                        {...f}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
 
             <div className="flex justify-end gap-2 mt-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={form.formState.isSubmitting}
+              >
+                {t('inventory_suppliers.form_cancel_button', 'Cancel')}
               </Button>
-              <Button type="submit">Update Supplier</Button>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {form.formState.isSubmitting
+                  ? t('inventory_suppliers.saving', 'Saving...')
+                  : t('inventory_suppliers.update_button', 'Update Supplier')}
+              </Button>
             </div>
           </form>
         </Form>
