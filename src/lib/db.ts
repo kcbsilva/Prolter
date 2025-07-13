@@ -14,4 +14,6 @@ const pool = new Pool({
 
 export const query = (text: string, params?: any[]) => pool.query(text, params);
 export { pool };
+
+// ✅ This fixes the error:
 export const db = { query, pool };
