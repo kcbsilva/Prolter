@@ -10,15 +10,30 @@ export async function PUT(req: Request, { params }: Params) {
   const { id } = params;
 
   try {
-    const { businessName, email, telephone } = await req.json();
+    const {
+      businessName,
+      businessNumber,
+      address,
+      telephone,
+      email,
+    } = await req.json();
 
-    if (!businessName || !email || !telephone) {
+    if (!businessName || !businessNumber || !address || !telephone || !email) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
     await db.query(
-      `UPDATE inventory_suppliers SET business_name = $1, email = $2, telephone = $3 WHERE id = $4`,
-      [businessName, email, telephone, id]
+      `
+      UPDATE inventory_suppliers
+      SET
+        business_name = $1,
+        business_number = $2,
+        address = $3,
+        telephone = $4,
+        email = $5
+      WHERE id = $6
+      `,
+      [businessName, businessNumber, address, telephone, email, id]
     );
 
     return NextResponse.json({ success: true });

@@ -4,15 +4,24 @@ import { db } from '@/lib/db';
 
 export async function POST(req: Request) {
   try {
-    const { businessName, email, telephone } = await req.json();
+    const {
+      businessName,
+      businessNumber,
+      address,
+      telephone,
+      email,
+    } = await req.json();
 
-    if (!businessName || !email || !telephone) {
+    // Basic field validation (you can expand this if needed)
+    if (!businessName || !businessNumber || !address || !telephone || !email) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
     await db.query(
-      `INSERT INTO inventory_suppliers (business_name, email, telephone) VALUES ($1, $2, $3)`,
-      [businessName, email, telephone]
+      `INSERT INTO inventory_suppliers 
+        (business_name, business_number, address, telephone, email)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [businessName, businessNumber, address, telephone, email]
     );
 
     return NextResponse.json({ success: true });
