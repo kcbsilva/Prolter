@@ -3,19 +3,20 @@
 
 import * as React from 'react';
 import { Eye, Trash2, Edit } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { PaginatedTable } from '@/components/ui/table/PaginatedTable';
 import { usePagination } from '@/hooks/usePagination';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { PaginatedTable } from '@/components/ui/table/PaginatedTable';
+import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
 
 interface DatabaseEntry {
   name: string;
   owner: string;
   encoding: string;
-  status?: 'active' | 'inactive' | 'maintenance';
   size?: string;
+  status?: 'active' | 'inactive' | 'maintenance';
   created?: string;
 }
 
@@ -27,18 +28,24 @@ export function ListDatabases() {
 
   const fetchDatabases = async () => {
     setLoading(true);
-    setTimeout(() => {
-      const fakeData = Array.from({ length: 100 }, (_, i) => ({
-        name: `database_${i + 1}`,
-        owner: `user_${i + 1}`,
-        encoding: 'UTF8',
-        status: ['active', 'inactive', 'maintenance'][i % 3] as 'active' | 'inactive' | 'maintenance',
-        size: `${Math.floor(Math.random() * 1000)}MB`,
-        created: new Date(2021, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString(),
-      }));
-      setDatabases(fakeData);
+    try {
+      const res = await fetch('/api/settings/postgres/databases');
+      const data = await res.json();
+      setDatabases(
+        data.map((db: any) => ({
+          name: db.name,
+          owner: db.owner,
+          encoding: db.encoding,
+          size: db.size,
+          status: 'active', // Placeholder; update if you implement real logic
+          created: '', // Optional: if available in data
+        }))
+      );
+    } catch (error) {
+      console.error('Failed to fetch databases:', error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   React.useEffect(() => {
@@ -67,17 +74,31 @@ export function ListDatabases() {
     }
   };
 
+  const columns = [
+    { key: 'name', label: 'Database Name' },
+    { key: 'owner', label: 'Owner' },
+    { key: 'encoding', label: 'Encoding' },
+    { key: 'size', label: 'Size' },
+    { key: 'status', label: 'Status' },
+    { key: 'created', label: 'Created' },
+  ];
+
+  if (loading) {
+    return (
+      <PaginatedSkeletonTable
+        columns={columns}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+        onRefresh={fetchDatabases}
+        entriesCount={0} children={undefined}      />
+    );
+  }
+
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <PaginatedTable<DatabaseEntry>
-        columns={[
-          { key: 'name', label: 'Database Name' },
-          { key: 'owner', label: 'Owner' },
-          { key: 'encoding', label: 'Encoding' },
-          { key: 'size', label: 'Size' },
-          { key: 'status', label: 'Status' },
-          { key: 'created', label: 'Created' },
-        ]}
+        columns={columns}
         data={currentData}
         page={page}
         totalPages={totalPages}
@@ -85,11 +106,8 @@ export function ListDatabases() {
         onRefresh={fetchDatabases}
         loading={loading}
         totalEntries={filteredData.length}
-        renderRow={(db: DatabaseEntry, i: number) => (
-          <TableRow 
-            key={db.name} 
-            className="hover:bg-gray-50 transition-colors border-b border-gray-100"
-          >
+        renderRow={(db, i) => (
+          <TableRow key={db.name} className="hover:bg-gray-50 transition-colors border-b border-gray-100">
             <TableCell className="text-center py-2">
               <input type="checkbox" className="rounded" />
             </TableCell>
@@ -113,25 +131,13 @@ export function ListDatabases() {
             </TableCell>
             <TableCell className="py-2 text-center">
               <div className="flex items-center gap-2 justify-center">
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-6 w-6 p-0 hover:bg-gray-100"
-                >
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-gray-100">
                   <Eye className="h-3 w-3" />
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-6 w-6 p-0 hover:bg-gray-100"
-                >
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-gray-100">
                   <Edit className="h-3 w-3" />
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="ghost" 
-                  className="h-6 w-6 p-0 hover:bg-red-100 text-red-600"
-                >
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0 hover:bg-red-100 text-red-600">
                   <Trash2 className="h-3 w-3" />
                 </Button>
               </div>
