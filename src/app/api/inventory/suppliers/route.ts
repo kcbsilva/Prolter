@@ -1,6 +1,15 @@
 // /api/inventory/suppliers/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { z } from 'zod';
+
+const supplierInputSchema = z.object({
+  businessName: z.string().min(1),
+  businessNumber: z.string().min(1),
+  address: z.string().min(1),
+  telephone: z.string().min(1),
+  email: z.string().email(),
+});
 
 export async function GET() {
   try {
@@ -32,20 +41,35 @@ export async function GET() {
     return NextResponse.json(suppliers);
   } catch (error) {
     console.error('[SUPPLIERS_GET_ERROR]', error);
-    return NextResponse.json({ error: 'Failed to fetch suppliers' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch suppliers' },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { businessName, businessNumber, address, telephone, email } = body;
 
-    const result = await db.query(`
+    const parse = supplierInputSchema.safeParse(body);
+    if (!parse.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: parse.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const { businessName, businessNumber, address, telephone, email } = parse.data;
+
+    const result = await db.query(
+      `
       INSERT INTO inventory_suppliers (business_name, business_number, address, telephone, email)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING *
-    `, [businessName, businessNumber, address, telephone, email]);
+    `,
+      [businessName, businessNumber, address, telephone, email]
+    );
 
     const supplier = {
       id: result.rows[0].id.toString(),
@@ -61,6 +85,9 @@ export async function POST(request: Request) {
     return NextResponse.json(supplier);
   } catch (error) {
     console.error('[SUPPLIERS_POST_ERROR]', error);
-    return NextResponse.json({ error: 'Failed to create supplier' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create supplier' },
+      { status: 500 }
+    );
   }
 }
