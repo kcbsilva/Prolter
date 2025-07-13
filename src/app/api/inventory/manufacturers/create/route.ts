@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     const result = await db.query(
       `
-      INSERT INTO manufacturers (
+      INSERT INTO inventory_manufacturers (
         id, business_name, business_number, address, telephone, email
       ) VALUES (
         gen_random_uuid(), $1, $2, $3, $4, $5
