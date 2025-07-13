@@ -31,12 +31,12 @@ function SupplierRow({
 }) {
   return (
     <TableRow key={supplier.id}>
-      <TableCell className="text-xs">{supplier.id}</TableCell>
-      <TableCell className="text-xs">{supplier.businessName}</TableCell>
-      <TableCell className="text-xs">{supplier.businessNumber}</TableCell>
-      <TableCell className="text-xs">{supplier.address}</TableCell>
-      <TableCell className="text-xs">{supplier.email}</TableCell>
-      <TableCell className="text-xs">{supplier.telephone}</TableCell>
+      <TableCell className="text-center text-xs">{supplier.id}</TableCell>
+      <TableCell className="text-left text-xs">{supplier.businessName}</TableCell>
+      <TableCell className="text-left text-xs">{supplier.businessNumber}</TableCell>
+      <TableCell className="text-left text-xs">{supplier.address}</TableCell>
+      <TableCell className="text-left text-xs">{supplier.email}</TableCell>
+      <TableCell className="text-left text-xs">{supplier.telephone}</TableCell>
       <TableCell className="text-center space-x-1">
         <Button
           variant="ghost"
@@ -87,30 +87,30 @@ export function ListSuppliers({
       ]}
       page={1}
       totalPages={1}
-      onPageChange={() => {}}
+      onPageChange={() => { }}
       onRefresh={() => window.location.reload()}
     >
       {loading
         ? Array.from({ length: 10 }).map((_, idx) => (
-            <TableRow key={idx}>
-              {[...Array(6)].map((_, i) => (
-                <TableCell key={i}>
-                  <Skeleton className="h-4 w-24" />
-                </TableCell>
-              ))}
-              <TableCell className="text-center">
-                <Skeleton className="h-4 w-16 ml-auto" />
+          <TableRow key={idx}>
+            {[...Array(6)].map((_, i) => (
+              <TableCell key={i}>
+                <Skeleton className="h-4 w-24" />
               </TableCell>
-            </TableRow>
-          ))
+            ))}
+            <TableCell className="text-center">
+              <Skeleton className="h-4 w-16 ml-auto" />
+            </TableCell>
+          </TableRow>
+        ))
         : suppliers.map((supplier) => (
-            <SupplierRow
-              key={supplier.id}
-              supplier={supplier}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+          <SupplierRow
+            key={supplier.id}
+            supplier={supplier}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
     </PaginatedSkeletonTable>
   );
 }
