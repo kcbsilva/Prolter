@@ -33,6 +33,7 @@ function SupplierRow({
     <TableRow key={supplier.id}>
       <TableCell className="text-xs">{supplier.businessName}</TableCell>
       <TableCell className="text-xs">{supplier.businessNumber}</TableCell>
+      <TableCell className="text-xs">{supplier.address}</TableCell> {/* ✅ New field */}
       <TableCell className="text-xs text-muted-foreground">{supplier.email}</TableCell>
       <TableCell className="text-xs">{supplier.telephone}</TableCell>
       <TableCell className="text-center space-x-1">
@@ -77,6 +78,7 @@ export function ListSuppliers({
       columns={[
         { key: 'businessName', label: 'Business Name' },
         { key: 'businessNumber', label: 'Business Number' },
+        { key: 'address', label: 'Address' }, // ✅ Add this
         { key: 'email', label: 'Email' },
         { key: 'telephone', label: 'Telephone' },
         { key: 'actions', label: 'Actions', className: 'text-center' },
