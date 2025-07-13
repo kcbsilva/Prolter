@@ -11,7 +11,7 @@ const monitoredServices = [
   { id: 'nodejs', nameKey: 'service_nodejs', systemd: null },
   { id: 'postgresql', nameKey: 'service_postgresql', systemd: 'postgresql' },
   { id: 'strongswan', nameKey: 'service_strongswan', systemd: 'strongswan' },
-  { id: 'sshd', nameKey: 'service_sshd', systemd: 'sshd' },
+  { id: 'sshd', nameKey: 'service_sshd', systemd: 'ssh' },
   { id: 'prolter', nameKey: 'service_prolter', systemd: 'prolter' },
 ];
 

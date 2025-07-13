@@ -1,15 +1,13 @@
-// ✅ FRONTEND: src/components/pages/SystemMonitor/SystemChecks.tsx
+// src/components/pages/SystemMonitor/SystemChecks.tsx
 'use client';
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Power, ArrowUpCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useRouter } from 'next/navigation';
 import { UpdateProlterModal } from '@/components/settings/system/UpdateProlterModal';
 
 interface MonitoredService {
@@ -28,9 +26,26 @@ interface Props {
 export function SystemChecks({ services, setServices, isLoading }: Props) {
   const { t } = useLocale();
   const { toast } = useToast();
-  const router = useRouter();
 
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
+  const [isTogglingDebug, setIsTogglingDebug] = useState(false);
+
+  useEffect(() => {
+    async function fetchDebugStatus() {
+      try {
+        const res = await fetch('/api/debug/status');
+        const data = await res.json();
+        setDebugMode(data.debug);
+      } catch {
+        setDebugMode(false);
+      }
+    }
+
+    fetchDebugStatus();
+    const interval = setInterval(fetchDebugStatus, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleRestartService = async (serviceId: string) => {
     toast({
@@ -119,6 +134,38 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
     }
   };
 
+  const handleToggleDebug = async () => {
+    setIsTogglingDebug(true);
+    try {
+      const res = await fetch('/api/debug/toggle', { method: 'POST' });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Unknown error');
+
+      setDebugMode(data.status === 'started');
+      toast({
+        title: `Debug ${data.status === 'started' ? 'Enabled' : 'Stopped'}`,
+        description: `Prolter debug mode is now ${data.status}`,
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Failed to toggle debug mode',
+        description: err.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsTogglingDebug(false);
+    }
+  };
+
+  const sortedServices = [...services].sort((a, b) => {
+    if (a.id === 'ubuntu') return -1;
+    if (b.id === 'ubuntu') return 1;
+    if (a.id === 'prolter') return 1;
+    if (b.id === 'prolter') return -1;
+    return 0;
+  });
+
   return (
     <>
       <Card className="lg:col-span-1">
@@ -127,13 +174,23 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {services.map(service => (
+            {sortedServices.map(service => (
               <div
                 key={service.id}
                 className="flex items-center justify-between p-2 border rounded-md hover:bg-muted/50 transition-colors"
               >
                 <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${service.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      service.id === 'prolter'
+                        ? debugMode
+                          ? 'bg-green-500'
+                          : 'bg-red-500'
+                        : service.status === 'Active'
+                        ? 'bg-green-500'
+                        : 'bg-red-500'
+                    }`}
+                  />
                   <span className="text-xs font-medium">{t(service.nameKey)}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -157,6 +214,17 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
                     >
                       <ArrowUpCircle className="mr-1.5 h-3 w-3" />
                       {t('service_action_update')}
+                    </Button>
+                  )}
+                  {service.id === 'prolter' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={handleToggleDebug}
+                      disabled={isTogglingDebug}
+                    >
+                      {debugMode ? 'Stop Debug' : 'Start Debug'}
                     </Button>
                   )}
                 </div>
