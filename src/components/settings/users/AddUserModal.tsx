@@ -58,12 +58,17 @@ export function AddUserModal({ onSuccess }: AddUserModalProps) {
   const onSubmit = async (data: AddUserFormData) => {
     try {
       const hashedPassword = await bcrypt.hash(data.password, 10);
-      await createUser({
-        email: data.email,
-        full_name: data.full_name,
-        role: data.role,
-        password: hashedPassword,
+      await fetch('/api/settings/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          full_name: data.full_name,
+          password: hashedPassword,
+          role: data.role,
+        }),
       });
+
       toast({ title: 'User created successfully.' });
       setOpen(false);
       onSuccess();
