@@ -23,6 +23,7 @@ export function UpdateProlterModal({ open, onOpenChange }: UpdateProlterModalPro
   const [currentStep, setCurrentStep] = React.useState(0);
   const [errors, setErrors] = React.useState<string | null>(null);
   const [isUpdating, setIsUpdating] = React.useState(false);
+  const [rawOutput, setRawOutput] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!open) return;
@@ -30,26 +31,46 @@ export function UpdateProlterModal({ open, onOpenChange }: UpdateProlterModalPro
     const runUpdateSteps = async () => {
       setIsUpdating(true);
       setErrors(null);
+      setRawOutput(null);
       setCurrentStep(0);
 
       for (let i = 0; i < updateSteps.length; i++) {
         const step = updateSteps[i];
         try {
           const res = await fetch(`/api/system/update/step/${step.id}`, { method: 'POST' });
+
           if (!res.ok) {
-            const data = await res.json();
-            setErrors(data?.error || 'Unknown error');
+            // Try to parse JSON, fall back to raw text (for <html> errors)
+            let errorMessage;
+            try {
+              const data = await res.json();
+              errorMessage = data?.error || 'Unknown JSON error';
+              setRawOutput(JSON.stringify(data, null, 2));
+            } catch {
+              const rawText = await res.text();
+              errorMessage = rawText.includes('<!DOCTYPE')
+                ? 'Received HTML instead of JSON. The API route may be missing or broken.'
+                : rawText;
+              setRawOutput(rawText);
+            }
+
+            setErrors(`${step.label} failed:\n${errorMessage}`);
             break;
           }
+
+          const data = await res.json();
+          setRawOutput(data?.output || null);
+
           setCurrentStep(i + 1);
           await new Promise(res => setTimeout(res, 600));
         } catch (err: any) {
-          setErrors(err.message);
+          setErrors(`Fetch error: ${err.message}`);
           break;
         }
       }
 
       setIsUpdating(false);
+
       if (currentStep === updateSteps.length - 1) {
         setTimeout(() => router.push('/login'), 1500);
       }
@@ -76,14 +97,23 @@ export function UpdateProlterModal({ open, onOpenChange }: UpdateProlterModalPro
               </li>
             ))}
           </ul>
+
+          {rawOutput && (
+            <pre className="text-xs bg-muted p-2 rounded max-h-60 overflow-auto whitespace-pre-wrap">
+              {rawOutput}
+            </pre>
+          )}
+
           {errors && (
-            <div className="text-red-600 text-sm border border-red-500 p-2 rounded">
+            <div className="text-red-600 text-sm border border-red-500 p-2 rounded whitespace-pre-wrap">
               ⚠️ Update failed: {errors}
             </div>
           )}
+
           {!errors && currentStep === updateSteps.length && (
             <div className="text-green-600 text-sm">✅ Update complete. Redirecting...</div>
           )}
+
           <div className="flex justify-end">
             <Button onClick={() => onOpenChange(false)} disabled={isUpdating}>
               Close
