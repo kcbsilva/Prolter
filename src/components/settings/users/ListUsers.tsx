@@ -33,24 +33,25 @@ export function ListUsers({
 
   const [page, setPage] = React.useState(1);
   const entriesPerPage = 10;
-  const totalPages = Math.ceil(userProfiles.length / entriesPerPage);
+  const totalPages = Math.max(1, Math.ceil(userProfiles.length / entriesPerPage));
+  const currentData = userProfiles.slice(
+    (page - 1) * entriesPerPage,
+    page * entriesPerPage
+  );
 
   const renderBadge = (role: string) => {
     const variant = role === 'admin' ? 'destructive' : 'secondary';
     return <Badge variant={variant}>{role}</Badge>;
   };
 
-  const currentData = userProfiles.slice(
-    (page - 1) * entriesPerPage,
-    page * entriesPerPage
-  );
-
   const renderRows = () =>
     currentData.map((user) => (
       <tr key={user.id} className="border-b">
         <td className="px-4 py-2">{user.email}</td>
         <td className="px-4 py-2">{user.full_name}</td>
-        <td className="px-4 py-2">{renderBadge(String(user.role?.name || user.role))}</td>
+        <td className="px-4 py-2">
+          {renderBadge(user.role?.name || 'Unassigned')}
+        </td>
         <td className="px-4 py-2 text-right">
           <div className="flex justify-end gap-2">
             <Button size="sm" variant="outline" onClick={() => onEditClick(user)}>
@@ -62,23 +63,24 @@ export function ListUsers({
       </tr>
     ));
 
+  if (error) {
+    return <p className="text-sm text-red-500 px-4 py-2">Error loading users: {error}</p>;
+  }
+
+  if (!isLoading && userProfiles.length === 0) {
+    return <p className="text-center text-muted-foreground py-4">No users found.</p>;
+  }
+
   return (
-    <>
-      {error && (
-        <div className="text-sm text-red-500 px-4 py-2">
-          Error loading users: {error}
-        </div>
-      )}
-      <PaginatedSkeletonTable
-        columns={columns}
-        page={page}
-        totalPages={totalPages}
-        entriesCount={userProfiles.length}
-        onPageChange={setPage}
-        onRefresh={onRefresh || (() => {})}
-      >
-        {!isLoading && currentData.length > 0 ? renderRows() : null}
-      </PaginatedSkeletonTable>
-    </>
+    <PaginatedSkeletonTable
+      columns={columns}
+      page={page}
+      totalPages={totalPages}
+      entriesCount={userProfiles.length}
+      onPageChange={setPage}
+      onRefresh={onRefresh || (() => {})}
+    >
+      {isLoading ? null : renderRows()}
+    </PaginatedSkeletonTable>
   );
 }
