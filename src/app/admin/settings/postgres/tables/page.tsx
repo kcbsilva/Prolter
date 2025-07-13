@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Table2, PlusCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { PaginatedSkeletonTable } from '@/components/ui/tables/PaginatedSkeletonTable';
+import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
 
 interface Database {
   id: string;
