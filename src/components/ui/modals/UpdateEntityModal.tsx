@@ -49,8 +49,14 @@ export function UpdateEntityModal<T extends ZodObject<any>>({
 }: UpdateEntityModalProps<T>) {
   const form = useForm<z.infer<T>>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues as DefaultValues<z.infer<T>>, // ✅ Fix
+    defaultValues: defaultValues as DefaultValues<z.infer<T>>,
+    shouldUnregister: true,
   });
+
+  // ✅ Reset form when defaultValues change
+  React.useEffect(() => {
+    form.reset(defaultValues as DefaultValues<z.infer<T>>);
+  }, [defaultValues, form]);
 
   const handleSubmit = async (data: z.infer<T>) => {
     await onSubmit(data);
