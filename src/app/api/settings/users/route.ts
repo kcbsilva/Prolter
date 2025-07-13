@@ -1,5 +1,5 @@
 // src/app/api/settings/users/route.ts
-import { createUser } from '@/services/postgres/users';
+import { createUser, getUserProfiles } from '@/services/postgres/users';
 import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
@@ -24,7 +24,17 @@ export async function POST(req: Request) {
     const user = await createUser(parsed.data);
     return Response.json(user);
   } catch (err) {
-    console.error('POST /admin/settings/users failed:', err);
+    console.error('POST /settings/users failed:', err);
+    return new Response('Internal Server Error', { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const users = await getUserProfiles();
+    return Response.json(users);
+  } catch (err) {
+    console.error('GET /settings/users failed:', err);
     return new Response('Internal Server Error', { status: 500 });
   }
 }
