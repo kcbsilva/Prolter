@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription, // ✅ Add this
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,6 +82,9 @@ export function AddUserModal({ onSuccess }: AddUserModalProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
+          <DialogDescription>
+            Fill in the user’s email, name, role, and password to create an account.
+          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -109,9 +113,7 @@ export function AddUserModal({ onSuccess }: AddUserModalProps) {
             <Label>Confirm Password</Label>
             <Input type="password" {...form.register('confirmPassword')} />
           </div>
-          <Button type="submit">
-            Create User
-          </Button>
+          <Button type="submit">Create User</Button>
         </form>
       </DialogContent>
     </Dialog>
