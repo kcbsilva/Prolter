@@ -23,7 +23,7 @@ export async function PUT(req: Request, { params }: Params) {
 
     const result = await db.query(
       `
-      UPDATE manufacturers
+      UPDATE inventory_manufacturers
       SET business_name = $1,
           business_number = $2,
           address = $3,
@@ -46,7 +46,17 @@ export async function PUT(req: Request, { params }: Params) {
       return NextResponse.json({ error: 'Manufacturer not found' }, { status: 404 });
     }
 
-    return NextResponse.json(result.rows[0]);
+    const row = result.rows[0];
+
+    return NextResponse.json({
+      id: row.id,
+      businessName: row.business_name,
+      businessNumber: row.business_number,
+      address: row.address,
+      telephone: row.telephone,
+      email: row.email,
+      createdAt: row.created_at,
+    });
   } catch (error) {
     console.error('[UPDATE_MANUFACTURER_ERROR]', error);
     return NextResponse.json({ error: 'Failed to update manufacturer' }, { status: 500 });

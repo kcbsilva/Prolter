@@ -34,7 +34,17 @@ export async function POST(req: Request) {
       ]
     );
 
-    return NextResponse.json(result.rows[0]);
+    const row = result.rows[0];
+
+    return NextResponse.json({
+      id: row.id,
+      businessName: row.business_name,
+      businessNumber: row.business_number,
+      address: row.address,
+      telephone: row.telephone,
+      email: row.email,
+      createdAt: row.created_at,
+    });
   } catch (error) {
     console.error('[CREATE_MANUFACTURER_ERROR]', error);
     return NextResponse.json({ error: 'Failed to create manufacturer' }, { status: 500 });

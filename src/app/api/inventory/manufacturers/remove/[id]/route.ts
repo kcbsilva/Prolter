@@ -11,7 +11,7 @@ export async function DELETE(req: Request, { params }: Params) {
     const id = params.id;
 
     const result = await db.query(
-      `DELETE FROM manufacturers WHERE id = $1 RETURNING *`,
+      `DELETE FROM inventory_manufacturers WHERE id = $1 RETURNING *`,
       [id]
     );
 
@@ -19,7 +19,17 @@ export async function DELETE(req: Request, { params }: Params) {
       return NextResponse.json({ error: 'Manufacturer not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: 'Manufacturer deleted' });
+    const row = result.rows[0];
+
+    return NextResponse.json({
+      id: row.id,
+      businessName: row.business_name,
+      businessNumber: row.business_number,
+      address: row.address,
+      telephone: row.telephone,
+      email: row.email,
+      createdAt: row.created_at,
+    });
   } catch (error) {
     console.error('[DELETE_MANUFACTURER_ERROR]', error);
     return NextResponse.json({ error: 'Failed to delete manufacturer' }, { status: 500 });
