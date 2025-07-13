@@ -59,19 +59,20 @@ export function UpdateManufacturerModal({
       telephone: '',
       email: '',
     },
+    shouldUnregister: true, // ✅ helps avoid stale values when switching modals
   });
 
   useEffect(() => {
-    if (manufacturer) {
+    if (manufacturer && open) {
       form.reset({
-        businessName: manufacturer.businessName,
-        businessNumber: manufacturer.businessNumber,
-        address: manufacturer.address,
-        telephone: manufacturer.telephone,
-        email: manufacturer.email,
+        businessName: manufacturer.businessName || '',
+        businessNumber: manufacturer.businessNumber || '',
+        address: manufacturer.address || '',
+        telephone: manufacturer.telephone || '',
+        email: manufacturer.email || '',
       });
     }
-  }, [manufacturer, form]);
+  }, [manufacturer, open, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

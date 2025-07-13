@@ -133,8 +133,15 @@ export function ManufacturersPageContent() {
       const res = await fetch(`/api/inventory/manufacturers/remove/${deleting.id}`, {
         method: 'DELETE',
       });
+
       if (!res.ok) throw new Error();
+
+      // 👇 Option A: re-fetch the list
       await fetchManufacturers();
+
+      // 👇 Option B: manually filter out deleted item (if list is small)
+      // setManufacturers((prev) => prev.filter((m) => m.id !== deleting.id));
+
       toast({
         title: 'Manufacturer Deleted',
         description: `Manufacturer "${deleting.businessName}" deleted.`,
@@ -266,8 +273,8 @@ export function ManufacturersPageContent() {
         </CardContent>
       </Card>
 
-      <UpdateEntityModal
-        entityName="Manufacturer"
+      <UpdateEntityModal<typeof manufacturerSchema>
+        title="Manufacturer"
         schema={manufacturerSchema}
         fields={manufacturerFields}
         defaultValues={editing ? {
@@ -291,17 +298,29 @@ export function ManufacturersPageContent() {
         onSubmit={handleUpdate}
       />
 
-      {isDeleteOpen && (
+
+      {isDeleteOpen && deleting && (
         <RemoveEntityDialog
-          entityName={deleting?.businessName || 'Manufacturer'}
+          entity={deleting}
+          title={`Delete ${deleting.businessName}?`}
+          description="This will permanently remove the manufacturer from the system."
           onConfirm={handleDelete}
+          onOpenChange={(open) => {
+            setIsDeleteOpen(open);
+            if (!open) setDeleting(null);
+          }}
         />
       )}
 
       {isMassDeleteOpen && (
         <RemoveEntityDialog
-          entityName={`${selectedIds.size} selected manufacturer(s)`}
+          entity={true}
+          title={`Delete ${selectedIds.size} manufacturer(s)?`}
+          description="This will permanently remove the selected manufacturers from the system."
           onConfirm={handleMassDelete}
+          onOpenChange={(open) => {
+            setIsMassDeleteOpen(open);
+          }}
         />
       )}
     </div>
