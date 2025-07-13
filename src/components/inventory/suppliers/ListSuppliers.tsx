@@ -85,26 +85,26 @@ export function ListSuppliers({
       ]}
       page={1}
       totalPages={1}
-      onPageChange={() => {}}
+      onPageChange={() => { }}
       onRefresh={() => window.location.reload()}
     >
       {loading
         ? Array.from({ length: 10 }).map((_, idx) => (
-            <TableRow key={idx}>
-              {[...Array(4)].map((_, i) => (
-                <TableCell key={i}><Skeleton className="h-4 w-24" /></TableCell>
-              ))}
-              <TableCell className="text-center"><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
-            </TableRow>
-          ))
+          <TableRow key={idx}>
+            {[...Array(5)].map((_, i) => ( // changed from 4 to 5
+              <TableCell key={i}><Skeleton className="h-4 w-24" /></TableCell>
+            ))}
+            <TableCell className="text-center"><Skeleton className="h-4 w-16 ml-auto" /></TableCell>
+          </TableRow>
+        ))
         : suppliers.map((supplier) => (
-            <SupplierRow
-              key={supplier.id}
-              supplier={supplier}
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
-          ))}
+          <SupplierRow
+            key={supplier.id}
+            supplier={supplier}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
     </PaginatedSkeletonTable>
   );
 }
