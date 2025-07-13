@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     }
 
     await db.query(
-      `INSERT INTO suppliers (business_name, email, telephone) VALUES ($1, $2, $3)`,
+      `INSERT INTO inventory_suppliers (business_name, email, telephone) VALUES ($1, $2, $3)`,
       [businessName, email, telephone]
     );
 

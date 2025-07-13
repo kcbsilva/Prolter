@@ -17,7 +17,7 @@ export async function PUT(req: Request, { params }: Params) {
     }
 
     await db.query(
-      `UPDATE suppliers SET business_name = $1, email = $2, telephone = $3 WHERE id = $4`,
+      `UPDATE inventory_suppliers SET business_name = $1, email = $2, telephone = $3 WHERE id = $4`,
       [businessName, email, telephone, id]
     );
 

@@ -406,3 +406,14 @@ CREATE TABLE inventory_manufacturers (
   email TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE inventory_suppliers (
+  id SERIAL PRIMARY KEY,
+  business_name VARCHAR(255) NOT NULL,
+  business_number VARCHAR(50),
+  address TEXT,
+  telephone VARCHAR(50),
+  email VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

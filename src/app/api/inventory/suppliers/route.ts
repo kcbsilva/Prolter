@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 
 export async function GET() {
   try {
-    const result = await db.query(`SELECT * FROM suppliers ORDER BY created_at DESC`);
+    const result = await db.query(`SELECT * FROM inventory_suppliers ORDER BY created_at DESC`);
     return NextResponse.json(result.rows);
   } catch (error) {
     console.error('[SUPPLIERS_GET_ERROR]', error);

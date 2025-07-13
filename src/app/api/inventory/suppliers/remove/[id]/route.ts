@@ -10,7 +10,7 @@ export async function DELETE(req: Request, { params }: Params) {
   const { id } = params;
 
   try {
-    await db.query(`DELETE FROM suppliers WHERE id = $1`, [id]);
+    await db.query(`DELETE FROM inventory_suppliers WHERE id = $1`, [id]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[SUPPLIER_DELETE_ERROR]', error);
