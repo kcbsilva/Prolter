@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Table2, PlusCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Skeleton } from '@/components/ui/skeleton';
+import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
 
 interface Database {
   id: string;
@@ -85,7 +85,7 @@ export default function PostgresTablesPage() {
 
       <div className="w-full max-w-sm">
         {loadingDbs ? (
-          <Skeleton className="h-10 w-full rounded-md" />
+          <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
         ) : (
           <Select value={selectedDb} onValueChange={setSelectedDb}>
             <SelectTrigger>
@@ -113,23 +113,36 @@ export default function PostgresTablesPage() {
               : t('postgres_tables.select_db_prompt', 'Please select a database to view its tables.')}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {loadingTables ? (
-            <div className="flex flex-col gap-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-4 w-1/2" />
-              ))}
-            </div>
+            <PaginatedSkeletonTable
+              columns={[{ key: 'name', label: 'Table Name' }]}
+              page={1}
+              totalPages={1}
+              onPageChange={() => { }}
+              onRefresh={() => { }}
+            >
+              <></>
+            </PaginatedSkeletonTable>
           ) : tables.length > 0 ? (
-            <ul className="list-disc list-inside text-sm text-muted-foreground">
-              {tables.map((table) => (
-                <li key={table}>{table}</li>
-              ))}
-            </ul>
+            <table className="w-full text-sm">
+              <thead className="bg-muted text-muted-foreground">
+                <tr>
+                  <th className="text-left px-4 py-2">{t('postgres_tables.table_name', 'Table Name')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tables.map((table) => (
+                  <tr key={table} className="border-t">
+                    <td className="px-4 py-2">{table}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           ) : (
-            <p className="text-xs text-muted-foreground">
+            <div className="text-xs text-muted-foreground px-4 py-6">
               {t('postgres_tables.no_tables_found', 'No tables found in this database.')}
-            </p>
+            </div>
           )}
         </CardContent>
       </Card>
