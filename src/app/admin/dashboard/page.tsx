@@ -6,7 +6,7 @@ import CustomizableDashboard from '@/components/dashboard/sections/CustomizableD
 
 export default function AdminDashboardPage() {
   return (
-    <div className="p-4">
+    <div className="p-1">
       <CustomizableDashboard />
     </div>
   );

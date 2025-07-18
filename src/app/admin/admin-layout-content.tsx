@@ -53,7 +53,7 @@ export function AppLayoutContent({ children }: { children: React.ReactNode }) {
 
         {/* Main content area */}
         <SidebarInset noMargin={isMapPage}>
-          <div className={isMapPage ? "p-0 h-full overflow-y-auto" : "p-2 md:p-4 lg:p-6 h-full overflow-y-auto"}>
+          <div className={isMapPage ? "p-1 h-full overflow-y-auto" : "p-0 md:p-4 lg:p-0 h-full overflow-y-auto"}>
             {children}
           </div>
         </SidebarInset>

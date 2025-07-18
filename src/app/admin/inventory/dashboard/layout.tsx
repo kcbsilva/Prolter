@@ -8,7 +8,7 @@ import { inventoryCategories, manufacturers, suppliers, products } from '@/data/
 export default function InventoryDashboardPage() {
   const { t } = useLocale();
   return (
-    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4">
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">{t('inventory_dashboard.total_categories', 'Total Categories')}</CardTitle>

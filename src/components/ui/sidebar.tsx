@@ -1,15 +1,15 @@
 // src/components/ui/sidebar.tsx
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import NextLink, { type LinkProps as NextLinkProps } from "next/link";
-import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
-import { ChevronDown, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { usePathname } from 'next/navigation';
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { ChevronDown, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const sidebarVariants = cva(
@@ -17,9 +17,9 @@ const sidebarVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gray-200 text-card-foreground", // 👈 light grey background
-        inset: "m-2 rounded-lg border bg-gray-200 text-card-foreground shadow-lg",
-        floating: "m-2 rounded-lg border bg-gray-200 text-card-foreground shadow-lg",
+        default: "bg-background text-card-foreground",
+        inset: "m-2 rounded-lg border bg-background text-card-foreground shadow-lg",
+        floating: "m-2 rounded-lg border bg-background text-card-foreground shadow-lg",
       },
       side: {
         left: "inset-y-0 left-0 border-r",
@@ -37,7 +37,7 @@ const sidebarVariants = cva(
       collapsible: "full",
     },
   }
-)
+);
 
 const sidebarMobileVariants = cva(
   "fixed inset-y-0 z-50 h-full text-card-foreground bg-card border-border shadow-xl transition-transform duration-300 ease-in-out data-[state=open]:translate-x-0 data-[state=closed]:-translate-x-full",
@@ -52,45 +52,55 @@ const sidebarMobileVariants = cva(
       side: "left",
     },
   }
-)
+);
 
-interface SidebarProps
-  extends React.HTMLAttributes<HTMLElement>,
-  VariantProps<typeof sidebarVariants> {
-  asChild?: boolean
+interface SidebarProps extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof sidebarVariants> {
+  asChild?: boolean;
 }
 
 type SidebarContextValue = {
-  variant: VariantProps<typeof sidebarVariants>["variant"]
-  side: VariantProps<typeof sidebarVariants>["side"]
-  isMobile: boolean
-  isOpenMobile: boolean
-  setIsOpenMobile: (open: boolean) => void
-  isCollapsed: boolean
-  setIsCollapsed: (collapsed: boolean) => void
+  variant: VariantProps<typeof sidebarVariants>["variant"];
+  side: VariantProps<typeof sidebarVariants>["side"];
+  isMobile: boolean;
+  isOpenMobile: boolean;
+  setIsOpenMobile: (open: boolean) => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (collapsed: boolean) => void;
   sidebarNodeRef: React.RefObject<HTMLElement | null>;
-  // New properties for dropdown management
-  openDropdownIds: string[]
-  setOpenDropdownIds: React.Dispatch<React.SetStateAction<string[]>>
-}
+  openDropdownIds: string[];
+  setOpenDropdownIds: React.Dispatch<React.SetStateAction<string[]>>;
+};
 
-const SidebarContext = React.createContext<SidebarContextValue | null>(null)
+const SidebarContext = React.createContext<SidebarContextValue | null>(null);
 
 function useSidebar() {
-  const context = React.useContext(SidebarContext)
+  const context = React.useContext(SidebarContext);
   if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.")
+    throw new Error("useSidebar must be used within a SidebarProvider.");
   }
-  return context
+  return context;
+}
+
+// Helper to safely assign refs (mutable function or object refs)
+function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
+  if (!ref) return;
+
+  if (typeof ref === "function") {
+    ref(value);
+  } else {
+    // TS may complain if ref is readonly, ignore error here since you control usage
+    // @ts-expect-error
+    ref.current = value;
+  }
 }
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> &
-  Pick<SidebarProps, "variant" | "side"> & {
-    defaultOpenMobile?: boolean
-    defaultCollapsedDesktop?: boolean
-  }
+    Pick<SidebarProps, "variant" | "side"> & {
+      defaultOpenMobile?: boolean;
+      defaultCollapsedDesktop?: boolean;
+    }
 >(
   (
     {
@@ -104,15 +114,15 @@ const SidebarProvider = React.forwardRef<
     },
     ref
   ) => {
-    const isMobile = useIsMobile()
-    const [isOpenMobile, setIsOpenMobile] = React.useState(defaultOpenMobile ?? false)
+    const isMobile = useIsMobile();
+    const [isOpenMobile, setIsOpenMobile] = React.useState(defaultOpenMobile ?? false);
     const [isCollapsed, setIsCollapsedState] = React.useState(defaultCollapsedDesktop);
     const [openDropdownIds, setOpenDropdownIds] = React.useState<string[]>([]);
     const sidebarNodeRef = React.useRef<HTMLElement | null>(null);
     const pathname = usePathname();
 
     React.useEffect(() => {
-      if (typeof window !== 'undefined' && !isMobile) {
+      if (typeof window !== "undefined" && !isMobile) {
         const stored = localStorage.getItem("sidebarCollapsed");
         if (stored !== null) {
           setIsCollapsedState(JSON.parse(stored));
@@ -120,18 +130,24 @@ const SidebarProvider = React.forwardRef<
       }
     }, [isMobile]);
 
-    const setIsCollapsed = React.useCallback((collapsed: boolean) => {
-      if (!isMobile) {
-        setIsCollapsedState(collapsed);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem("sidebarCollapsed", JSON.stringify(collapsed));
+    const setIsCollapsed = React.useCallback(
+      (collapsed: boolean) => {
+        if (!isMobile) {
+          setIsCollapsedState(collapsed);
+          if (typeof window !== "undefined") {
+            localStorage.setItem("sidebarCollapsed", JSON.stringify(collapsed));
+          }
         }
-      }
-    }, [isMobile]);
+      },
+      [isMobile]
+    );
 
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        if (sidebarNodeRef.current && !sidebarNodeRef.current.contains(event.target as Node)) {
+        if (
+          sidebarNodeRef.current &&
+          !sidebarNodeRef.current.contains(event.target as Node)
+        ) {
           if (isMobile && isOpenMobile) {
             setIsOpenMobile(false);
           } else if (!isMobile && !isCollapsed) {
@@ -172,8 +188,19 @@ const SidebarProvider = React.forwardRef<
         openDropdownIds,
         setOpenDropdownIds,
       }),
-      [variant, side, isMobile, isOpenMobile, setIsOpenMobile, isCollapsed, setIsCollapsed, sidebarNodeRef, openDropdownIds, setOpenDropdownIds]
-    )
+      [
+        variant,
+        side,
+        isMobile,
+        isOpenMobile,
+        setIsOpenMobile,
+        isCollapsed,
+        setIsCollapsed,
+        sidebarNodeRef,
+        openDropdownIds,
+        setOpenDropdownIds,
+      ]
+    );
 
     return (
       <SidebarContext.Provider value={contextValue}>
@@ -181,35 +208,24 @@ const SidebarProvider = React.forwardRef<
           {children}
         </div>
       </SidebarContext.Provider>
-    )
+    );
   }
-)
-SidebarProvider.displayName = "SidebarProvider"
+);
+SidebarProvider.displayName = "SidebarProvider";
 
-const Sidebar = React.forwardRef<
-  HTMLElement,
-  SidebarProps
->(({ className, children, ...props }, ref) => {
-  const { variant, side, isMobile, isOpenMobile, setIsOpenMobile, isCollapsed, sidebarNodeRef } = useSidebar()
+const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(({ className, children, ...props }, ref) => {
+  const { variant, side, isMobile, isOpenMobile, setIsOpenMobile, isCollapsed, sidebarNodeRef } =
+    useSidebar();
 
-  // Create a callback ref that updates both the internal ref and the forwarded ref
-  const mergedRef = React.useCallback((node: HTMLElement | null) => {
-    // Update the internal ref
-    if (sidebarNodeRef) {
-      sidebarNodeRef.current = node;
-    }
-    
-    // Update the forwarded ref
-    if (typeof ref === 'function') {
-      ref(node);
-    } else if (ref && typeof ref === 'object' && 'current' in ref) {
-      try {
-        (ref as React.MutableRefObject<HTMLElement | null>).current = node;
-      } catch {
-        // Silently ignore read-only refs
+  const mergedRef = React.useCallback(
+    (node: HTMLElement | null) => {
+      if (sidebarNodeRef) {
+        sidebarNodeRef.current = node;
       }
-    }
-  }, [ref, sidebarNodeRef]);
+      assignRef(ref, node);
+    },
+    [ref, sidebarNodeRef]
+  );
 
   const commonProps = {
     "data-sidebar": "sidebar",
@@ -218,7 +234,7 @@ const Sidebar = React.forwardRef<
     "data-collapsible": "full",
     "data-collapsed": isMobile ? "false" : isCollapsed.toString(),
     ...props,
-  }
+  };
 
   if (isMobile) {
     return (
@@ -229,17 +245,15 @@ const Sidebar = React.forwardRef<
           className={cn(
             sidebarVariants({ variant, side, collapsible: "full" }),
             "fixed inset-y-0 top-14 z-40 flex flex-col h-[calc(100vh-3.5rem)]",
-            "border-r-2 border-primary", // ✅ You added this line
             (variant === "floating" || variant === "inset") && "p-2",
             className
           )}
-          data-state={isOpenMobile ? "open" : "closed"}
           {...commonProps}
         >
           {children}
         </nav>
       </>
-    )
+    );
   }
   return (
     <nav
@@ -254,9 +268,9 @@ const Sidebar = React.forwardRef<
     >
       {children}
     </nav>
-  )
-})
-Sidebar.displayName = "Sidebar"
+  );
+});
+Sidebar.displayName = "Sidebar";
 
 const SidebarHeader = React.forwardRef<
   HTMLDivElement,
