@@ -1,6 +1,7 @@
 // src/services/postgres/users.ts
 'use server';
 
+import { randomUUID } from 'crypto';
 import { query } from './db';
 import type { Role, Permission, UserTemplate, UserTemplateData, UserProfile } from '@/types/users';
 
@@ -139,7 +140,7 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
       up.full_name,
       up.username,
       up.avatar_url,
-      up.role_id,
+      up.role,
       up.created_at AS user_created_at,
       up.updated_at AS user_updated_at,
       r.id AS role_id,
@@ -147,7 +148,7 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
       r.description AS role_description,
       r.created_at AS role_created_at
     FROM user_profiles up
-    LEFT JOIN roles r ON up.role_id = r.id;
+    LEFT JOIN roles r ON up.role = r.id;
   `);
 
   return result.rows.map((row) => {
@@ -157,14 +158,14 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
       full_name: row.full_name,
       username: row.username,
       avatar_url: row.avatar_url,
-      role_id: row.role_id ? row.role_id.toString() : null,
+      role_id: row.role ? row.role.toString() : null,
       role: hasRole
         ? {
-          id: row.role_id.toString(),
-          name: row.role_name,
-          description: row.role_description,
-          created_at: new Date(row.role_created_at).toISOString(),
-        }
+            id: row.role_id.toString(),
+            name: row.role_name,
+            description: row.role_description,
+            created_at: new Date(row.role_created_at).toISOString(),
+          }
         : undefined,
       created_at: new Date(row.user_created_at).toISOString(),
       updated_at: new Date(row.user_updated_at).toISOString(),
@@ -182,7 +183,7 @@ export async function updateUserProfile(
     UPDATE user_profiles
     SET full_name = COALESCE($1, full_name),
         avatar_url = COALESCE($2, avatar_url),
-        role_id = COALESCE($3, role_id),
+        role = COALESCE($3, role),
         updated_at = NOW()
     WHERE id = $4;
   `,
@@ -238,8 +239,11 @@ export async function updateUser(
 }
 
 // --- Auth Placeholders ---
-export async function createAuthUserPlaceholder(username: string, passwordHash: string): Promise<{ id: string; username: string }> {
-  return { id: `auth-user-${Date.now()}`, username };
+export async function createAuthUserPlaceholder(
+  username: string,
+  passwordHash: string
+): Promise<{ id: string; username: string }> {
+  return { id: randomUUID(), username };
 }
 
 export async function sendPasswordResetEmail(username: string): Promise<void> {

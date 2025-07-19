@@ -41,7 +41,7 @@ CREATE TABLE user_profiles (
   id UUID PRIMARY KEY,
   email VARCHAR(255),
   full_name VARCHAR(255),
-  role_id INTEGER REFERENCES roles(id),
+  role INTEGER REFERENCES roles(id),
   avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
@@ -233,9 +233,10 @@ CREATE TABLE cities (
 -- Authentication users
 CREATE TABLE users (
   id UUID PRIMARY KEY,
+  username VARCHAR(255) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
   full_name TEXT;
-  role_id INTEGER REFERENCES roles(id);
+  role INTEGER REFERENCES roles(id);
   password_hash TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
