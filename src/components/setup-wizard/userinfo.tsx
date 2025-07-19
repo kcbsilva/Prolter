@@ -29,11 +29,15 @@ interface UserInfoStepProps {
   defaultValues?: StepUserData;
   onBack: () => void;
   onNext: (data: StepUserData) => void;
-  tenantId: string;
 }
 
-export function UserInfoStep({ defaultValues, onBack, onNext, tenantId }: UserInfoStepProps) {
+export function UserInfoStep({
+  defaultValues,
+  onBack,
+  onNext,
+}: UserInfoStepProps) {
   const [loading, setLoading] = React.useState(false);
+
   const form = useForm<StepUserData>({
     resolver: zodResolver(stepUserSchema),
     defaultValues: defaultValues ?? {
@@ -46,7 +50,7 @@ export function UserInfoStep({ defaultValues, onBack, onNext, tenantId }: UserIn
   const handleSubmit = async (data: StepUserData) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/users/${tenantId}`, {
+      const res = await fetch(`/api/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

@@ -24,7 +24,6 @@ interface AddItemModalProps {
   label: string;
   placeholder: string;
   apiPath: string;
-  tenantId: string;
 }
 
 const currencyOptions = [
@@ -51,7 +50,6 @@ export function AddItemModal({
   label,
   placeholder,
   apiPath,
-  tenantId,
 }: AddItemModalProps) {
   const [name, setName] = React.useState('');
   const [currency, setCurrency] = React.useState('BRL');
@@ -66,7 +64,7 @@ export function AddItemModal({
 
     setLoading(true);
     try {
-      const res = await fetch(`${apiPath}/${tenantId}`, {
+      const res = await fetch(apiPath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(

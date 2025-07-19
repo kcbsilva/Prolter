@@ -38,6 +38,7 @@ interface ListProjectsProps {
   setPage: (page: number) => void;
   totalPages: number;
   perPage: number;
+  setPerPage: (value: number) => void;
 }
 
 export function ListProjects({
@@ -53,14 +54,20 @@ export function ListProjects({
   setPage,
   totalPages,
   perPage,
+  setPerPage,
 }: ListProjectsProps) {
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'Planned': return 'bg-blue-100 text-blue-800';
-      case 'Completed': return 'bg-primary/10 text-primary';
-      case 'On Hold': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'Active':
+        return 'bg-green-100 text-green-800';
+      case 'Planned':
+        return 'bg-blue-100 text-blue-800';
+      case 'Completed':
+        return 'bg-primary/10 text-primary';
+      case 'On Hold':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -96,7 +103,7 @@ export function ListProjects({
             value={perPage.toString()}
             onValueChange={(v) => {
               setPage(1);
-              window.dispatchEvent(new CustomEvent('changePerPage', { detail: parseInt(v) }));
+              setPerPage(parseInt(v));
             }}
           >
             <SelectTrigger className="w-[100px]">
@@ -114,10 +121,25 @@ export function ListProjects({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-center cursor-pointer" onClick={() => onSortChange?.('id')}>ID</TableHead>
-            <TableHead className="text-center cursor-pointer" onClick={() => onSortChange?.('name')}>Name</TableHead>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => onSortChange?.('id')}
+            >
+              ID
+            </TableHead>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => onSortChange?.('name')}
+            >
+              Name
+            </TableHead>
             <TableHead className="text-center">PoP</TableHead>
-            <TableHead className="text-center cursor-pointer" onClick={() => onSortChange?.('status')}>Status</TableHead>
+            <TableHead
+              className="text-center cursor-pointer"
+              onClick={() => onSortChange?.('status')}
+            >
+              Status
+            </TableHead>
             <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -125,28 +147,48 @@ export function ListProjects({
           {projects === null ? (
             Array.from({ length: 4 }).map((_, i) => (
               <TableRow key={i}>
-                <TableCell colSpan={5}><Skeleton className="h-10 w-full" /></TableCell>
+                <TableCell colSpan={5}>
+                  <Skeleton className="h-10 w-full" />
+                </TableCell>
               </TableRow>
             ))
           ) : projects.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-6">
+              <TableCell
+                colSpan={5}
+                className="text-center text-sm text-muted-foreground py-6"
+              >
                 No projects found.
               </TableCell>
             </TableRow>
           ) : (
             projects.map((project) => (
               <TableRow key={project.id} className="hover:bg-muted/30">
-                <TableCell className="text-center text-xs font-mono">{project.id}</TableCell>
-                <TableCell className="text-center text-sm">{project.project_name}</TableCell>
-                <TableCell className="text-center text-sm">{project.pop_name || '—'}</TableCell>
+                <TableCell className="text-center text-xs font-mono">
+                  {project.id}
+                </TableCell>
                 <TableCell className="text-center text-sm">
-                  <Badge className={`text-xs ${getStatusBadgeClass(project.status)} border-transparent`}>
+                  {project.project_name}
+                </TableCell>
+                <TableCell className="text-center text-sm">
+                  {project.pop_name || '—'}
+                </TableCell>
+                <TableCell className="text-center text-sm">
+                  <Badge
+                    className={`text-xs ${getStatusBadgeClass(
+                      project.status
+                    )} border-transparent`}
+                  >
                     {project.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center space-x-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(project)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => onEdit(project)}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button

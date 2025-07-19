@@ -35,14 +35,12 @@ interface CountryCityStepProps {
   defaultValues?: Step1Data;
   onBack: () => void;
   onNext: (data: Step1Data) => void;
-  tenantId: string;
 }
 
 export function CountryCityStep({
   defaultValues,
   onBack,
   onNext,
-  tenantId,
 }: CountryCityStepProps) {
   const [loading, setLoading] = React.useState(false);
   const [countries, setCountries] = React.useState<string[]>([]);
@@ -62,7 +60,7 @@ export function CountryCityStep({
     const saved = localStorage.getItem('setupStep1');
     if (saved) form.reset(JSON.parse(saved));
 
-    fetch(`/api/countries/${tenantId}`)
+    fetch(`/api/countries`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -74,7 +72,7 @@ export function CountryCityStep({
       })
       .catch(console.error);
 
-    fetch(`/api/cities/${tenantId}`)
+    fetch(`/api/cities`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -85,7 +83,7 @@ export function CountryCityStep({
         }
       })
       .catch(console.error);
-  }, [form, tenantId]);
+  }, [form]);
 
   const handleSubmit = (data: Step1Data) => {
     setLoading(true);
@@ -217,7 +215,6 @@ export function CountryCityStep({
         label="Country"
         placeholder="Enter country name"
         apiPath="/api/countries"
-        tenantId={tenantId}
       />
 
       <AddItemModal
@@ -228,7 +225,6 @@ export function CountryCityStep({
         label="City"
         placeholder="Enter city name"
         apiPath="/api/cities"
-        tenantId={tenantId}
       />
     </>
   );

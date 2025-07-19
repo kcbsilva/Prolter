@@ -1,9 +1,13 @@
+// src/app/admin/login/page.tsx
 
 'use client';
-import * as React from "react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocale } from "@/contexts/LocaleContext";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,11 +19,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useLocale } from "@/contexts/LocaleContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { ProlterLogo } from '@/components/prolter-logo';
+
+type IpApiResponse = { ip: string };
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -34,6 +38,7 @@ export default function AdminLoginPage() {
   const { login, isAuthenticated, isLoading: authIsLoading } = useAuth();
   const { t } = useLocale();
 
+  // Parse redirect_url query parameter on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -44,19 +49,35 @@ export default function AdminLoginPage() {
     }
   }, []);
 
+  // Fetch public IP with cleanup on unmount
   useEffect(() => {
-    fetch("https://api.ipify.org?format=json")
-      .then((res) => res.json())
+    const controller = new AbortController();
+
+    fetch("https://api.ipify.org?format=json", { signal: controller.signal })
+      .then((res) => res.json() as Promise<IpApiResponse>)
       .then((data) => {
         setPublicIP(data.ip || "Unavailable");
         setIpLoading(false);
       })
       .catch((e) => {
-        console.error("IP fetch error:", e);
-        setPublicIP("Unavailable");
-        setIpLoading(false);
+        if (e.name !== 'AbortError') {
+          console.error("IP fetch error:", e);
+          setPublicIP("Unavailable");
+          setIpLoading(false);
+        }
       });
+
+    return () => {
+      controller.abort();
+    };
   }, []);
+
+  // If authenticated and not submitting, redirect to desired page
+  useEffect(() => {
+    if (isAuthenticated && !isSubmitting) {
+      router.replace(redirectUrl);
+    }
+  }, [isAuthenticated, isSubmitting, redirectUrl, router]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -65,11 +86,19 @@ export default function AdminLoginPage() {
 
     try {
       await login(email, password, redirectUrl);
+      // If login does not redirect internally, the above effect will redirect
     } catch (loginError: any) {
       if (loginError.message === 'auth.email_not_confirmed') {
-        setError(t('auth.email_not_confirmed_error', 'Your email address has not been confirmed. Please check your inbox (and spam folder) for a confirmation link.'));
+        setError(
+          t(
+            'auth.email_not_confirmed_error',
+            'Your email address has not been confirmed. Please check your inbox (and spam folder) for a confirmation link.'
+          )
+        );
       } else {
-        setError(loginError.message || t('login.error_failed', 'Login failed. Please check your credentials.'));
+        setError(
+          loginError.message || t('login.error_failed', 'Login failed. Please check your credentials.')
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -90,20 +119,20 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
-      <div className="flex flex-1"> {/* Main content area that takes up available space */}
-        {/* Branding section */}
+      <div className="flex flex-1">
+        {/* Branding section for larger screens */}
         <div className="hidden lg:flex lg:w-3/4 bg-muted flex-col items-center justify-center p-12 text-center relative overflow-hidden">
-          <ProlterLogo 
+          <ProlterLogo
             className="w-4/5 max-w-2xl h-auto"
           />
         </div>
 
-        {/* Login form */}
-        <div className="w-full lg:w-1/4 flex justify-center items-center bg-muted p-4 md:py-8 md:pl-8 md:pr-12 lg:pr-16">
+        {/* Login form section */}
+        <div className="w-full lg:w-1/4 flex justify-start items-center bg-muted p-4 md:py-8 md:pl-8 md:pr-12 lg:pl-12 lg:pr-6">
           <Card className="w-full max-w-xs bg-card border text-card-foreground shadow-lg">
             <CardHeader className="items-center pt-8 pb-4">
               <div className="lg:hidden mb-4">
-                <ProlterLogo /> {/* Default smaller logo for mobile view card */}
+                <ProlterLogo /> {/* Small logo for mobile */}
               </div>
               <CardTitle className="text-xl text-primary pt-4 lg:pt-0">
                 {t("login.title", "Admin Login")}
@@ -111,8 +140,9 @@ export default function AdminLoginPage() {
               <CardDescription className="text-muted-foreground text-center px-2">
                 {t("login.description", "Enter your credentials to access the admin panel.")}
               </CardDescription>
-              <div className="my-2 border-t border-border w-full"></div> {/* Standard Separator */}
+              <div className="my-2 border-t border-border w-full"></div>
             </CardHeader>
+
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1.5">
@@ -120,6 +150,7 @@ export default function AdminLoginPage() {
                   <Input
                     id="email"
                     type="email"
+                    autoComplete="username"
                     placeholder={t("login.username_placeholder", "Enter your email")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -137,6 +168,7 @@ export default function AdminLoginPage() {
                   <Input
                     id="password"
                     type="password"
+                    autoComplete="current-password"
                     placeholder={t("login.password_placeholder", "Enter your password")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -144,17 +176,22 @@ export default function AdminLoginPage() {
                     disabled={isSubmitting || authIsLoading}
                   />
                 </div>
-                {error && <p className="text-xs text-destructive">{error}</p>}
+                {error && (
+                  <p className="text-xs text-destructive" aria-live="assertive">{error}</p>
+                )}
                 <Button
                   type="submit"
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                   disabled={isSubmitting || authIsLoading}
                 >
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isSubmitting ? t('login.loading', 'Signing In...') : t("login.submit_button", "Sign In")}
+                  {isSubmitting
+                    ? t('login.loading', 'Signing In...')
+                    : t("login.submit_button", "Sign In")}
                 </Button>
               </form>
             </CardContent>
+
             <CardFooter className="flex justify-center items-center text-xs pt-4 pb-6 px-6">
               <div className="text-muted-foreground">
                 {t("login.your_ip", "Your IP:")}&nbsp;
@@ -168,8 +205,8 @@ export default function AdminLoginPage() {
           </Card>
         </div>
       </div>
-      
-      {/* Page-specific Footer */}
+
+      {/* Footer */}
       <footer className="w-full py-3 px-8 mt-auto bg-muted">
         <p className="text-center text-sm text-muted-foreground">
           Prolter © 2025 - All rights reserved.

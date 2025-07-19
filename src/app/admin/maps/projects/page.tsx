@@ -30,6 +30,8 @@ export default function ProjectsPage() {
   const [page, setPage] = React.useState(1);
   const [perPage, setPerPage] = React.useState(10);
 
+  const [error, setError] = React.useState<string | null>(null);
+
   React.useEffect(() => {
     async function loadData() {
       try {
@@ -41,44 +43,53 @@ export default function ProjectsPage() {
         if (!projectRes.ok) throw new Error('Failed to load projects');
         if (!popRes.ok) throw new Error('Failed to load PoPs');
 
-        const [projectData, popData] = await Promise.all([
-          projectRes.json(),
-          popRes.json(),
-        ]);
+        const projectData: MapProject[] = await projectRes.json();
+        const popData: Pop[] = await popRes.json();
 
         setProjects(projectData);
         setPops(popData);
+        setError(null);
       } catch (err) {
         console.error('Error loading project data:', err);
+        setError(t('maps_elements.load_error', 'Failed to load data'));
         setProjects([]);
         setPops([]);
       }
     }
-
     loadData();
-  }, []);
+  }, [t]);
+
+  // Reset page on filters/search/sort/perPage changes
+  React.useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, sortBy, sortOrder, perPage]);
+
+  const getSortValue = (project: MapProject): string | number => {
+    if (sortBy === 'name') return project.project_name.toLowerCase();
+    if (sortBy === 'status') return project.status.toLowerCase();
+    return project.id;
+  };
 
   const filteredProjects = React.useMemo(() => {
-    if (!projects) return null;
-
+    if (!projects) return [];
     return projects
-      .filter((p) =>
-        p.project_name.toLowerCase().includes(search.toLowerCase()) &&
-        (statusFilter === 'all' || p.status === statusFilter)
+      .filter(
+        (p) =>
+          p.project_name.toLowerCase().includes(search.toLowerCase()) &&
+          (statusFilter === 'all' || p.status === statusFilter)
       )
       .sort((a, b) => {
-        const valA = sortBy === 'name' ? a.project_name : sortBy === 'status' ? a.status : a.id;
-        const valB = sortBy === 'name' ? b.project_name : sortBy === 'status' ? b.status : b.id;
+        const valA = getSortValue(a);
+        const valB = getSortValue(b);
         if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
         if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
         return 0;
       });
   }, [projects, search, statusFilter, sortBy, sortOrder]);
 
-  const totalPages = filteredProjects ? Math.ceil(filteredProjects.length / perPage) : 1;
+  const totalPages = filteredProjects.length > 0 ? Math.ceil(filteredProjects.length / perPage) : 1;
 
   const paginatedProjects = React.useMemo(() => {
-    if (!filteredProjects) return null;
     const start = (page - 1) * perPage;
     return filteredProjects.slice(start, start + perPage);
   }, [filteredProjects, page, perPage]);
@@ -93,7 +104,7 @@ export default function ProjectsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="p-4 flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold flex items-center gap-2">
           <FileCode className="h-4 w-4 text-primary" />
@@ -113,10 +124,14 @@ export default function ProjectsPage() {
         </AddProjectModal>
       </div>
 
+      {error && (
+        <div className="text-center text-red-600 font-semibold py-3">{error}</div>
+      )}
+
       <Card>
         <CardContent className="pt-6">
           <ListProjects
-            projects={paginatedProjects}
+            projects={paginatedProjects.length > 0 ? paginatedProjects : (projects === null ? null : [])}
             onEdit={(project) => {
               setEditingProject(project);
               setEditOpen(true);
@@ -133,7 +148,6 @@ export default function ProjectsPage() {
             totalPages={totalPages}
             perPage={perPage}
             setPerPage={setPerPage}
-            totalCount={filteredProjects?.length || 0}
           />
         </CardContent>
       </Card>
