@@ -15,13 +15,22 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
-export const stepUserSchema = z.object({
-  fullName: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-});
+const localStorageKey = 'setupStepUser';
+
+export const stepUserSchema = z
+  .object({
+    fullName: z.string().min(1, 'Name is required'),
+    username: z.string().min(4, 'Username must be at least 4 characters'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords must match',
+    path: ['confirmPassword'],
+  });
 
 export type StepUserData = z.infer<typeof stepUserSchema>;
 
@@ -37,32 +46,49 @@ export function UserInfoStep({
   onNext,
 }: UserInfoStepProps) {
   const [loading, setLoading] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const form = useForm<StepUserData>({
     resolver: zodResolver(stepUserSchema),
-    defaultValues: defaultValues ?? {
-      fullName: '',
-      email: '',
-      password: '',
-    },
+    defaultValues:
+      defaultValues ??
+      (() => {
+        const stored = localStorage.getItem(localStorageKey);
+        return stored
+          ? JSON.parse(stored)
+          : {
+              fullName: '',
+              username: '',
+              password: '',
+              confirmPassword: '',
+            };
+      })(),
   });
 
   const handleSubmit = async (data: StepUserData) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/users`, {
+      const res = await fetch(`/api/settings/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          fullName: data.fullName,
+          username: data.username,
+          password: data.password,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to create user');
 
-      localStorage.setItem('setupStepUser', JSON.stringify(data));
+      localStorage.setItem(localStorageKey, JSON.stringify(data));
       onNext(data);
     } catch (err) {
       console.error(err);
-      alert('Failed to create user. Check the console.');
+      toast({
+        title: 'User creation failed',
+        description: 'Could not create admin user. Check the console for details.',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -70,7 +96,10 @@ export function UserInfoStep({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 animate-fade-in-left">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-4 animate-fade-in-left"
+      >
         <FormField
           control={form.control}
           name="fullName"
@@ -87,12 +116,12 @@ export function UserInfoStep({
 
         <FormField
           control={form.control}
-          name="email"
+          name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="admin@example.com" {...field} />
+                <Input placeholder="admin" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -105,8 +134,40 @@ export function UserInfoStep({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Password</FormLabel>
+              <div className="relative">
+                <FormControl>
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    {...field}
+                  />
+                </FormControl>
+                <button
+                  type="button"
+                  className="absolute right-3 top-2 text-muted-foreground"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirm Password</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••" {...field} />
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
