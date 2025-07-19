@@ -40,7 +40,7 @@ export interface UserTemplateData {
 export interface UserProfile {
   id: string;
   full_name: string;
-  email: string;
+  username: string;
   avatar_url?: string | null;
   role?: Role;
   role_id?: string | null;

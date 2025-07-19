@@ -6,7 +6,6 @@ import type { Role, Permission, UserTemplate, UserTemplateData, UserProfile } fr
 
 // --- Roles ---
 export async function getRoles(): Promise<Role[]> {
-  console.log('PostgreSQL service: getRoles called');
   const { rows } = await query('SELECT * FROM roles ORDER BY name');
   return rows.map(row => ({
     ...row,
@@ -16,7 +15,6 @@ export async function getRoles(): Promise<Role[]> {
 }
 
 export async function addRole(roleData: Pick<Role, 'name' | 'description'>): Promise<Role> {
-  console.log('PostgreSQL service: addRole called with', roleData);
   const sql = 'INSERT INTO roles (name, description) VALUES ($1, $2) RETURNING *;';
   const { rows } = await query(sql, [roleData.name, roleData.description]);
   return {
@@ -28,7 +26,6 @@ export async function addRole(roleData: Pick<Role, 'name' | 'description'>): Pro
 
 // --- Permissions ---
 export async function getPermissions(): Promise<Permission[]> {
-  console.log('PostgreSQL service: getPermissions called');
   const staticPermissions: Permission[] = [
     {
       id: 'perm_sub_view',
@@ -50,7 +47,6 @@ export async function getPermissions(): Promise<Permission[]> {
 
 // --- User Templates ---
 export async function getUserTemplates(): Promise<UserTemplate[]> {
-  console.log('PostgreSQL service: getUserTemplates called');
   const { rows: templates } = await query(`
     SELECT ut.id, ut.template_name, ut.description, ut.default_role, ut.created_at,
            array_agg(tp.permission_id) FILTER (WHERE tp.permission_id IS NOT NULL) as permission_ids
@@ -70,7 +66,6 @@ export async function getUserTemplates(): Promise<UserTemplate[]> {
 }
 
 export async function addUserTemplate(templateData: UserTemplateData): Promise<UserTemplate> {
-  console.log('PostgreSQL service: addUserTemplate called with', templateData);
   const { permission_ids, ...rest } = templateData;
 
   const insertTemplateSql =
@@ -101,7 +96,6 @@ export async function addUserTemplate(templateData: UserTemplateData): Promise<U
 }
 
 export async function updateUserTemplate(templateId: string, templateData: UserTemplateData): Promise<UserTemplate> {
-  console.log('PostgreSQL service: updateUserTemplate called', templateId);
   const { permission_ids, ...rest } = templateData;
 
   const updateSql =
@@ -113,7 +107,6 @@ export async function updateUserTemplate(templateId: string, templateData: UserT
     templateId,
   ]);
   const updated = rows[0];
-
   if (!updated) throw new Error('Template not found or not updated.');
 
   await query('DELETE FROM template_permissions WHERE template_id = $1;', [templateId]);
@@ -135,19 +128,16 @@ export async function updateUserTemplate(templateId: string, templateData: UserT
 }
 
 export async function deleteUserTemplate(templateId: string): Promise<void> {
-  console.log('PostgreSQL service: deleteUserTemplate called', templateId);
   await query('DELETE FROM user_templates WHERE id = $1;', [templateId]);
 }
 
 // --- User Profiles ---
 export async function getUserProfiles(): Promise<UserProfile[]> {
-  console.log('PostgreSQL service: getUserProfiles called');
-
   const result = await query(`
     SELECT 
       up.id AS user_id,
       up.full_name,
-      up.email,
+      up.username,
       up.avatar_url,
       up.role_id,
       up.created_at AS user_created_at,
@@ -162,20 +152,19 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
 
   return result.rows.map((row) => {
     const hasRole = row.role_id && row.role_name;
-
     return {
       id: row.user_id.toString(),
       full_name: row.full_name,
-      email: row.email,
+      username: row.username,
       avatar_url: row.avatar_url,
       role_id: row.role_id ? row.role_id.toString() : null,
       role: hasRole
         ? {
-            id: row.role_id.toString(),
-            name: row.role_name,
-            description: row.role_description,
-            created_at: new Date(row.role_created_at).toISOString(),
-          }
+          id: row.role_id.toString(),
+          name: row.role_name,
+          description: row.role_description,
+          created_at: new Date(row.role_created_at).toISOString(),
+        }
         : undefined,
       created_at: new Date(row.user_created_at).toISOString(),
       updated_at: new Date(row.user_updated_at).toISOString(),
@@ -187,7 +176,6 @@ export async function updateUserProfile(
   userId: string,
   data: Partial<Pick<UserProfile, 'full_name' | 'avatar_url' | 'role_id'>>
 ): Promise<UserProfile> {
-  console.log('PostgreSQL service: updateUserProfile called for ID', userId);
   const { full_name, avatar_url, role_id } = data;
   await query(
     `
@@ -207,28 +195,27 @@ export async function updateUserProfile(
 }
 
 export interface NewUserInput {
-  email: string;
+  username: string;
   password: string;
   full_name: string;
   role: 'admin' | 'user';
 }
 
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
-  console.log('PostgreSQL service: createUser called with', userData);
-  const authUser = await createAuthUserPlaceholder(userData.email, userData.password);
+  const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
   const { rows } = await query(
     `
-    INSERT INTO user_profiles (id, email, full_name, role, created_at, updated_at)
+    INSERT INTO user_profiles (id, username, full_name, role, created_at, updated_at)
     VALUES ($1, $2, $3, $4, NOW(), NOW())
     RETURNING *;
   `,
-    [authUser.id, userData.email, userData.full_name, userData.role]
+    [authUser.id, userData.username, userData.full_name, userData.role]
   );
   const user = rows[0];
   return {
     id: user.id.toString(),
     full_name: user.full_name,
-    email: user.email,
+    username: user.username,
     avatar_url: user.avatar_url,
     role_id: user.role ? user.role.toString() : null,
     created_at: new Date(user.created_at).toISOString(),
@@ -237,29 +224,26 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
 }
 
 export async function deleteUser(userId: string): Promise<void> {
-  console.log('PostgreSQL service: deleteUser called for ID', userId);
   await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
 }
 
 export async function updateUser(
   userId: string,
-  data: { email: string; full_name: string; role: 'admin' | 'user' }
+  data: { username: string; full_name: string; role: 'admin' | 'user' }
 ): Promise<void> {
-  console.log('PostgreSQL service: updateUser called', userId);
   await query(
-    'UPDATE user_profiles SET email = $1, full_name = $2, role = $3, updated_at = NOW() WHERE id = $4',
-    [data.email, data.full_name, data.role, userId]
+    'UPDATE user_profiles SET username = $1, full_name = $2, role = $3, updated_at = NOW() WHERE id = $4',
+    [data.username, data.full_name, data.role, userId]
   );
 }
 
-// --- Auth Placeholders (to be replaced with real integration) ---
-export async function createAuthUserPlaceholder(email: string, passwordHash: string): Promise<{ id: string; email: string }> {
-  console.warn('createAuthUserPlaceholder is a non-functional placeholder.');
-  return { id: `auth-user-${Date.now()}`, email };
+// --- Auth Placeholders ---
+export async function createAuthUserPlaceholder(username: string, passwordHash: string): Promise<{ id: string; username: string }> {
+  return { id: `auth-user-${Date.now()}`, username };
 }
 
-export async function sendPasswordResetEmail(email: string): Promise<void> {
-  console.warn('sendPasswordResetEmail placeholder for', email);
+export async function sendPasswordResetEmail(username: string): Promise<void> {
+  console.warn('sendPasswordResetEmail placeholder for', username);
 }
 
 export async function updatePasswordWithToken(token: string, newPassword: string): Promise<void> {
