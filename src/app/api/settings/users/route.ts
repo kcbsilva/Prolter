@@ -5,10 +5,9 @@ import { z } from 'zod';
 export const dynamic = 'force-dynamic';
 
 const newUserSchema = z.object({
-  email: z.string().email(),
+  username: z.string().min(4),
   password: z.string().min(6),
-  full_name: z.string().min(1),
-  role: z.enum(['admin', 'user']),
+  fullName: z.string().min(1),
 });
 
 export async function POST(req: Request) {
@@ -21,7 +20,13 @@ export async function POST(req: Request) {
       return new Response('Invalid user data', { status: 400 });
     }
 
-    const user = await createUser(parsed.data);
+    const user = await createUser({
+      username: parsed.data.username,
+      password: parsed.data.password,
+      full_name: parsed.data.fullName,
+      role: 'admin', // ⬅️ hardcoded here
+    });
+
     return Response.json(user);
   } catch (err) {
     console.error('POST /settings/users failed:', err);
