@@ -57,11 +57,11 @@ export function UserInfoStep({
         return stored
           ? JSON.parse(stored)
           : {
-              fullName: '',
-              username: '',
-              password: '',
-              confirmPassword: '',
-            };
+            fullName: '',
+            username: '',
+            password: '',
+            confirmPassword: '',
+          };
       })(),
   });
 
@@ -179,7 +179,7 @@ export function UserInfoStep({
         />
 
         <div className="flex justify-between pt-2">
-          <Button type="button" variant="outline" onClick={onBack}>
+          <Button type="button" variant="outline" onClick={onBack} className="text-[#233B6E]">
             Back
           </Button>
           <Button type="submit" disabled={loading}>
