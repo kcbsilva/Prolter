@@ -1,64 +1,32 @@
-// src/app/setup-wizard/page.tsx
+// src/app/admin/setup-wizard/page.tsx
 'use client';
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { Loader2 } from 'lucide-react';
-
-import { Card, CardContent } from '@/components/ui/card';
-import { StepProgressBar } from '@/components/setup-wizard/StepProgressBar';
+import { Loader2, CheckCircle, Circle } from 'lucide-react';
 
 import { WelcomeStep } from '@/components/setup-wizard/welcome';
-import { CountryCityStep } from '@/components/setup-wizard/countrycity';
-import { BusinessInfoStep } from '@/components/setup-wizard/businessinfo';
 import { UserInfoStep } from '@/components/setup-wizard/userinfo';
+import { BusinessInfoStep } from '@/components/setup-wizard/businessinfo';
 import { PopInfoStep } from '@/components/setup-wizard/popinfo';
-import { IPInfoStep } from '@/components/setup-wizard/ipinfo';
 import { NASInfoStep } from '@/components/setup-wizard/nasinfo';
+import { ProlterLogo } from '@/components/prolter-logo';
+
+const steps = [
+  { label: 'Admin Setup', key: 'setupStepUser', component: UserInfoStep },
+  { label: 'Business Setup', key: 'setupStep2', component: BusinessInfoStep },
+  { label: 'PoP Setup', key: 'setupStep3', component: PopInfoStep },
+  { label: 'Device Setup', key: 'setupStep5', component: NASInfoStep, isFinal: true },
+];
 
 export default function SetupWizardPage() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
   const [showFinalScreen, setShowFinalScreen] = React.useState(false);
-
   const stepDirection = React.useRef<'forward' | 'back'>('forward');
-
-  const steps = [
-    {
-      label: 'Location',
-      key: 'setupStep1',
-      component: CountryCityStep,
-    },
-    {
-      label: 'Business Info',
-      key: 'setupStep2',
-      component: BusinessInfoStep,
-    },
-    {
-      label: 'Admin User',
-      key: 'setupStepUser',
-      component: UserInfoStep,
-    },
-    {
-      label: 'PoP Info',
-      key: 'setupStep3',
-      component: PopInfoStep,
-    },
-    {
-      label: 'IP Info',
-      key: 'setupStep4',
-      component: IPInfoStep,
-    },
-    {
-      label: 'NAS Info',
-      key: 'setupStep5',
-      component: NASInfoStep,
-      isFinal: true,
-    },
-  ];
 
   const goToStep = (index: number) => {
     setIsLoading(true);
@@ -67,7 +35,7 @@ export default function SetupWizardPage() {
       setCurrentStep(index);
       localStorage.setItem('setupStep', index.toString());
       setIsLoading(false);
-    }, 400);
+    }, 300);
   };
 
   const saveStepData = (key: string, data: any) => {
@@ -84,15 +52,15 @@ export default function SetupWizardPage() {
   };
 
   const handleFinalSubmit = async (data: any) => {
+    if (isLoading) return;
+    setIsLoading(true);
     saveStepData('setupStep5', data);
     localStorage.setItem('setupComplete', 'true');
 
     const payload = {
-      step1: loadStepData('setupStep1'),
-      step2: loadStepData('setupStep2'),
       user: loadStepData('setupStepUser'),
+      step2: loadStepData('setupStep2'),
       step3: loadStepData('setupStep3'),
-      step4: loadStepData('setupStep4'),
       step5: data,
     };
 
@@ -109,9 +77,11 @@ export default function SetupWizardPage() {
       localStorage.removeItem('setupStep');
       confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
       setShowFinalScreen(true);
+      setTimeout(() => router.push('/app'), 5000);
     } catch (err) {
       console.error(err);
       alert('Setup failed. Please try again.');
+      setIsLoading(false);
     }
   };
 
@@ -128,7 +98,7 @@ export default function SetupWizardPage() {
       return <WelcomeStep onNext={() => goToStep(1)} />;
     }
 
-    const { component: StepComponent, key, isFinal } = steps[currentStep - 1] ?? {};
+    const { component: StepComponent, key, isFinal } = steps[currentStep - 1];
     const defaultValues = loadStepData(key);
 
     return (
@@ -137,13 +107,29 @@ export default function SetupWizardPage() {
         onBack={() => goToStep(currentStep - 1)}
         onNext={(data: any) => {
           saveStepData(key, data);
-          if (isFinal) {
-            handleFinalSubmit(data);
-          } else {
-            goToStep(currentStep + 1);
-          }
+          isFinal ? handleFinalSubmit(data) : goToStep(currentStep + 1);
         }}
       />
+    );
+  };
+
+  const renderSidebarStep = (label: string, index: number) => {
+    const isDone = index < currentStep - 1;
+    const isCurrent = index === currentStep - 1;
+    return (
+      <div
+        key={label}
+        className={`flex items-center gap-2 py-2 pl-4 pr-2 rounded transition ${
+          isCurrent ? 'bg-[#233B6E] text-white font-semibold' : 'text-[#081124]'
+        }`}
+      >
+        {isDone ? (
+          <CheckCircle className="h-4 w-4 text-green-600" />
+        ) : (
+          <Circle className="h-4 w-4" />
+        )}
+        <span className="text-sm">{label}</span>
+      </div>
     );
   };
 
@@ -158,7 +144,7 @@ export default function SetupWizardPage() {
       <p className="text-muted-foreground mb-6">Your Prolter system is ready to use.</p>
       <button
         onClick={() => router.push('/app')}
-        className="bg-yellow-500 text-black font-semibold py-2 px-6 rounded hover:bg-yellow-400 transition"
+        className="bg-[#fca311] hover:bg-[#fca311]/90 text-white font-semibold py-2 px-6 rounded transition"
       >
         Go to Prolter
       </button>
@@ -166,16 +152,22 @@ export default function SetupWizardPage() {
   );
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-4 pt-8">
-      <div className="w-full max-w-2xl border border-[#fca311] rounded-lg shadow-xl bg-card">
-        <Card className="border-none shadow-none bg-transparent">
-          {!showFinalScreen && currentStep > 0 && (
-            <StepProgressBar
-              currentStep={currentStep}
-              labels={steps.map((s) => s.label)}
-            />
-          )}
-          <CardContent>
+    <div className="min-h-screen w-full bg-animated-prolter flex items-center justify-center px-4">
+      <div className="w-full max-w-5xl rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md shadow-2xl overflow-hidden flex min-h-[600px]">
+        {/* Sidebar (light left) */}
+        <aside className="w-64 py-6 px-4 flex flex-col justify-between bg-[#E5E5E5] text-[#081124]">
+          <div className="flex flex-col items-center">
+            <ProlterLogo className="h-10 w-auto mb-6 text-[#081124]" />
+            <div className="space-y-1 w-full">
+              {steps.map((s, i) => renderSidebarStep(s.label, i))}
+            </div>
+          </div>
+          <div className="text-xs text-[#233B6E]/60 text-center">© 2025 Prolter</div>
+        </aside>
+
+        {/* Main Content (dark right) */}
+        <main className="flex-1 p-10 flex items-center justify-center bg-[#14213D]/60 text-white backdrop-blur-md border-l border-white/10">
+          <div className="w-full max-w-2xl">
             <AnimatePresence mode="wait">
               {isLoading ? (
                 <motion.div
@@ -201,8 +193,8 @@ export default function SetupWizardPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </CardContent>
-        </Card>
+          </div>
+        </main>
       </div>
     </div>
   );

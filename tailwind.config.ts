@@ -79,7 +79,7 @@ const config = {
         "fade-in-left": "fade-in-left 0.5s ease-out",
       },
       fontFamily: {
-        sans: ["Tenorite", "Arial", "sans-serif"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
     },
   },
