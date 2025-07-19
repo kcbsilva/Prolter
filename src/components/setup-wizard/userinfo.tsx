@@ -75,6 +75,7 @@ export function UserInfoStep({
           fullName: data.fullName,
           username: data.username,
           password: data.password,
+          role: 'admin',
         }),
       });
 
