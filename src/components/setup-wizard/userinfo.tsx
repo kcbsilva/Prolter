@@ -94,6 +94,8 @@ export function UserInfoStep({
     }
   };
 
+  const inputClass = 'bg-[#E5E5E5] text-[#233B6E] placeholder:text-[#233B6E]/60';
+
   return (
     <Form {...form}>
       <form
@@ -107,7 +109,7 @@ export function UserInfoStep({
             <FormItem>
               <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder="Admin Full Name" {...field} />
+                <Input placeholder="Admin Full Name" className={inputClass} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,7 +123,7 @@ export function UserInfoStep({
             <FormItem>
               <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input placeholder="admin" {...field} />
+                <Input placeholder="admin" className={inputClass} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -139,6 +141,7 @@ export function UserInfoStep({
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
+                    className={inputClass}
                     {...field}
                   />
                 </FormControl>
@@ -166,6 +169,7 @@ export function UserInfoStep({
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
+                  className={inputClass}
                   {...field}
                 />
               </FormControl>
