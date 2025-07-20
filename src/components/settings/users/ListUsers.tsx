@@ -1,4 +1,3 @@
-// src/components/settings/users/ListUsers.tsx
 'use client'
 
 import * as React from 'react'
@@ -9,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { UserBar } from './UserBar'
 import { cn } from '@/lib/utils'
 import { UpdatePasswordModal } from './UpdatePasswordModal'
+import { AddUserModal } from './AddUserModal'
 
 export function ListUsers() {
   const [users, setUsers] = React.useState<ProUser[]>([])
@@ -17,6 +17,7 @@ export function ListUsers() {
   const [editedData, setEditedData] = React.useState<Partial<ProUser>>({})
   const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null)
   const [showPasswordModal, setShowPasswordModal] = React.useState(false)
+  const [showAddModal, setShowAddModal] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const [page, setPage] = React.useState(1)
   const [showArchived, setShowArchived] = React.useState(false)
@@ -41,6 +42,7 @@ export function ListUsers() {
   }, [showArchived])
 
   const totalPages = Math.ceil(users.length / USERS_PER_PAGE)
+
   const paginatedUsers = users
     .filter(user =>
       user.full_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -102,12 +104,9 @@ export function ListUsers() {
         total={users.length}
         search={search}
         setSearch={setSearch}
-        onAddUser={fetchUsers}
+        onAddUser={() => setShowAddModal(true)}
         selectedUserId={selectedUserId}
-        onChangePassword={(id: string) => {
-          setSelectedUserId(id)
-          setShowPasswordModal(true)
-        }}
+        onChangePassword={() => setShowPasswordModal(true)}
         showArchived={showArchived}
         setShowArchived={setShowArchived}
       />
@@ -116,6 +115,9 @@ export function ListUsers() {
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr>
+              <th className="p-3 w-10">
+                <input type="checkbox" disabled className="opacity-50" />
+              </th>
               <th className="p-3 text-left">Full Name</th>
               <th className="p-3 text-left">Username</th>
               <th className="p-3 text-left">Role</th>
@@ -138,6 +140,13 @@ export function ListUsers() {
                   )}
                   onClick={() => setSelectedUserId(user.id)}
                 >
+                  <td className="p-3 w-10">
+                    <input
+                      type="checkbox"
+                      className="accent-primary h-4 w-4"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </td>
                   <td className="p-3">
                     {editingUserId === user.id ? (
                       <Input
@@ -185,20 +194,37 @@ export function ListUsers() {
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex justify-end items-center gap-2 pt-4">
-          <Button size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
-          <span className="text-sm">Page {page} of {totalPages}</span>
-          <Button size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
-        </div>
-      )}
+      {/* Pagination */}
+      {
+        totalPages > 1 && (
+          <div className="flex justify-end items-center gap-2 pt-4">
+            <Button size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
+            <span className="text-sm">Page {page} of {totalPages}</span>
+            <Button size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
+          </div>
+        )
+      }
 
-      {showPasswordModal && selectedUserId && (
-        <UpdatePasswordModal
-          userId={selectedUserId}
-          onClose={() => setShowPasswordModal(false)}
-        />
-      )}
-    </div>
+      {/* Modals */}
+      {
+        showPasswordModal && selectedUserId && (
+          <UpdatePasswordModal
+            userId={selectedUserId}
+            onClose={() => setShowPasswordModal(false)}
+          />
+        )
+      }
+
+      {
+        showAddModal && (
+          <AddUserModal
+            onClose={() => {
+              setShowAddModal(false)
+              fetchUsers()
+            }}
+          />
+        )
+      }
+    </div >
   )
 }
