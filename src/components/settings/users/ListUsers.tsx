@@ -1,105 +1,204 @@
 // src/components/settings/users/ListUsers.tsx
-'use client';
+'use client'
 
-import * as React from 'react';
-import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
-import type { UserProfile } from '@/types/users';
-import { RemoveUserDialog } from './RemoveUserDialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Pencil } from 'lucide-react';
+import * as React from 'react'
+import { ProUser, UserStatus } from '@/types/prousers'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { UserBar } from './UserBar'
+import { cn } from '@/lib/utils'
+import { UpdatePasswordModal } from './UpdatePasswordModal'
 
-interface ListUsersProps {
-  userProfiles: UserProfile[];
-  isLoading: boolean;
-  error?: string;
-  onEditClick: (user: UserProfile) => void;
-  onRefresh?: () => void;
-  selectedUsers?: Set<string>;
-  onSelectUser?: (userId: string, checked: boolean) => void;
-  onSelectAll?: (checked: boolean) => void;
-  showSelection?: boolean;
-}
+export function ListUsers() {
+  const [users, setUsers] = React.useState<ProUser[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [editingUserId, setEditingUserId] = React.useState<string | null>(null)
+  const [editedData, setEditedData] = React.useState<Partial<ProUser>>({})
+  const [selectedUserId, setSelectedUserId] = React.useState<string | null>(null)
+  const [showPasswordModal, setShowPasswordModal] = React.useState(false)
+  const [search, setSearch] = React.useState('')
+  const [page, setPage] = React.useState(1)
+  const [showArchived, setShowArchived] = React.useState(false)
 
-export function ListUsers({
-  userProfiles,
-  isLoading,
-  error,
-  onEditClick,
-  onRefresh,
-  selectedUsers = new Set(),
-  onSelectUser,
-  onSelectAll,
-  showSelection = false,
-}: ListUsersProps) {
-  const [page, setPage] = React.useState(1);
-  const entriesPerPage = 10;
-  const totalPages = Math.max(1, Math.ceil(userProfiles.length / entriesPerPage));
-  const currentData = userProfiles.slice(
-    (page - 1) * entriesPerPage,
-    page * entriesPerPage
-  );
+  const USERS_PER_PAGE = 10
 
-  const renderBadge = (role: string) => {
-    const variant = role === 'admin' ? 'destructive' : 'secondary';
-    return <Badge variant={variant}>{role}</Badge>;
-  };
-
-  const renderRows = () =>
-    currentData.map((user) => {
-      const isChecked = selectedUsers.has(user.id);
-      return (
-        <tr key={user.id} className="border-b">
-          {showSelection && (
-            <td className="px-4 py-2">
-              <Checkbox
-                checked={isChecked}
-                onCheckedChange={(checked) => onSelectUser?.(user.id, Boolean(checked))}
-              />
-            </td>
-          )}
-          <td className="px-4 py-2">{user.email}</td>
-          <td className="px-4 py-2">{user.full_name}</td>
-          <td className="px-4 py-2">{renderBadge(user.role?.name || 'Unassigned')}</td>
-          <td className="px-4 py-2 text-right">
-            <div className="flex justify-end gap-2">
-              <Button size="sm" variant="outline" onClick={() => onEditClick(user)}>
-                <Pencil className="w-4 h-4" />
-              </Button>
-              <RemoveUserDialog user={user} onSuccess={onRefresh || (() => {})} />
-            </div>
-          </td>
-        </tr>
-      );
-    });
-
-  const columns = [
-    ...(showSelection ? [{ key: 'select', label: '' }] : []),
-    { key: 'email', label: 'Email' },
-    { key: 'full_name', label: 'Full Name' },
-    { key: 'role', label: 'Role' },
-    { key: 'actions', label: 'Actions', className: 'text-right' },
-  ];
-
-  if (error) {
-    return <p className="text-sm text-red-500 px-4 py-2">Error loading users: {error}</p>;
+  const fetchUsers = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/users?archived=${showArchived}`)
+      const data = await res.json()
+      setUsers(data)
+    } catch (err) {
+      console.error('[FETCH_USERS_ERROR]', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  if (!isLoading && userProfiles.length === 0) {
-    return <p className="text-center text-muted-foreground py-4">No users found.</p>;
+  React.useEffect(() => {
+    fetchUsers()
+  }, [showArchived])
+
+  const totalPages = Math.ceil(users.length / USERS_PER_PAGE)
+  const paginatedUsers = users
+    .filter(user =>
+      user.full_name.toLowerCase().includes(search.toLowerCase()) ||
+      user.username.toLowerCase().includes(search.toLowerCase())
+    )
+    .slice((page - 1) * USERS_PER_PAGE, page * USERS_PER_PAGE)
+
+  const handleEdit = (user: ProUser) => {
+    setEditingUserId(user.id)
+    setEditedData(user)
+  }
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch(`/api/users/update/${editingUserId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editedData),
+      })
+      if (!res.ok) throw new Error('Update failed')
+      setEditingUserId(null)
+      setEditedData({})
+      fetchUsers()
+    } catch (error) {
+      console.error('[INLINE_EDIT_ERROR]', error)
+    }
+  }
+
+  const toggleStatus = async (user: ProUser) => {
+    const newStatus: UserStatus = user.status === 'active' ? 'inactive' : 'active'
+    try {
+      await fetch(`/api/users/update/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, status: newStatus })
+      })
+      fetchUsers()
+    } catch (err) {
+      console.error('[TOGGLE_STATUS_ERROR]', err)
+    }
+  }
+
+  const archiveUser = async (user: ProUser) => {
+    try {
+      await fetch(`/api/users/update/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, is_archived: true })
+      })
+      fetchUsers()
+    } catch (err) {
+      console.error('[ARCHIVE_USER_ERROR]', err)
+    }
   }
 
   return (
-    <PaginatedSkeletonTable
-      columns={columns}
-      page={page}
-      totalPages={totalPages}
-      entriesCount={userProfiles.length}
-      onPageChange={setPage}
-      onRefresh={onRefresh || (() => {})}
-    >
-      {isLoading ? null : renderRows()}
-    </PaginatedSkeletonTable>
-  );
+    <div className="space-y-4">
+      <UserBar
+        total={users.length}
+        search={search}
+        setSearch={setSearch}
+        onAddUser={fetchUsers}
+        selectedUserId={selectedUserId}
+        onChangePassword={(id: string) => {
+          setSelectedUserId(id)
+          setShowPasswordModal(true)
+        }}
+        showArchived={showArchived}
+        setShowArchived={setShowArchived}
+      />
+
+      <div className="border rounded-md overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted">
+            <tr>
+              <th className="p-3 text-left">Full Name</th>
+              <th className="p-3 text-left">Username</th>
+              <th className="p-3 text-left">Role</th>
+              <th className="p-3 text-left">Status</th>
+              <th className="p-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={5} className="p-4 text-center">Loading users...</td></tr>
+            ) : paginatedUsers.length === 0 ? (
+              <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No users found.</td></tr>
+            ) : (
+              paginatedUsers.map(user => (
+                <tr
+                  key={user.id}
+                  className={cn(
+                    "border-t hover:bg-accent cursor-pointer",
+                    selectedUserId === user.id && "bg-accent"
+                  )}
+                  onClick={() => setSelectedUserId(user.id)}
+                >
+                  <td className="p-3">
+                    {editingUserId === user.id ? (
+                      <Input
+                        value={editedData.full_name || ''}
+                        onChange={e => setEditedData(prev => ({ ...prev, full_name: e.target.value }))}
+                      />
+                    ) : user.full_name}
+                  </td>
+                  <td className="p-3">
+                    {editingUserId === user.id ? (
+                      <Input
+                        value={editedData.username || ''}
+                        onChange={e => setEditedData(prev => ({ ...prev, username: e.target.value }))}
+                      />
+                    ) : user.username}
+                  </td>
+                  <td className="p-3">
+                    {editingUserId === user.id ? (
+                      <Input
+                        value={editedData.role_id || ''}
+                        onChange={e => setEditedData(prev => ({ ...prev, role_id: e.target.value }))}
+                      />
+                    ) : user.role_id}
+                  </td>
+                  <td className="p-3">
+                    <Badge variant={user.status === 'active' ? 'default' : 'secondary'}>
+                      {user.status}
+                    </Badge>
+                  </td>
+                  <td className="p-3 space-x-2">
+                    {editingUserId === user.id ? (
+                      <Button size="sm" onClick={handleSave}>Save</Button>
+                    ) : (
+                      <Button size="sm" variant="outline" onClick={() => toggleStatus(user)}>
+                        {user.status === 'active' ? 'Disable' : 'Enable'}
+                      </Button>
+                    )}
+                    <Button size="sm" variant="secondary" onClick={() => handleEdit(user)}>Edit</Button>
+                    <Button size="sm" variant="destructive" onClick={() => archiveUser(user)}>Archive</Button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {totalPages > 1 && (
+        <div className="flex justify-end items-center gap-2 pt-4">
+          <Button size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
+          <span className="text-sm">Page {page} of {totalPages}</span>
+          <Button size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
+        </div>
+      )}
+
+      {showPasswordModal && selectedUserId && (
+        <UpdatePasswordModal
+          userId={selectedUserId}
+          onClose={() => setShowPasswordModal(false)}
+        />
+      )}
+    </div>
+  )
 }

@@ -1,126 +1,131 @@
-// src/components/settings/users/AddUserModal.tsx
-'use client';
+// /components/settings/users/AddUserModal.tsx
+'use client'
 
-import * as React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription, // ✅ Add this
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from '@/hooks/use-toast';
-import { PlusCircle } from 'lucide-react';
-import { createUser } from '@/services/postgres/users';
-import bcrypt from 'bcryptjs';
-
-const formSchema = z
-  .object({
-    email: z.string().email(),
-    full_name: z.string().min(1),
-    role: z.enum(['admin', 'user']),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
-export type AddUserFormData = z.infer<typeof formSchema>;
+import * as React from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { UserStatus } from '@/types/prousers'
 
 interface AddUserModalProps {
-  onSuccess: () => void;
+  onClose: () => void
 }
 
-export function AddUserModal({ onSuccess }: AddUserModalProps) {
-  const { toast } = useToast();
-  const [open, setOpen] = React.useState(false);
+const formSchema = z.object({
+  full_name: z.string().min(1),
+  username: z.string().min(1),
+  password: z.string().min(6),
+  role_id: z.string().uuid(),
+  status: z.enum(['active', 'inactive'])
+})
 
-  const form = useForm<AddUserFormData>({
+type FormData = z.infer<typeof formSchema>
+
+export function AddUserModal({ onClose }: AddUserModalProps) {
+  const [loading, setLoading] = React.useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors }
+  } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
       full_name: '',
-      role: 'user',
+      username: '',
       password: '',
-      confirmPassword: '',
-    },
-  });
+      role_id: '',
+      status: 'active'
+    }
+  })
 
-  const onSubmit = async (data: AddUserFormData) => {
+  const onSubmit = async (data: FormData) => {
+    setLoading(true)
     try {
-      const hashedPassword = await bcrypt.hash(data.password, 10);
-      await fetch('/api/settings/users', {
+      const res = await fetch('/api/users/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: data.email,
-          full_name: data.full_name,
-          password: hashedPassword,
-          role: data.role,
-        }),
-      });
+        body: JSON.stringify(data)
+      })
 
-      toast({ title: 'User created successfully.' });
-      setOpen(false);
-      onSuccess();
-    } catch (error: any) {
-      toast({ title: 'Failed to create user.', description: error.message, variant: 'destructive' });
+      if (!res.ok) throw new Error('Failed to create user')
+
+      reset()
+      onClose()
+    } catch (error) {
+      console.error('[ADD_USER_ERROR]', error)
+      alert('Error adding user')
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default">
-          <PlusCircle className="mr-2 h-4 w-4" /> Add User
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Add New User</DialogTitle>
-          <DialogDescription>
-            Fill in the user’s email, name, role, and password to create an account.
-          </DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 py-4"
-        >
-          <div>
-            <Label>Email</Label>
-            <Input type="email" {...form.register('email')} />
-          </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <Label>Full Name</Label>
-            <Input type="text" {...form.register('full_name')} />
+            <Input {...register('full_name')} />
+            {errors.full_name && <p className="text-sm text-red-500">Full name is required</p>}
           </div>
+
           <div>
-            <Label>Role</Label>
-            <select {...form.register('role')} className="w-full border rounded px-3 py-2">
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
+            <Label>Username</Label>
+            <Input {...register('username')} />
+            {errors.username && <p className="text-sm text-red-500">Username is required</p>}
           </div>
+
           <div>
             <Label>Password</Label>
-            <Input type="password" {...form.register('password')} />
+            <Input type="password" {...register('password')} />
+            {errors.password && <p className="text-sm text-red-500">Password must be at least 6 characters</p>}
           </div>
+
           <div>
-            <Label>Confirm Password</Label>
-            <Input type="password" {...form.register('confirmPassword')} />
+            <Label>Role ID</Label>
+            <Input {...register('role_id')} />
+            {errors.role_id && <p className="text-sm text-red-500">Role is required</p>}
           </div>
-          <Button type="submit">Create User</Button>
+
+          <div>
+            <Label>Status</Label>
+            <Select
+              value={watch('status')}
+              onValueChange={(val) => setValue('status', val as UserStatus)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Adding...' : 'Add User'}
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

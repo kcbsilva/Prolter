@@ -1,69 +1,62 @@
-// src/components/settings/users/RemoveUserDialog.tsx
-'use client';
+// /components/settings/users/RemoveUserDialog.tsx
+'use client'
 
-import * as React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Trash2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { deleteUser } from '@/services/postgres/users';
-import type { UserProfile } from '@/types/users';
+import * as React from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { ProUser } from '@/types/prousers'
 
 interface RemoveUserDialogProps {
-  user?: UserProfile;
-  onSuccess: () => void;
-  trigger?: React.ReactNode;
+  user: ProUser
+  onClose: () => void
 }
 
-export function RemoveUserDialog({ user, onSuccess, trigger }: RemoveUserDialogProps) {
-  const { toast } = useToast();
-  const [open, setOpen] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+export function RemoveUserDialog({ user, onClose }: RemoveUserDialogProps) {
+  const [loading, setLoading] = React.useState(false)
 
-  const handleDelete = async () => {
-    if (!user) return;
+  const handleArchive = async () => {
+    setLoading(true)
     try {
-      setLoading(true);
-      await deleteUser(user.id);
-      toast({ title: 'User deleted successfully.' });
-      setOpen(false);
-      onSuccess();
-    } catch (error: any) {
-      toast({
-        title: 'Failed to delete user.',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+      const res = await fetch(`/api/users/update/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...user, is_archived: true })
+      })
 
-  if (!user) return null;
+      if (!res.ok) throw new Error('Failed to archive user')
+
+      onClose()
+    } catch (error) {
+      console.error('[ARCHIVE_USER_ERROR]', error)
+      alert('Error archiving user')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger || <Button variant="destructive" size="sm"><Trash2 className="w-4 h-4" /></Button>}</DialogTrigger>
-      <DialogContent>
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Confirm Deletion</DialogTitle>
+          <DialogTitle>Archive User</DialogTitle>
         </DialogHeader>
-        <p>Are you sure you want to delete <strong>{user.full_name || user.email}</strong>?</p>
-        <div className="flex justify-end gap-2 mt-4">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
-            Cancel
-          </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={loading}>
-            Delete
-          </Button>
+
+        <div className="space-y-4 text-sm">
+          <p>
+            Are you sure you want to archive <strong>{user.full_name}</strong>?
+            They will be disabled and hidden from the user list.
+          </p>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="ghost" onClick={onClose} disabled={loading}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleArchive} disabled={loading}>
+              {loading ? 'Archiving...' : 'Archive'}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

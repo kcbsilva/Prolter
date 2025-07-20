@@ -48,7 +48,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "firebase": "^11.7.3",
-    "framer-motion": "^12.19.2",
+    "framer-motion": "^12.23.6",
     "genkit": "^1.6.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
