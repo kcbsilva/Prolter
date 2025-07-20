@@ -212,13 +212,17 @@ export interface NewUserInput {
 }
 
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
+  // Step 1: Lookup role ID from name
+  const roleResult = await query('SELECT id FROM roles WHERE name = $1', [userData.role]);
+  if (roleResult.rows.length === 0) {
+    throw new Error(`Role '${userData.role}' not found`);
+  }
+  const roleId = roleResult.rows[0].id;
+
+  // Step 2: Create auth placeholder
   const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
 
-  // ✅ Get role ID from roles table
-  const roleResult = await query('SELECT id FROM roles WHERE name = $1', [userData.role]);
-  const roleId = roleResult.rows[0]?.id;
-  if (!roleId) throw new Error(`Role '${userData.role}' not found in roles table`);
-
+  // Step 3: Insert user with correct role ID
   const { rows } = await query(
     `
     INSERT INTO user_profiles (id, username, full_name, email, role, status, created_at, updated_at)
@@ -230,7 +234,7 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
       userData.username,
       userData.full_name,
       userData.email || `${userData.username}@example.com`,
-      roleId, // ✅ integer from roles table, not string "admin"
+      roleId,
       userData.status || 'active',
     ]
   );
@@ -250,6 +254,7 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
     createdAt: new Date(user.created_at).toISOString(),
   };
 }
+
 
 export async function deleteUser(userId: string): Promise<void> {
   await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
