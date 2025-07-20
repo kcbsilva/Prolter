@@ -9,8 +9,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { UserStatus } from '@/types/prousers'
 
 interface AddUserModalProps {
   onClose: () => void
@@ -19,9 +17,7 @@ interface AddUserModalProps {
 const formSchema = z.object({
   full_name: z.string().min(1),
   username: z.string().min(1),
-  password: z.string().min(6),
-  role_id: z.string().uuid(),
-  status: z.enum(['active', 'inactive'])
+  password: z.string().min(6)
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -33,17 +29,13 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
     register,
     handleSubmit,
     reset,
-    watch,
-    setValue,
     formState: { errors }
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       full_name: '',
       username: '',
-      password: '',
-      role_id: '',
-      status: 'active'
+      password: ''
     }
   })
 
@@ -92,28 +84,6 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
             <Label>Password</Label>
             <Input type="password" {...register('password')} />
             {errors.password && <p className="text-sm text-red-500">Password must be at least 6 characters</p>}
-          </div>
-
-          <div>
-            <Label>Role ID</Label>
-            <Input {...register('role_id')} />
-            {errors.role_id && <p className="text-sm text-red-500">Role is required</p>}
-          </div>
-
-          <div>
-            <Label>Status</Label>
-            <Select
-              value={watch('status')}
-              onValueChange={(val) => setValue('status', val as UserStatus)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
