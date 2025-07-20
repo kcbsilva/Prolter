@@ -166,11 +166,11 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
       role_id: row.role ? row.role.toString() : null,
       role: hasRole
         ? {
-            id: row.role_id.toString(),
-            name: row.role_name,
-            description: row.role_description,
-            created_at: new Date(row.role_created_at).toISOString(),
-          }
+          id: row.role_id.toString(),
+          name: row.role_name,
+          description: row.role_description,
+          created_at: new Date(row.role_created_at).toISOString(),
+        }
         : undefined,
       status: row.status || 'active', // Default to active if not set
       created_at: new Date(row.user_created_at).toISOString(),
@@ -214,13 +214,10 @@ export interface NewUserInput {
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
   const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
 
-  // 🔍 Look up the role ID by role name
+  // ✅ Get role ID from roles table
   const roleResult = await query('SELECT id FROM roles WHERE name = $1', [userData.role]);
   const roleId = roleResult.rows[0]?.id;
-
-  if (!roleId) {
-    throw new Error(`Role '${userData.role}' not found in roles table`);
-  }
+  if (!roleId) throw new Error(`Role '${userData.role}' not found in roles table`);
 
   const { rows } = await query(
     `
@@ -233,7 +230,7 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
       userData.username,
       userData.full_name,
       userData.email || `${userData.username}@example.com`,
-      roleId,
+      roleId, // ✅ integer from roles table, not string "admin"
       userData.status || 'active',
     ]
   );
@@ -254,7 +251,6 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
   };
 }
 
-
 export async function deleteUser(userId: string): Promise<void> {
   await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
 }
@@ -262,7 +258,7 @@ export async function deleteUser(userId: string): Promise<void> {
 // Updated updateUser function with correct signature
 export async function updateUser(updateData: UpdateUserData): Promise<UserProfile> {
   const { id, username, full_name, email, role, status } = updateData;
-  
+
   await query(
     `UPDATE user_profiles 
      SET username = COALESCE($1, username), 
@@ -274,7 +270,7 @@ export async function updateUser(updateData: UpdateUserData): Promise<UserProfil
      WHERE id = $6`,
     [username, full_name, email, role, status, id]
   );
-  
+
   // Return the updated user
   const profiles = await getUserProfiles();
   const updated = profiles.find(p => p.id === id);
@@ -285,7 +281,7 @@ export async function updateUser(updateData: UpdateUserData): Promise<UserProfil
 // New bulk delete function
 export async function deleteUsers(userIds: string[]): Promise<void> {
   if (userIds.length === 0) return;
-  
+
   const placeholders = userIds.map((_, index) => `$${index + 1}`).join(',');
   await query(`DELETE FROM user_profiles WHERE id IN (${placeholders});`, userIds);
 }
