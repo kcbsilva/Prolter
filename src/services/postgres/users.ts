@@ -213,21 +213,31 @@ export interface NewUserInput {
 
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
   const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
+
+  // 🔍 Look up the role ID by role name
+  const roleResult = await query('SELECT id FROM roles WHERE name = $1', [userData.role]);
+  const roleId = roleResult.rows[0]?.id;
+
+  if (!roleId) {
+    throw new Error(`Role '${userData.role}' not found in roles table`);
+  }
+
   const { rows } = await query(
     `
     INSERT INTO user_profiles (id, username, full_name, email, role, status, created_at, updated_at)
     VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
     RETURNING *;
-  `,
+    `,
     [
-      authUser.id, 
-      userData.username, 
-      userData.full_name, 
+      authUser.id,
+      userData.username,
+      userData.full_name,
       userData.email || `${userData.username}@example.com`,
-      userData.role,
-      userData.status || 'active'
+      roleId,
+      userData.status || 'active',
     ]
   );
+
   const user = rows[0];
   return {
     id: user.id.toString(),
@@ -243,6 +253,7 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
     createdAt: new Date(user.created_at).toISOString(),
   };
 }
+
 
 export async function deleteUser(userId: string): Promise<void> {
   await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
