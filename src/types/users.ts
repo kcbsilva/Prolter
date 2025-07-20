@@ -58,7 +58,7 @@ export interface UpdateUserData {
   username?: string;
   full_name?: string;
   email?: string;
-  role?: 'admin' | 'user' | 'manager';
+  role?: string; // ✅ changed from enum to generic string
   status?: 'active' | 'inactive' | 'pending';
 }
 
@@ -67,6 +67,6 @@ export interface CreateUserData {
   email: string;
   full_name: string;
   password: string;
-  role: 'admin' | 'user' | 'manager';
+  role: string; // ✅ now accepts role name (e.g., 'admin') and will be mapped to role.id
   status?: 'active' | 'inactive' | 'pending';
 }
