@@ -5,19 +5,36 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from '@/components/ui/select'
 
 interface AddUserModalProps {
   onClose: () => void
 }
 
+// Replace these with your actual UUIDs from the roles table
+const ROLE_USER_ID = '00000000-0000-0000-0000-000000000001'
+const ROLE_ADMIN_ID = '00000000-0000-0000-0000-000000000002'
+
 const formSchema = z.object({
   full_name: z.string().min(1),
   username: z.string().min(1),
-  password: z.string().min(6)
+  password: z.string().min(6),
+  role_id: z.string().uuid()
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -29,13 +46,16 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors }
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       full_name: '',
       username: '',
-      password: ''
+      password: '',
+      role_id: ''
     }
   })
 
@@ -71,23 +91,55 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
           <div>
             <Label>Full Name</Label>
             <Input {...register('full_name')} />
-            {errors.full_name && <p className="text-sm text-red-500">Full name is required</p>}
+            {errors.full_name && (
+              <p className="text-sm text-red-500">Full name is required</p>
+            )}
           </div>
 
           <div>
             <Label>Username</Label>
             <Input {...register('username')} />
-            {errors.username && <p className="text-sm text-red-500">Username is required</p>}
+            {errors.username && (
+              <p className="text-sm text-red-500">Username is required</p>
+            )}
           </div>
 
           <div>
             <Label>Password</Label>
             <Input type="password" {...register('password')} />
-            {errors.password && <p className="text-sm text-red-500">Password must be at least 6 characters</p>}
+            {errors.password && (
+              <p className="text-sm text-red-500">
+                Password must be at least 6 characters
+              </p>
+            )}
+          </div>
+
+          <div>
+            <Label>Role</Label>
+            <Select
+              value={watch('role_id')}
+              onValueChange={(val) => setValue('role_id', val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ROLE_USER_ID}>User</SelectItem>
+                <SelectItem value={ROLE_ADMIN_ID}>Admin</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.role_id && (
+              <p className="text-sm text-red-500">Role is required</p>
+            )}
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
