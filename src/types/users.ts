@@ -41,9 +41,32 @@ export interface UserProfile {
   id: string;
   full_name: string;
   username: string;
+  email: string; // Added missing email property
+  name: string; // Added missing name property (can be computed from full_name)
   avatar_url?: string | null;
   role?: Role;
   role_id?: string | null;
+  status: 'active' | 'inactive' | 'pending'; // Added missing status property
   created_at: string;
   updated_at: string;
+  createdAt: string; // Alias for created_at for compatibility
+}
+
+// Additional interfaces for the enhanced functionality
+export interface UpdateUserData {
+  id: string;
+  username?: string;
+  full_name?: string;
+  email?: string;
+  role?: 'admin' | 'user' | 'manager';
+  status?: 'active' | 'inactive' | 'pending';
+}
+
+export interface CreateUserData {
+  username: string;
+  email: string;
+  full_name: string;
+  password: string;
+  role: 'admin' | 'user' | 'manager';
+  status?: 'active' | 'inactive' | 'pending';
 }

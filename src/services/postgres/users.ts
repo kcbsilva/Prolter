@@ -3,7 +3,7 @@
 
 import { randomUUID } from 'crypto';
 import { query } from './db';
-import type { Role, Permission, UserTemplate, UserTemplateData, UserProfile } from '@/types/users';
+import type { Role, Permission, UserTemplate, UserTemplateData, UserProfile, UpdateUserData, CreateUserData } from '@/types/users';
 
 // --- Roles ---
 export async function getRoles(): Promise<Role[]> {
@@ -139,8 +139,10 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
       up.id AS user_id,
       up.full_name,
       up.username,
+      up.email,
       up.avatar_url,
       up.role,
+      up.status,
       up.created_at AS user_created_at,
       up.updated_at AS user_updated_at,
       r.id AS role_id,
@@ -156,7 +158,9 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
     return {
       id: row.user_id.toString(),
       full_name: row.full_name,
+      name: row.full_name, // Use full_name as name
       username: row.username,
+      email: row.email || `${row.username}@example.com`, // Fallback email if not present
       avatar_url: row.avatar_url,
       role_id: row.role ? row.role.toString() : null,
       role: hasRole
@@ -167,8 +171,10 @@ export async function getUserProfiles(): Promise<UserProfile[]> {
             created_at: new Date(row.role_created_at).toISOString(),
           }
         : undefined,
+      status: row.status || 'active', // Default to active if not set
       created_at: new Date(row.user_created_at).toISOString(),
       updated_at: new Date(row.user_updated_at).toISOString(),
+      createdAt: new Date(row.user_created_at).toISOString(), // Alias for compatibility
     };
   });
 }
@@ -199,28 +205,41 @@ export interface NewUserInput {
   username: string;
   password: string;
   full_name: string;
-  role: 'admin' | 'user';
+  email?: string;
+  role: 'admin' | 'user' | 'manager';
+  status?: 'active' | 'inactive' | 'pending';
 }
 
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
   const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
   const { rows } = await query(
     `
-    INSERT INTO user_profiles (id, username, full_name, role, created_at, updated_at)
-    VALUES ($1, $2, $3, $4, NOW(), NOW())
+    INSERT INTO user_profiles (id, username, full_name, email, role, status, created_at, updated_at)
+    VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
     RETURNING *;
   `,
-    [authUser.id, userData.username, userData.full_name, userData.role]
+    [
+      authUser.id, 
+      userData.username, 
+      userData.full_name, 
+      userData.email || `${userData.username}@example.com`,
+      userData.role,
+      userData.status || 'active'
+    ]
   );
   const user = rows[0];
   return {
     id: user.id.toString(),
     full_name: user.full_name,
+    name: user.full_name,
     username: user.username,
+    email: user.email,
     avatar_url: user.avatar_url,
     role_id: user.role ? user.role.toString() : null,
+    status: user.status || 'active',
     created_at: new Date(user.created_at).toISOString(),
     updated_at: new Date(user.updated_at).toISOString(),
+    createdAt: new Date(user.created_at).toISOString(),
   };
 }
 
@@ -228,14 +247,35 @@ export async function deleteUser(userId: string): Promise<void> {
   await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
 }
 
-export async function updateUser(
-  userId: string,
-  data: { username: string; full_name: string; role: 'admin' | 'user' }
-): Promise<void> {
+// Updated updateUser function with correct signature
+export async function updateUser(updateData: UpdateUserData): Promise<UserProfile> {
+  const { id, username, full_name, email, role, status } = updateData;
+  
   await query(
-    'UPDATE user_profiles SET username = $1, full_name = $2, role = $3, updated_at = NOW() WHERE id = $4',
-    [data.username, data.full_name, data.role, userId]
+    `UPDATE user_profiles 
+     SET username = COALESCE($1, username), 
+         full_name = COALESCE($2, full_name), 
+         email = COALESCE($3, email),
+         role = COALESCE($4, role), 
+         status = COALESCE($5, status),
+         updated_at = NOW() 
+     WHERE id = $6`,
+    [username, full_name, email, role, status, id]
   );
+  
+  // Return the updated user
+  const profiles = await getUserProfiles();
+  const updated = profiles.find(p => p.id === id);
+  if (!updated) throw new Error('Updated user not found');
+  return updated;
+}
+
+// New bulk delete function
+export async function deleteUsers(userIds: string[]): Promise<void> {
+  if (userIds.length === 0) return;
+  
+  const placeholders = userIds.map((_, index) => `$${index + 1}`).join(',');
+  await query(`DELETE FROM user_profiles WHERE id IN (${placeholders});`, userIds);
 }
 
 // --- Auth Placeholders ---

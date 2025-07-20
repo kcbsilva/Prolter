@@ -7,6 +7,7 @@ import type { UserProfile } from '@/types/users';
 import { RemoveUserDialog } from './RemoveUserDialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Pencil } from 'lucide-react';
 
 interface ListUsersProps {
@@ -15,6 +16,10 @@ interface ListUsersProps {
   error?: string;
   onEditClick: (user: UserProfile) => void;
   onRefresh?: () => void;
+  selectedUsers?: Set<string>;
+  onSelectUser?: (userId: string, checked: boolean) => void;
+  onSelectAll?: (checked: boolean) => void;
+  showSelection?: boolean;
 }
 
 export function ListUsers({
@@ -23,14 +28,11 @@ export function ListUsers({
   error,
   onEditClick,
   onRefresh,
+  selectedUsers = new Set(),
+  onSelectUser,
+  onSelectAll,
+  showSelection = false,
 }: ListUsersProps) {
-  const columns = [
-    { key: 'email', label: 'Email' },
-    { key: 'full_name', label: 'Full Name' },
-    { key: 'role', label: 'Role' },
-    { key: 'actions', label: 'Actions', className: 'text-right' },
-  ];
-
   const [page, setPage] = React.useState(1);
   const entriesPerPage = 10;
   const totalPages = Math.max(1, Math.ceil(userProfiles.length / entriesPerPage));
@@ -45,23 +47,40 @@ export function ListUsers({
   };
 
   const renderRows = () =>
-    currentData.map((user) => (
-      <tr key={user.id} className="border-b">
-        <td className="px-4 py-2">{user.email}</td>
-        <td className="px-4 py-2">{user.full_name}</td>
-        <td className="px-4 py-2">
-          {renderBadge(user.role?.name || 'Unassigned')}
-        </td>
-        <td className="px-4 py-2 text-right">
-          <div className="flex justify-end gap-2">
-            <Button size="sm" variant="outline" onClick={() => onEditClick(user)}>
-              <Pencil className="w-4 h-4" />
-            </Button>
-            <RemoveUserDialog user={user} onSuccess={onRefresh || (() => {})} />
-          </div>
-        </td>
-      </tr>
-    ));
+    currentData.map((user) => {
+      const isChecked = selectedUsers.has(user.id);
+      return (
+        <tr key={user.id} className="border-b">
+          {showSelection && (
+            <td className="px-4 py-2">
+              <Checkbox
+                checked={isChecked}
+                onCheckedChange={(checked) => onSelectUser?.(user.id, Boolean(checked))}
+              />
+            </td>
+          )}
+          <td className="px-4 py-2">{user.email}</td>
+          <td className="px-4 py-2">{user.full_name}</td>
+          <td className="px-4 py-2">{renderBadge(user.role?.name || 'Unassigned')}</td>
+          <td className="px-4 py-2 text-right">
+            <div className="flex justify-end gap-2">
+              <Button size="sm" variant="outline" onClick={() => onEditClick(user)}>
+                <Pencil className="w-4 h-4" />
+              </Button>
+              <RemoveUserDialog user={user} onSuccess={onRefresh || (() => {})} />
+            </div>
+          </td>
+        </tr>
+      );
+    });
+
+  const columns = [
+    ...(showSelection ? [{ key: 'select', label: '' }] : []),
+    { key: 'email', label: 'Email' },
+    { key: 'full_name', label: 'Full Name' },
+    { key: 'role', label: 'Role' },
+    { key: 'actions', label: 'Actions', className: 'text-right' },
+  ];
 
   if (error) {
     return <p className="text-sm text-red-500 px-4 py-2">Error loading users: {error}</p>;
