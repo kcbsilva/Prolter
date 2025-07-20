@@ -135,23 +135,24 @@ export async function deleteUserTemplate(templateId: string): Promise<void> {
 // --- User Profiles ---
 export async function getUserProfiles(): Promise<UserProfile[]> {
   const result = await query(`
-    SELECT 
-      up.id AS user_id,
-      up.full_name,
-      up.username,
-      up.email,
-      up.avatar_url,
-      up.role,
-      up.status,
-      up.created_at AS user_created_at,
-      up.updated_at AS user_updated_at,
-      r.id AS role_id,
-      r.name AS role_name,
-      r.description AS role_description,
-      r.created_at AS role_created_at
-    FROM user_profiles up
-    LEFT JOIN roles r ON up.role = r.id;
-  `);
+  SELECT 
+    up.id AS user_id,
+    up.full_name,
+    up.username,
+    up.email,
+    up.avatar_url,
+    up.role,
+    up.status,
+    up.created_at AS user_created_at,
+    up.updated_at AS user_updated_at,
+    r.id AS role_id,
+    r.name AS role_name,
+    r.description AS role_description,
+    r.created_at AS role_created_at
+  FROM user_profiles up
+  LEFT JOIN roles r ON up.role::int = r.id;
+`);
+
 
   return result.rows.map((row) => {
     const hasRole = row.role_id && row.role_name;
