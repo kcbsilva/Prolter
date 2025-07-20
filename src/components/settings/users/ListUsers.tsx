@@ -9,8 +9,13 @@ import { UserBar } from './UserBar'
 import { cn } from '@/lib/utils'
 import { UpdatePasswordModal } from './UpdatePasswordModal'
 import { AddUserModal } from './AddUserModal'
+import { toast } from '@/hooks/use-toast'
 
-export function ListUsers() {
+interface ListUsersProps {
+  tab: 'active' | 'archived'
+}
+
+export function ListUsers({ tab }: ListUsersProps) {
   const [users, setUsers] = React.useState<ProUser[]>([])
   const [loading, setLoading] = React.useState(true)
   const [editingUserId, setEditingUserId] = React.useState<string | null>(null)
@@ -20,14 +25,14 @@ export function ListUsers() {
   const [showAddModal, setShowAddModal] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const [page, setPage] = React.useState(1)
-  const [showArchived, setShowArchived] = React.useState(false)
 
   const USERS_PER_PAGE = 10
+  const isArchivedTab = tab === 'archived'
 
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/settings/users?archived=${showArchived}`)
+      const res = await fetch(`/api/settings/users?archived=${isArchivedTab}`)
       const data = await res.json()
       setUsers(data)
     } catch (err) {
@@ -39,7 +44,7 @@ export function ListUsers() {
 
   React.useEffect(() => {
     fetchUsers()
-  }, [showArchived])
+  }, [tab])
 
   const totalPages = Math.ceil(users.length / USERS_PER_PAGE)
 
@@ -86,6 +91,15 @@ export function ListUsers() {
   }
 
   const archiveUser = async (user: ProUser) => {
+    if (user.status === 'active') {
+      toast({
+        title: 'Cannot archive active user',
+        description: 'Disable the user before archiving.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     try {
       await fetch(`/api/settings/users/update/${user.id}`, {
         method: 'PUT',
@@ -107,8 +121,8 @@ export function ListUsers() {
         onAddUser={() => setShowAddModal(true)}
         selectedUserId={selectedUserId}
         onChangePassword={() => setShowPasswordModal(true)}
-        showArchived={showArchived}
-        setShowArchived={setShowArchived}
+        showArchived={isArchivedTab}
+        setShowArchived={() => {}}
       />
 
       <div className="border rounded-md overflow-hidden">
@@ -127,9 +141,9 @@ export function ListUsers() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5} className="p-4 text-center">Loading users...</td></tr>
+              <tr><td colSpan={6} className="p-4 text-center">Loading users...</td></tr>
             ) : paginatedUsers.length === 0 ? (
-              <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No users found.</td></tr>
+              <tr><td colSpan={6} className="p-4 text-center text-muted-foreground">No users found.</td></tr>
             ) : (
               paginatedUsers.map(user => (
                 <tr
@@ -185,7 +199,9 @@ export function ListUsers() {
                       </Button>
                     )}
                     <Button size="sm" variant="secondary" onClick={() => handleEdit(user)}>Edit</Button>
-                    <Button size="sm" variant="destructive" onClick={() => archiveUser(user)}>Archive</Button>
+                    {!isArchivedTab && (
+                      <Button size="sm" variant="destructive" onClick={() => archiveUser(user)}>Archive</Button>
+                    )}
                   </td>
                 </tr>
               ))
@@ -194,37 +210,29 @@ export function ListUsers() {
         </table>
       </div>
 
-      {/* Pagination */}
-      {
-        totalPages > 1 && (
-          <div className="flex justify-end items-center gap-2 pt-4">
-            <Button size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
-            <span className="text-sm">Page {page} of {totalPages}</span>
-            <Button size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
-          </div>
-        )
-      }
+      {totalPages > 1 && (
+        <div className="flex justify-end items-center gap-2 pt-4">
+          <Button size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
+          <span className="text-sm">Page {page} of {totalPages}</span>
+          <Button size="sm" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>Next</Button>
+        </div>
+      )}
 
-      {/* Modals */}
-      {
-        showPasswordModal && selectedUserId && (
-          <UpdatePasswordModal
-            userId={selectedUserId}
-            onClose={() => setShowPasswordModal(false)}
-          />
-        )
-      }
+      {showPasswordModal && selectedUserId && (
+        <UpdatePasswordModal
+          userId={selectedUserId}
+          onClose={() => setShowPasswordModal(false)}
+        />
+      )}
 
-      {
-        showAddModal && (
-          <AddUserModal
-            onClose={() => {
-              setShowAddModal(false)
-              fetchUsers()
-            }}
-          />
-        )
-      }
-    </div >
+      {showAddModal && (
+        <AddUserModal
+          onClose={() => {
+            setShowAddModal(false)
+            fetchUsers()
+          }}
+        />
+      )}
+    </div>
   )
 }
