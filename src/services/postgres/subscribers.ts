@@ -65,12 +65,53 @@ function mapRowToSubscriber(row: any): Subscriber {
 /* -------------------------------------------------------------
    LIST
 -------------------------------------------------------------- */
-export async function listSubscribers(): Promise<Subscriber[]> {
-  const { rows } = await query(
-    'SELECT * FROM subscribers WHERE deleted_at IS NULL ORDER BY created_at DESC'
-  );
-  return rows.map(mapRowToSubscriber);
+export async function listSubscribers(
+  page = 1,
+  perPage = 10,
+  status?: string
+): Promise<{
+  subscribers: Subscriber[]
+  total: number
+  totalPages: number
+}> {
+  const offset = (page - 1) * perPage
+  const values: any[] = [perPage, offset]
+  const conditions: string[] = ['deleted_at IS NULL']
+  let idx = 3
+
+  if (status) {
+    conditions.push(`status = $${idx}`)
+    values.push(status)
+    idx++
+  }
+
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
+  const dataQuery = `
+    SELECT * FROM subscribers
+    ${whereClause}
+    ORDER BY created_at DESC
+    LIMIT $1 OFFSET $2
+  `
+
+  const countQuery = `
+    SELECT COUNT(*) FROM subscribers
+    ${whereClause}
+  `
+
+  const dataResult = await query(dataQuery, values)
+  const countResult = await query(countQuery, values.slice(2)) // only pass status if set
+
+  const total = Number(countResult.rows[0]?.count ?? 0)
+  const totalPages = Math.ceil(total / perPage)
+
+  return {
+    subscribers: dataResult.rows.map(mapRowToSubscriber),
+    total,
+    totalPages,
+  }
 }
+
 
 /* -------------------------------------------------------------
    ADD
