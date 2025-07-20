@@ -2,13 +2,11 @@
 'use client'
 
 import * as React from 'react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ListUsers } from '@/components/settings/users/ListUsers'
 import { UsersCards } from '@/components/settings/users/UsersCards'
-import { Button } from '@/components/ui/button'
 
 export default function UserSettingsPage() {
-  const [tab, setTab] = React.useState<'active' | 'archived'>('active')
-
   return (
     <main className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -17,22 +15,19 @@ export default function UserSettingsPage() {
 
       <UsersCards />
 
-      <div className="flex gap-2">
-        <Button
-          variant={tab === 'active' ? 'default' : 'outline'}
-          onClick={() => setTab('active')}
-        >
-          Active Users
-        </Button>
-        <Button
-          variant={tab === 'archived' ? 'default' : 'outline'}
-          onClick={() => setTab('archived')}
-        >
-          Archived Users
-        </Button>
-      </div>
+      <Tabs defaultValue="active" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="active">Active Users</TabsTrigger>
+          <TabsTrigger value="archived">Archived Users</TabsTrigger>
+        </TabsList>
 
-      <ListUsers tab={tab} />
+        <TabsContent value="active">
+          <ListUsers tab="active" />
+        </TabsContent>
+        <TabsContent value="archived">
+          <ListUsers tab="archived" />
+        </TabsContent>
+      </Tabs>
     </main>
   )
 }

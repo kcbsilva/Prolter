@@ -1,3 +1,4 @@
+// /components/settings/users/ListUsers.tsx
 'use client'
 
 import * as React from 'react'
@@ -112,6 +113,18 @@ export function ListUsers({ tab }: ListUsersProps) {
     }
   }
 
+  const unarchiveUser = async (user: ProUser) => {
+    try {
+      await fetch(`/api/users/unarchive/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      fetchUsers()
+    } catch (err) {
+      console.error('[UNARCHIVE_USER_ERROR]', err)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <UserBar
@@ -199,7 +212,9 @@ export function ListUsers({ tab }: ListUsersProps) {
                       </Button>
                     )}
                     <Button size="sm" variant="secondary" onClick={() => handleEdit(user)}>Edit</Button>
-                    {!isArchivedTab && (
+                    {isArchivedTab ? (
+                      <Button size="sm" variant="outline" onClick={() => unarchiveUser(user)}>Unarchive</Button>
+                    ) : (
                       <Button size="sm" variant="destructive" onClick={() => archiveUser(user)}>Archive</Button>
                     )}
                   </td>
