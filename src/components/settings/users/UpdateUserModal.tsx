@@ -49,7 +49,7 @@ export function UpdateUserModal({ user, onClose }: UpdateUserModalProps) {
   const onSubmit = async (data: FormValues) => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/update/${user.id}`, {
+      const res = await fetch(`/app/api/users/update/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

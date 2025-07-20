@@ -17,7 +17,7 @@ export function RemoveUserDialog({ user, onClose }: RemoveUserDialogProps) {
   const handleArchive = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/update/${user.id}`, {
+      const res = await fetch(`/app/api/users/update/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...user, is_archived: true })

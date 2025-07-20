@@ -57,7 +57,7 @@ export function ListUsers() {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/api/settings/users/update/${editingUserId}`, {
+      const res = await fetch(`/app/api/settings/users/update/${editingUserId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editedData),

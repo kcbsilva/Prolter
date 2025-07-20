@@ -60,7 +60,7 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
   })
 
   const checkUsernameAvailable = async (username: string) => {
-    const res = await fetch(`/api/users/check-username?username=${username}`)
+    const res = await fetch(`/app/api/users/check-username?username=${username}`)
     const data = await res.json()
     return data.available
   }

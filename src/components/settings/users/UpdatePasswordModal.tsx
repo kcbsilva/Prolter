@@ -60,7 +60,7 @@ interface UpdatePasswordModalProps {
 
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/update-password/${userId}`, {
+      const res = await fetch(`/app/api/users/update-password/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
