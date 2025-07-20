@@ -227,11 +227,11 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
                 <div
                   className={cn(
                     'w-6 h-6 rounded-full border-2 transition-colors flex items-center justify-center',
-                    step === s 
-                      ? 'bg-primary border-primary' 
-                      : step > s 
-                      ? 'bg-green-500 border-green-500' 
-                      : 'bg-muted border-border'
+                    step === s
+                      ? 'bg-primary border-primary'
+                      : step > s
+                        ? 'bg-green-500 border-green-500'
+                        : 'bg-muted border-border'
                   )}
                 >
                   {step > s && <Check className="w-4 h-4 text-white" />}
@@ -354,8 +354,10 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('add_subscriber.email_label', 'Email')}</FormLabel>
-                      <FormControl><Input type="email" {...field} /></FormControl>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
