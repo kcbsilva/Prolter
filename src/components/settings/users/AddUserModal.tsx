@@ -22,6 +22,7 @@ import {
   SelectItem
 } from '@/components/ui/select'
 import { toast } from '@/hooks/use-toast'
+import { useSWRConfig } from 'swr' // ✅ added for mutate()
 
 interface AddUserModalProps {
   onClose: () => void
@@ -41,6 +42,7 @@ type FormData = z.infer<typeof formSchema>
 
 export function AddUserModal({ onClose }: AddUserModalProps) {
   const [loading, setLoading] = React.useState(false)
+  const { mutate } = useSWRConfig() // ✅ to trigger refetch after add
 
   const {
     register,
@@ -60,7 +62,7 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
   })
 
   const checkUsernameAvailable = async (username: string) => {
-    const res = await fetch(`/app/api/users/check-username?username=${username}`)
+    const res = await fetch(`/users/check-username?username=${username}`)
     const data = await res.json()
     return data.available
   }
@@ -68,7 +70,6 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
   const onSubmit = async (data: FormData) => {
     setLoading(true)
     try {
-      // check username availability first
       const available = await checkUsernameAvailable(data.username)
       if (!available) {
         toast({
@@ -93,6 +94,10 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
 
       reset()
       onClose()
+
+      // ✅ Trigger SWR refetches
+      mutate('/api/settings/users')
+      mutate('/api/settings/users/stats')
     } catch (error) {
       console.error('[ADD_USER_ERROR]', error)
       const errorMessage =
