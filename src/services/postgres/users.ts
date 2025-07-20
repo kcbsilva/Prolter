@@ -212,33 +212,40 @@ export interface NewUserInput {
 }
 
 export async function createUser(userData: NewUserInput): Promise<UserProfile> {
-  const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
+  // 1. Look up the role ID from the roles table
+  const roleResult = await query(
+    `SELECT id FROM roles WHERE name = $1 LIMIT 1;`,
+    [userData.role]
+  );
 
-  // 🔑 Get role ID from roles table
-  const roleResult = await query('SELECT id FROM roles WHERE name = $1', [userData.role]);
-  const roleId = roleResult.rows[0]?.id;
-
-  if (!roleId) {
+  if (roleResult.rows.length === 0) {
     throw new Error(`Role "${userData.role}" not found in roles table`);
   }
 
+  const roleId = roleResult.rows[0].id;
+
+  // 2. Create auth placeholder (or replace this with real auth logic)
+  const authUser = await createAuthUserPlaceholder(userData.username, userData.password);
+
+  // 3. Insert user into user_profiles
   const { rows } = await query(
     `
     INSERT INTO user_profiles (id, username, full_name, email, role, status, created_at, updated_at)
     VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
     RETURNING *;
-  `,
+    `,
     [
       authUser.id,
       userData.username,
       userData.full_name,
       userData.email || `${userData.username}@example.com`,
-      roleId, // 🛠️ use roleId instead of raw string
-      userData.status || 'active',
+      roleId, // ✅ use resolved integer ID here
+      userData.status || 'active'
     ]
   );
 
   const user = rows[0];
+
   return {
     id: user.id.toString(),
     full_name: user.full_name,
@@ -253,6 +260,7 @@ export async function createUser(userData: NewUserInput): Promise<UserProfile> {
     createdAt: new Date(user.created_at).toISOString(),
   };
 }
+
 
 export async function deleteUser(userId: string): Promise<void> {
   await query('DELETE FROM user_profiles WHERE id = $1;', [userId]);
