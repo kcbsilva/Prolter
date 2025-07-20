@@ -123,7 +123,7 @@ export default function PostgresTablesPage() {
             </SelectTrigger>
             <SelectContent>
               {databases.map((db) => (
-                <SelectItem key={db.id} value={db.name}>
+                <SelectItem key={db.id ?? db.name} value={db.name}>
                   {db.name}
                 </SelectItem>
               ))}
@@ -150,8 +150,8 @@ export default function PostgresTablesPage() {
               columns={[{ key: 'name', label: 'Table Name' }]}
               page={1}
               totalPages={1}
-              onPageChange={() => {}}
-              onRefresh={() => {}}
+              onPageChange={() => { }}
+              onRefresh={() => { }}
             >
               <></>
             </PaginatedSkeletonTable>
