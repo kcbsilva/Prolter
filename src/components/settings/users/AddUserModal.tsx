@@ -27,8 +27,8 @@ interface AddUserModalProps {
 }
 
 // Replace these with your actual UUIDs from the roles table
-const ROLE_USER_ID = '00000000-0000-0000-0000-000000000001'
-const ROLE_ADMIN_ID = '00000000-0000-0000-0000-000000000002'
+const ROLE_USER_ID = '9bffa346-ad38-4da9-ad06-ff4d4ef0439d'
+const ROLE_ADMIN_ID = 'e1a0890c-b8b6-4b25-9fa1-699da338b0f3'
 
 const formSchema = z.object({
     full_name: z.string().min(1),
