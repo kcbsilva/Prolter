@@ -1,43 +1,26 @@
 // /components/settings/users/UsersCards.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
-import { ProUser } from '@/types/prousers'
+import useSWR from 'swr'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { motion } from 'framer-motion'
 
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
 export function UsersCards() {
-  const [users, setUsers] = useState<ProUser[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data, error, isLoading } = useSWR('/api/settings/users/stats', fetcher)
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch('/api/users')
-        const data = await res.json()
-        setUsers(data)
-      } catch (err) {
-        console.error('[USER_STATS_ERROR]', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchUsers()
-  }, [])
-
-  if (loading) return null
-
-  const total = users.length
-  const active = users.filter(u => u.status === 'active').length
-  const inactive = users.filter(u => u.status === 'inactive').length
-  const admins = users.filter(u => u.role_id === 'admin').length
+  if (isLoading) return null
+  if (error) {
+    console.error('[USER_STATS_ERROR]', error)
+    return null
+  }
 
   const cards = [
-    { title: 'Total Users', value: total, icon: '👥' },
-    { title: 'Active Users', value: active, icon: '✅' },
-    { title: 'Inactive Users', value: inactive, icon: '❌' },
-    { title: 'Admins', value: admins, icon: '🛡️' },
+    { title: 'Total Users', value: data.total, icon: '👥' },
+    { title: 'Active Users', value: data.active, icon: '✅' },
+    { title: 'Inactive Users', value: data.inactive, icon: '❌' },
+    { title: 'Admins', value: data.admins, icon: '🛡️' },
   ]
 
   return (
