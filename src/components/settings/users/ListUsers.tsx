@@ -27,7 +27,7 @@ export function ListUsers() {
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/users?archived=${showArchived}`)
+      const res = await fetch(`/api/settings/users?archived=${showArchived}`)
       const data = await res.json()
       setUsers(data)
     } catch (err) {
@@ -57,7 +57,7 @@ export function ListUsers() {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`/app/api/settings/users/update/${editingUserId}`, {
+      const res = await fetch(`/api/settings/users/update/${editingUserId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editedData),
@@ -74,7 +74,7 @@ export function ListUsers() {
   const toggleStatus = async (user: ProUser) => {
     const newStatus: UserStatus = user.status === 'active' ? 'inactive' : 'active'
     try {
-      await fetch(`/api/users/update/${user.id}`, {
+      await fetch(`/api/settings/users/update/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...user, status: newStatus })
@@ -87,7 +87,7 @@ export function ListUsers() {
 
   const archiveUser = async (user: ProUser) => {
     try {
-      await fetch(`/api/users/update/${user.id}`, {
+      await fetch(`/api/settings/users/update/${user.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...user, is_archived: true })
