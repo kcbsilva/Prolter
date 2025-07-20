@@ -64,7 +64,7 @@ export function AddUserModal({ onClose }: AddUserModalProps) {
         try {
             console.log('[ADD_USER_PAYLOAD]', data) // ✅ Log payload
 
-            const res = await fetch('/api/users/create', {
+            const res = await fetch('/api/settings/users/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
