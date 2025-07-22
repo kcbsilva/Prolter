@@ -86,12 +86,15 @@
 
 @layer base {
   html {
-    @apply h-full;
+   @apply h-full;
+   @apply h-full w-full overflow-hidden;
   }
   body {
-    @apply h-full flex flex-col bg-background text-foreground text-xs;
+   @apply h-full flex flex-col bg-background text-foreground text-xs;
+   @apply h-full w-full overflow-hidden flex flex-col bg-background text-foreground text-xs;
     font-family: "Tenorite", Arial, sans-serif;
   }
+
   * {
     @apply border-border;
   }

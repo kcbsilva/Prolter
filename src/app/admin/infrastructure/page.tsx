@@ -76,10 +76,10 @@ export default function InfrastructurePage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-muted">
-      <div className="flex h-[700px] w-[2000px] overflow-hidden rounded-2xl shadow-md border bg-white">
+    <div className="h-screen w-screen overflow-hidden bg-muted">
+      <div className="flex h-full w-full overflow-hidden rounded-none">
         {/* Sidebar */}
-        <aside className="w-[200px] p-4 border-r bg-muted/40 space-y-1">
+        <aside className="w-[240px] h-full p-4 border-r bg-muted/40 space-y-1">
           {tabs.map((tab) => {
             const Icon = tab.icon
             const isActive = selectedTab === tab.value
@@ -101,10 +101,11 @@ export default function InfrastructurePage() {
         </aside>
   
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-y-auto bg-white">
+        <main className="flex-1 min-w-0 h-full p-6 overflow-auto bg-white">
           {renderContent()}
         </main>
       </div>
     </div>
   )
+  
 }
