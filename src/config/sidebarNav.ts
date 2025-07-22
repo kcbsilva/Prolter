@@ -87,34 +87,9 @@ export const sidebarNav: SidebarNavItem[] = [
   },
   {
     title: 'sidebar.finances',
+    href: '/admin/finances/',
     icon: DollarSign,
     tooltip: 'sidebar.finances',
-    children: [
-      {
-        title: 'sidebar.finances_dashboard',
-        href: '/admin/finances/dashboard',
-        icon: LayoutDashboard,
-        tooltip: 'sidebar.finances_dashboard',
-      },
-      {
-        title: 'sidebar.finances_cash_book',
-        href: '/admin/finances/cash-book',
-        icon: BookOpen,
-        tooltip: 'sidebar.finances_cash_book',
-      },
-      {
-        title: 'sidebar.finances_entry_categories',
-        href: '/admin/finances/entry-categories',
-        icon: ListFilter,
-        tooltip: 'sidebar.finances_entry_categories',
-      },
-      {
-        title: 'sidebar.finances_config',
-        href: '/admin/settings/finances/configurations',
-        icon: SlidersHorizontal,
-        tooltip: 'sidebar.finances_config',
-      },
-    ],
   },
   {
     title: 'sidebar.noc',
