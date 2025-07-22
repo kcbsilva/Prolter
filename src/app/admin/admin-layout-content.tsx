@@ -19,7 +19,7 @@ export function AppLayoutContent({ children }: { children: React.ReactNode }) {
       <main
         className={isMapPage
           ? 'flex-1 p-1 h-full overflow-y-auto'
-          : 'flex-1 p-4 md:p-4 lg:p-1 h-full overflow-y-auto'}
+          : 'flex-1 p-4 md:p-4 lg:p-0 h-full overflow-y-auto'}
       >
         {children}
       </main>
