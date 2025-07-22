@@ -76,7 +76,7 @@ export default function InfrastructurePage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted p-4">
+    <div className="min-h-screen bg-muted p-1">
       <div className="flex h-full w-full overflow-hidden rounded-2xl shadow-md border bg-white">
         {/* Sidebar */}
         <aside className="w-[240px] p-4 border-r bg-muted/40 rounded-l-2xl space-y-1">
