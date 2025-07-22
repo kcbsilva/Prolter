@@ -77,7 +77,7 @@ export default function InfrastructurePage() {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-muted">
-      <div className="flex h-[1200px] w-[1200px] overflow-hidden rounded-2xl shadow-md border bg-white">
+      <div className="flex h-[1000px] w-[2000px] overflow-hidden rounded-2xl shadow-md border bg-white">
         {/* Sidebar */}
         <aside className="w-[240px] p-4 border-r bg-muted/40 space-y-1">
           {tabs.map((tab) => {
