@@ -13,6 +13,7 @@ export function AppLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-screen w-full overflow-hidden">
       {/* Double Header */}
       <HeaderNav />
+    
 
       {/* Main content area */}
       <main

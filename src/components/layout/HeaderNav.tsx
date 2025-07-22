@@ -1,111 +1,85 @@
-// src/components/layouts/AdminNavTree.tsx
+// src/components/layouts/HeaderNav.tsx
 'use client'
 
 import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import type { SidebarNavItem } from '@/config/sidebarNav'
+import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/header/theme-toggle'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
-import { useLocale } from '@/contexts/LocaleContext'
+import { useTheme } from 'next-themes'
+import { FaWhatsapp, FaTelegram, FaLinkedin, FaFacebook } from 'react-icons/fa'
+import { MdAlternateEmail } from 'react-icons/md'
+import { AdminNavTree } from './AdminNavTree'
+import { sidebarNav } from '@/config/sidebarNav'
 
-interface AdminNavTreeProps {
-  items: SidebarNavItem[]
-  layout?: 'horizontal' | 'vertical' | 'dropdown'
-  level?: number
-}
-
-export function AdminNavTree({ items, layout = 'horizontal', level = 0 }: AdminNavTreeProps) {
+export function HeaderNav() {
   const pathname = usePathname()
-  const { t } = useLocale()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
-    <>
-      {items.map((item, index) => {
-        if (!item.title) return null
-        const key = `${item.title}-${index}`
-        const label = t(item.title)
-        const tooltip = t(item.tooltip || item.title)
-
-        const Icon = item.icon ? (item.icon as React.ElementType) : null
-        const iconElement = Icon ? <Icon className="w-4 h-4 shrink-0" /> : null
-
-        // Handle nested items
-        if (item.children && item.children.length > 0) {
-          if (layout === 'dropdown') {
-            return (
-              <DropdownMenuSub key={key}>
-                <DropdownMenuSubTrigger className="flex items-center gap-2 px-3 py-1.5 text-sm whitespace-nowrap">
-                  {iconElement}
-                  <span className="truncate">{label}</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="ml-2">
-                  <AdminNavTree items={item.children} layout="dropdown" level={level + 1} />
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-            )
-          }
-
-          return (
-            <div
-              key={key}
-              className={cn('flex flex-col', layout === 'horizontal' && 'relative group')}
-            >
-              <span
-                title={tooltip}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium whitespace-nowrap"
-              >
-                {iconElement}
-                <span className="truncate">{label}</span>
-              </span>
-              <div
-                className={cn(
-                  layout === 'horizontal'
-                    ? 'absolute hidden group-hover:flex flex-col top-full left-0 bg-white dark:bg-[#081124] shadow-md z-50'
-                    : 'ml-4'
-                )}
-              >
-                <AdminNavTree items={item.children} layout={layout} level={level + 1} />
-              </div>
-            </div>
-          )
-        }
-
-        if (!item.href) return null
-
-        const isActive = pathname === item.href
-
-        return layout === 'dropdown' ? (
-          <DropdownMenuItem asChild key={key}>
-            <Link
-              href={item.href}
-              title={tooltip}
-              className="flex items-center gap-2 text-sm whitespace-nowrap w-full"
-            >
-              {iconElement}
-              <span className="truncate">{label}</span>
-            </Link>
-          </DropdownMenuItem>
-        ) : (
-          <Link
-            key={key}
-            href={item.href}
-            title={tooltip}
-            className={cn(
-              'flex items-center gap-2 px-3 py-2 text-sm whitespace-nowrap',
-              isActive && 'text-[#fca311] font-semibold'
-            )}
-          >
-            {iconElement}
-            <span className="truncate">{label}</span>
+    <header className="w-full">
+      {/* Top Info Bar */}
+      <div className="h-8 flex items-center justify-between px-4 text-xs bg-[#233B6E] text-white dark:bg-[#081124]">
+        <div className="font-semibold text-sm">Prolter</div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <MdAlternateEmail className="w-3.5 h-3.5" />
+            <span>support@prolter.io</span>
+          </div>
+          <Link href="https://t.me/prolter" target="_blank" className="hover:text-[#fca311]">
+            <FaTelegram className="w-3.5 h-3.5" />
           </Link>
-        )
-      })}
-    </>
+          <Link href="https://wa.me/123456789" target="_blank" className="hover:text-[#fca311]">
+            <FaWhatsapp className="w-3.5 h-3.5" />
+          </Link>
+          <Link href="https://linkedin.com" target="_blank" className="hover:text-[#fca311]">
+            <FaLinkedin className="w-3.5 h-3.5" />
+          </Link>
+          <Link href="https://facebook.com" target="_blank" className="hover:text-[#fca311]">
+            <FaFacebook className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Navigation Bar */}
+      <div className="h-12 flex items-center justify-center relative px-4 sm:px-6 border-b-2 bg-white text-black dark:bg-[#14213D] dark:text-white border-b-[#233B6E] dark:border-b-[#FCA311]">
+        {/* Centered Navigation */}
+        <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 text-xs sm:text-sm">
+          <AdminNavTree items={sidebarNav} layout="horizontal" />
+        </nav>
+
+        {/* Right-aligned actions */}
+        <div className="ml-auto flex items-center gap-3">
+          <ThemeToggle mounted={mounted} theme={theme} setTheme={setTheme} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Avatar className="cursor-pointer h-7 w-7">
+                <AvatarImage src="/avatar.png" />
+                <AvatarFallback>AD</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/admin/profile">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-600">Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </header>
   )
 }
