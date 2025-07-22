@@ -81,95 +81,9 @@ export const sidebarNav: SidebarNavItem[] = [
   },
   {
     title: 'sidebar.infrastructure',
+    href: '/admin/infrastructure/',
     icon: TbRouteScan,
     tooltip: 'sidebar.infrastructure',
-    children: [
-      {
-        title: 'sidebar.infrastructure_projects',
-        href: '/admin/infrastructure/projects',
-        icon: FileCode,
-        tooltip: 'sidebar.infrastructure_projects',
-      },
-      {
-        title: 'sidebar.infrastructure_map',
-        href: '/admin/infrastructure/map',
-        icon: Globe,
-        tooltip: 'sidebar.infrastructure__map',
-      },
-      {
-        title: 'sidebar.infrastructure_elements',
-        icon: GitFork,
-        tooltip: 'sidebar.infrastructure_elements',
-        children: [
-          {
-            title: 'sidebar.infrastructure_elements_polls',
-            href: '/admin/infrastructure/elements/polls',
-            icon: Power,
-            tooltip: 'sidebar.infrastructure_elements_polls',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_fdhs',
-            href: '/admin/infrastructure/elements/fdhs',
-            icon: Box,
-            tooltip: 'sidebar.infrastructure_elements_fdhs',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_foscs',
-            href: '/admin/infrastructure/elements/foscs',
-            icon: Warehouse,
-            tooltip: 'sidebar.infrastructure_elements_foscs',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_peds',
-            href: '/admin/infrastructure/elements/peds',
-            icon: Box,
-            tooltip: 'sidebar.infrastructure_elements_peds',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_sites',
-            href: '/admin/infrastructure/elements/sites',
-            icon: Building,
-            tooltip: 'sidebar.infrastructure_elements_sites',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_vaults',
-            href: '/admin/infrastructure/elements/vaults',
-            icon: Archive,
-            tooltip: 'sidebar.infrastructure_elements_vaults',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_ducts',
-            href: '/admin/infrastructure/elements/ducts',
-            icon: GitBranch,
-            tooltip: 'sidebar.infrastructure_elements_ducts',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_accessories',
-            href: '/admin/infrastructure/elements/accessories',
-            icon: Puzzle,
-            tooltip: 'sidebar.infrastructure_elements_accessories',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_splitters',
-            href: '/admin/infrastructure/elements/splitters',
-            icon: Split,
-            tooltip: 'sidebar.infrastructure_elements_splitters',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_towers',
-            href: '/admin/infrastructure/elements/towers',
-            icon: TowerControl,
-            tooltip: 'sidebar.infrastructure_elements_towers',
-          },
-          {
-            title: 'sidebar.infrastructure_elements_cables',
-            href: '/admin/infrastructure/elements/cables',
-            icon: Cable,
-            tooltip: 'sidebar.infrastructure_elements_cables',
-          },
-        ],
-      },
-    ],
   },
   {
     title: 'sidebar.finances',

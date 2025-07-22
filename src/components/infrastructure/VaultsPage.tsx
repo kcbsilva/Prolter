@@ -8,7 +8,7 @@ import { Archive, FileText as FileTextIcon } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 
-export default function VaultsPage() {
+export function VaultsPage() {
   const { t } = useLocale();
   const { toast } = useToast();
   const iconSize = "h-3 w-3";

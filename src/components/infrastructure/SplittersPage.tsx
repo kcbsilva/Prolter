@@ -87,7 +87,7 @@ const placeholderSplitterManufacturers: string[] = [];
 
 const placeholderExistingSplitterTemplates: SplitterTemplate[] = [];
 
-export default function SplittersPage() {
+export function SplittersPage() {
   const { t } = useLocale();
   const { toast } = useToast();
   const iconSize = "h-3 w-3";

@@ -2,8 +2,26 @@
 'use client'
 
 import * as React from 'react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { ProjectsPage } from '@/app/admin/infrastructure/projects'
+import {
+  LayoutDashboard,
+  Map,
+  Layers,
+  Landmark,
+  Boxes,
+  Split,
+  Cable,
+  Vault,
+  Settings,
+  TowerControl,
+  Package,
+  Projector,
+  Sliders,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+
+import { DashboardPage } from '@/components/infrastructure/InfrastructureDashboardPage'
+import { ProjectsPage } from '@/components/infrastructure/ProjectsPage'
 import { MapPage } from '@/components/infrastructure/MapPage'
 import { HydroPollsPage } from '@/components/infrastructure/HydroPollsPage'
 import { FDHsPage } from '@/components/infrastructure/FDHsPage'
@@ -17,42 +35,76 @@ import { SplittersPage } from '@/components/infrastructure/SplittersPage'
 import { TowersPage } from '@/components/infrastructure/TowersPage'
 import { CablesPage } from '@/components/infrastructure/CablesPage'
 
+const tabs = [
+  { value: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { value: 'projects', label: 'Projects', icon: Projector },
+  { value: 'map', label: 'Map', icon: Map },
+  { value: 'hydro', label: 'Hydro Polls', icon: Landmark },
+  { value: 'fdhs', label: 'FDHs', icon: Boxes },
+  { value: 'foscs', label: 'FOSCs', icon: Layers },
+  { value: 'peds', label: 'PEDs', icon: Sliders },
+  { value: 'sites', label: 'Sites', icon: Landmark },
+  { value: 'vaults', label: 'Vaults', icon: Vault },
+  { value: 'ducts', label: 'Ducts', icon: Cable },
+  { value: 'accessories', label: 'Accessories', icon: Package },
+  { value: 'splitters', label: 'Splitters', icon: Split },
+  { value: 'towers', label: 'Towers', icon: TowerControl },
+  { value: 'cables', label: 'Cables', icon: Cable },
+]
+
 export default function InfrastructurePage() {
-  const [selectedTab, setSelectedTab] = React.useState('projects')
+  const [selectedTab, setSelectedTab] = React.useState('dashboard')
+
+  const renderContent = () => {
+    switch (selectedTab) {
+      case 'dashboard': return <DashboardPage />
+      case 'projects': return <ProjectsPage />
+      case 'map': return <MapPage />
+      case 'hydro': return <HydroPollsPage />
+      case 'fdhs': return <FDHsPage />
+      case 'foscs': return <FOSCsPage />
+      case 'peds': return <PEDsPage />
+      case 'sites': return <SitesPage />
+      case 'vaults': return <VaultsPage />
+      case 'ducts': return <DuctsPage />
+      case 'accessories': return <AccessoriesPage />
+      case 'splitters': return <SplittersPage />
+      case 'towers': return <TowersPage />
+      case 'cables': return <CablesPage />
+      default: return <DashboardPage />
+    }
+  }
 
   return (
-    <div className="p-4">
-      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-        <TabsList className="grid grid-cols-4 gap-2 mb-6">
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-          <TabsTrigger value="map">Map</TabsTrigger>
-          <TabsTrigger value="hydro">Hydro Polls</TabsTrigger>
-          <TabsTrigger value="fdhs">FDHs</TabsTrigger>
-          <TabsTrigger value="foscs">FOSCs</TabsTrigger>
-          <TabsTrigger value="peds">PEDs</TabsTrigger>
-          <TabsTrigger value="sites">Sites</TabsTrigger>
-          <TabsTrigger value="vaults">Vaults</TabsTrigger>
-          <TabsTrigger value="ducts">Ducts</TabsTrigger>
-          <TabsTrigger value="accessories">Accessories</TabsTrigger>
-          <TabsTrigger value="splitters">Splitters</TabsTrigger>
-          <TabsTrigger value="towers">Towers</TabsTrigger>
-          <TabsTrigger value="cables">Cables</TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen bg-muted p-4">
+      <div className="flex h-full w-full overflow-hidden rounded-2xl shadow-md border bg-white">
+        {/* Sidebar */}
+        <aside className="w-[240px] p-4 border-r bg-muted/40 rounded-l-2xl space-y-1">
+          {tabs.map((tab) => {
+            const Icon = tab.icon
+            const isActive = selectedTab === tab.value
+            return (
+              <Button
+                key={tab.value}
+                variant="ghost"
+                className={cn(
+                  'w-full justify-start font-normal text-sm rounded-lg',
+                  isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
+                )}
+                onClick={() => setSelectedTab(tab.value)}
+              >
+                <Icon className="w-4 h-4 mr-2" />
+                {tab.label}
+              </Button>
+            )
+          })}
+        </aside>
 
-        <TabsContent value="projects"><ProjectsPage /></TabsContent>
-        <TabsContent value="map"><MapPage /></TabsContent>
-        <TabsContent value="hydro"><HydroPollsPage /></TabsContent>
-        <TabsContent value="fdhs"><FDHsPage /></TabsContent>
-        <TabsContent value="foscs"><FOSCsPage /></TabsContent>
-        <TabsContent value="peds"><PEDsPage /></TabsContent>
-        <TabsContent value="sites"><SitesPage /></TabsContent>
-        <TabsContent value="vaults"><VaultsPage /></TabsContent>
-        <TabsContent value="ducts"><DuctsPage /></TabsContent>
-        <TabsContent value="accessories"><AccessoriesPage /></TabsContent>
-        <TabsContent value="splitters"><SplittersPage /></TabsContent>
-        <TabsContent value="towers"><TowersPage /></TabsContent>
-        <TabsContent value="cables"><CablesPage /></TabsContent>
-      </Tabs>
+        {/* Main Content */}
+        <main className="flex-1 p-6 overflow-y-auto bg-white rounded-r-2xl">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   )
 }

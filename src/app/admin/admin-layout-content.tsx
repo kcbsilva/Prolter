@@ -10,7 +10,7 @@ export function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const isMapPage = pathname === '/admin/maps/map'
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden">
+    <div className="p-1 flex flex-col h-screen w-full overflow-hidden">
       {/* Double Header */}
       <HeaderNav />
     

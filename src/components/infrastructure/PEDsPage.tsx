@@ -74,7 +74,7 @@ const placeholderPedManufacturers: string[] = [];
 
 const placeholderExistingPedTemplates: PedTemplate[] = [];
 
-export default function PedsPage() {
+export function PEDsPage() {
   const { t } = useLocale();
   const { toast } = useToast();
   const iconSize = "h-3 w-3";
