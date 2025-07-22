@@ -1,4 +1,4 @@
-// src/app/admin/maps/projects/page.tsx
+// src/app/infrastructure/ProjectsPage.tsx
 'use client';
 
 import * as React from 'react';
@@ -13,7 +13,7 @@ import { RemoveProjectDialog } from '@/components/maps/projects/RemoveProjectDia
 
 import type { MapProject, Pop } from '@/types/maps';
 
-export default function ProjectsPage() {
+export function ProjectsPage() {
   const { t } = useLocale();
 
   const [projects, setProjects] = React.useState<MapProject[] | null>(null);
@@ -59,7 +59,6 @@ export default function ProjectsPage() {
     loadData();
   }, [t]);
 
-  // Reset page on filters/search/sort/perPage changes
   React.useEffect(() => {
     setPage(1);
   }, [search, statusFilter, sortBy, sortOrder, perPage]);

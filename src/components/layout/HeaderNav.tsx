@@ -54,9 +54,9 @@ export function HeaderNav() {
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="h-12 flex items-center justify-center relative px-4 sm:px-6 border-b-2 bg-white text-black dark:bg-[#14213D] dark:text-white border-b-[#233B6E] dark:border-b-[#FCA311]">
+      <div className="h-12 flex items-center justify-between px-4 sm:px-6 border-b-2 bg-white text-black dark:bg-[#14213D] dark:text-white border-b-[#233B6E] dark:border-b-[#FCA311]">
         {/* Centered Navigation */}
-        <nav className="absolute left-1/2 -translate-x-1/2 flex items-center gap-4 text-xs sm:text-sm">
+        <nav className="flex items-center gap-4 text-xs sm:text-sm">
           <AdminNavTree items={sidebarNav} layout="horizontal" />
         </nav>
 

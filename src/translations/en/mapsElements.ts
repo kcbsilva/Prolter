@@ -1,6 +1,6 @@
 //src/translations/en/mapsElements.ts
 
-const maps_elements = {
+const infrastructure_elements = {
     add_element_button: 'Add Element',
     select_type_title: 'Select Element Type',
     select_type_description: 'Please select a specific map element type from the sidebar to view or manage its items.',
@@ -284,4 +284,4 @@ const maps_elements = {
     no_ducts_found: 'No ducts found. They are typically added via the map interface.',
   }
 
-  export default maps_elements;
+  export default infrastructure_elements;
