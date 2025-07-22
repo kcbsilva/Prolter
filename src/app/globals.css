@@ -86,19 +86,18 @@
 
 @layer base {
   html {
-   @apply h-full;
-   @apply h-full w-full overflow-hidden;
+    @apply h-full w-full overflow-hidden;
   }
   body {
-   @apply h-full flex flex-col bg-background text-foreground text-xs;
-   @apply h-full w-full overflow-hidden flex flex-col bg-background text-foreground text-xs;
-    font-family: "Tenorite", Arial, sans-serif;
+    @apply h-full w-full overflow-hidden flex flex-col bg-background text-foreground text-xs;
+    font-family: var(--font-inter), sans-serif;
   }
+}
+
 
   * {
     @apply border-border;
   }
-}
 
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
