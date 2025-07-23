@@ -307,7 +307,7 @@ export function FinancialConfigPage() {
                     <TableHead className="text-xs text-center">
                       {t("financial_configs.table_header_status")}
                     </TableHead>
-                    <TableHead className="text-right w-20 text-xs text-center">
+                    <TableHead className="w-20 text-xs text-center">
                       {t("financial_configs.table_header_actions")}
                     </TableHead>
                   </TableRow>
@@ -339,7 +339,7 @@ export function FinancialConfigPage() {
                             : t("financial_configs.status_inactive")}
                         </span>
                       </TableCell>
-                      <TableCell className="text-right text-center">
+                      <TableCell className="text-center">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button

@@ -101,7 +101,8 @@ export default function FinanceDashboard() {
             </DialogContent>
           </Dialog>
 
-          <Button variant="outline" size="sm" onClick={() => setIsEditing(prev => !prev)}>
+          <Button variant="outline" size="sm" onClick={() => setIsEditing((prev: boolean) => !prev)}
+          >
             {isEditing ? 'Finish Editing' : 'Edit Layout'}
           </Button>
         </div>
