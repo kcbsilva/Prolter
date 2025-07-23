@@ -91,69 +91,14 @@ export const sidebarNav: SidebarNavItem[] = [
     icon: DollarSign,
     tooltip: 'sidebar.finances',
   },
+  
   {
     title: 'sidebar.noc',
+    href: '/admin/noc/',
     icon: NetworkIcon,
     tooltip: 'sidebar.noc',
-    children: [
-      {
-        title: 'sidebar.noc_overview',
-        href: '/admin/noc/dashboard',
-        icon: LayoutDashboard,
-        tooltip: 'sidebar.noc_overview',
-      },
-      {
-        title: 'sidebar.fttx',
-        icon: GitBranch,
-        tooltip: 'sidebar.fttx',
-        children: [
-          {
-            title: 'sidebar.fttx_dashboard',
-            href: '/admin/noc/fttx/dashboard',
-            icon: LayoutDashboard,
-            tooltip: 'sidebar.fttx_dashboard',
-          },
-          {
-            title: 'sidebar.fttx_olts',
-            href: '/admin/noc/fttx/olts',
-            icon: NetworkIcon,
-            tooltip: 'sidebar.fttx_olts',
-          },
-          {
-            title: 'sidebar.fttx_onx_templates',
-            href: '/admin/noc/fttx/onx-templates',
-            icon: FileTextIcon,
-            tooltip: 'sidebar.fttx_onx_templates',
-          },
-        ],
-      },
-      {
-        title: 'sidebar.noc_wireless',
-        icon: Wifi,
-        tooltip: 'sidebar.noc_wireless',
-        children: [
-          {
-            title: 'sidebar.noc_wireless_dashboard',
-            href: '/admin/noc/wireless/dashboard',
-            icon: LayoutDashboard,
-            tooltip: 'sidebar.noc_wireless_dashboard',
-          },
-          {
-            title: 'sidebar.noc_wireless_aps',
-            href: '/admin/noc/wireless/access-points',
-            icon: RouterIcon,
-            tooltip: 'sidebar.noc_wireless_aps',
-          },
-          {
-            title: 'sidebar.noc_wireless_clients',
-            href: '/admin/noc/wireless/clients',
-            icon: Users2,
-            tooltip: 'sidebar.noc_wireless_clients',
-          },
-        ],
-      },
-    ],
   },
+
   {
     title: 'sidebar.hub',
     icon: Webhook,
