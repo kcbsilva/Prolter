@@ -9,11 +9,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 
-import { ListCategories } from '@/components/finances/entry-categories/ListCategories';
-import { AddCategoryModal } from '@/components/finances/entry-categories/AddCategoryModal';
-import { UpdateCategoryModal } from '@/components/finances/entry-categories/UpdateCategoryModal';
-import { RemoveCategoryDialog } from '@/components/finances/entry-categories/RemoveCategoryDialog';
-import { EntryCategory } from '@/components/finances/entry-categories/types';
+import { ListCategories } from '@/components/pages/finances/entry-categories/ListCategories';
+import { AddCategoryModal } from '@/components/pages/finances/entry-categories/AddCategoryModal';
+import { UpdateCategoryModal } from '@/components/pages/finances/entry-categories/UpdateCategoryModal';
+import { RemoveCategoryDialog } from '@/components/pages/finances/entry-categories/RemoveCategoryDialog';
+import { EntryCategory } from '@/components/pages/finances/entry-categories/types';
 
 const STATIC_INCOME_ID = 'static-income-root';
 const STATIC_EXPENSE_ID = 'static-expense-root';
@@ -25,7 +25,7 @@ const mockCategories: EntryCategory[] = [
   { id: 'cat-2', name: 'Office', type: 'Expense', parentCategoryId: STATIC_EXPENSE_ID, createdAt: new Date() },
 ];
 
-export default function EntryCategoriesPage() {
+export function EntryCategoriesPage() {
   const { t } = useLocale();
   const { toast } = useToast();
 

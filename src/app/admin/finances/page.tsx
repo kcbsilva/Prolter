@@ -12,10 +12,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-import { FinanceDashboardPage } from '@/components/finances/FinanceDashboardPage'
-import { CashBookPage } from '@/components/finances/CashBookPage'
-import { EntryCategoriesPage } from '@/components/finances/EntryCategoriesPage'
-import { FinancialConfigPage } from '@/components/finances/FinancialConfigPage'
+import { FinanceDashboardPage } from '@/components/pages/finances/FinanceDashboardPage'
+import { CashBookPage } from '@/components/pages/finances/CashBookPage'
+import { EntryCategoriesPage } from '@/components/pages/finances/EntryCategoriesPage'
+import { FinancialConfigPage } from '@/components/pages/finances/FinancialConfigPage'
 
 const tabs = [
   { value: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },

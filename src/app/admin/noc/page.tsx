@@ -11,12 +11,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-import { NocOverview } from '@/components/noc/overview'
-import { FTTxDashboard } from '@/components/noc/fttx/FttxDashboard'
-import { OLTsONXs } from '@/components/noc/fttx/FttxOltsOnxs'
-import { WirelessDashboard } from '@/components/noc/wireless/WirelessDashboard'
-import { AccessPoints } from '@/components/noc/wireless/WirelessAccessPoint'
-import { CPEs } from '@/components/noc/wireless/WirelessCPEs'
+import { NocOverview } from '@/components/pages/noc/overview'
+import { FTTxDashboard } from '@/components/pages/noc/fttx/FttxDashboard'
+import { OLTsONXs } from '@/components/pages/noc/fttx/FttxOltsOnxs'
+import { WirelessDashboard } from '@/components/pages/noc/wireless/WirelessDashboard'
+import { AccessPoints } from '@/components/pages/noc/wireless/WirelessAccessPoint'
+import { CPEs } from '@/components/pages/noc/wireless/WirelessCPEs'
 
 const tabs = [
   { value: 'overview', label: 'Dashboard', icon: LayoutDashboard },
