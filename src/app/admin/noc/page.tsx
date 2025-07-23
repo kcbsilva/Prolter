@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 import { NocOverview } from '@/components/noc/overview'
-import { FTTxDashboard } from '@/components/noc/fttx/FTTxDashboard'
+import { FTTxDashboard } from '@/components/noc/fttx/FttxDashboard'
 import { OLTsONXs } from '@/components/noc/fttx/FttxOltsOnxs'
 import { WirelessDashboard } from '@/components/noc/wireless/WirelessDashboard'
 import { AccessPoints } from '@/components/noc/wireless/WirelessAccessPoint'
