@@ -22,7 +22,7 @@ const categoryFields = [
   { name: 'name', label: 'Name', type: 'text' },
 ];
 
-export function CategoriesPageContent() {
+export function InventoryCategories() {
   const { toast } = useToast();
   const { t } = useLocale();
 

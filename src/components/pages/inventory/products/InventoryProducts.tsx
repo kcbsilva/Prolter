@@ -15,7 +15,7 @@ import { AddProductModal } from './AddProductModal';
 import { UpdateProductModal } from './UpdateProductModal';
 import { RemoveProductDialog } from './RemoveProductDialog';
 
-export function ProductsPageContent() {
+export function InventoryProducts() {
   const { t } = useLocale();
   const { toast } = useToast();
   const [products, setProducts] = React.useState<Product[]>(productsData);

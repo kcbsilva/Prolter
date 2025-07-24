@@ -11,7 +11,7 @@ import { ListSuppliers } from './ListSuppliers';
 import { useEntityPage } from '@/hooks/use-entity-page';
 import type { Supplier } from '@/types/inventory';
 
-export function SuppliersPageContent() {
+export function InventorySuppliers() {
   const { t } = useLocale();
 
   const {

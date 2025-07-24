@@ -73,7 +73,7 @@ interface Warehouse extends WarehouseFormData {
   itemCount: number; // Placeholder for number of items in warehouse
 }
 
-export default function WarehousesPage() {
+export function InventoryWarehouses() {
   const { t } = useLocale();
   const { toast } = useToast();
   const [isAddWarehouseDialogOpen, setIsAddWarehouseDialogOpen] = React.useState(false);

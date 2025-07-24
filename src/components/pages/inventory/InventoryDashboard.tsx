@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import { inventoryCategories, manufacturers, suppliers, products } from '@/data/inventory';
 
-export default function InventoryDashboardPage() {
+export function InventoryDashboard() {
   const { t } = useLocale();
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

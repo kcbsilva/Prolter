@@ -60,7 +60,7 @@ const dashboardStats = {
 
 type ServiceCallStatusFilter = 'All' | 'Pending' | 'InProgress' | 'Resolved';
 
-export default function ServiceCallsDashboardPage() {
+export function ServiceCallsDashboard() {
   const { t } = useLocale();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = React.useState('');

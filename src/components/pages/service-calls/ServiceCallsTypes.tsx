@@ -27,7 +27,7 @@ const placeholderServiceTypes: ServiceType[] = [
   { id: 'st-003', name: 'Equipment Swap', description: 'Replacing faulty customer premises equipment.' },
 ];
 
-export default function ServiceTypesPage() {
+export function ServiceCallsTypes() {
   const { t } = useLocale();
   const { toast } = useToast();
   const iconSize = "h-3 w-3";

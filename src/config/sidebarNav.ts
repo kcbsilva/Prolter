@@ -98,105 +98,23 @@ export const sidebarNav: SidebarNavItem[] = [
     icon: NetworkIcon,
     tooltip: 'sidebar.noc',
   },
-
   {
     title: 'sidebar.hub',
+    href: '/admin/hub/',
     icon: Webhook,
     tooltip: 'sidebar.hub',
-    children: [
-      {
-        title: 'sidebar.hub_dashboard',
-        href: '/admin/hub/dashboard',
-        icon: LayoutDashboard,
-        tooltip: 'sidebar.hub_dashboard_tooltip',
-      },
-      {
-        title: 'sidebar.hub_connections',
-        href: '/admin/hub/connections',
-        icon: GitMerge,
-        tooltip: 'sidebar.hub_connections_tooltip',
-      },
-      {
-        title: 'sidebar.hub_participants',
-        href: '/admin/hub/participants',
-        icon: Users2,
-        tooltip: 'sidebar.hub_participants_tooltip',
-      },
-      {
-        title: 'sidebar.hub_configurations',
-        href: '/admin/hub/configurations',
-        icon: Settings2,
-        tooltip: 'sidebar.hub_configurations_tooltip',
-      },
-    ],
   },
   {
     title: 'sidebar.inventory',
+    href: '/admin/inventory/',
     icon: Archive,
     tooltip: 'sidebar.inventory',
-    children: [
-      {
-        title: 'sidebar.inventory_dashboard',
-        href: '/admin/inventory/dashboard',
-        icon: LayoutGrid,
-        tooltip: 'sidebar.inventory_dashboard',
-      },
-      {
-        title: 'sidebar.inventory_categories',
-        href: '/admin/inventory/categories',
-        icon: ListFilter,
-        tooltip: 'sidebar.inventory_categories',
-      },
-      {
-        title: 'sidebar.inventory_manufacturers',
-        href: '/admin/inventory/manufacturers',
-        icon: Factory,
-        tooltip: 'sidebar.inventory_manufacturers',
-      },
-      {
-        title: 'sidebar.inventory_suppliers',
-        href: '/admin/inventory/suppliers',
-        icon: Truck,
-        tooltip: 'sidebar.inventory_suppliers',
-      },
-      {
-        title: 'sidebar.inventory_products',
-        href: '/admin/inventory/products',
-        icon: PackageIcon,
-        tooltip: 'sidebar.inventory_products',
-      },
-       {
-        title: 'sidebar.inventory_warehouses',
-        href: '/admin/inventory/warehouses',
-        icon: Warehouse,
-        tooltip: 'sidebar.inventory_warehouses',
-      },
-      {
-        title: 'sidebar.inventory_vehicles',
-        href: '/admin/inventory/vehicles',
-        icon: Bus,
-        tooltip: 'sidebar.inventory_vehicles',
-      },
-    ],
   },
-   {
+  {
     title: 'sidebar.service_calls',
+    href: '/admin/service-calls/',
     icon: Wrench,
     tooltip: 'sidebar.service_calls',
-    children: [
-      {
-        title: 'sidebar.service_calls_dashboard',
-        href: '/admin/service-calls/dashboard',
-        icon: LayoutDashboard,
-        tooltip: 'sidebar.service_calls_dashboard',
-      },
-      {
-        title: 'sidebar.service_calls_service_types',
-        href: '/admin/service-calls/service-types',
-        icon: ListChecks,
-        tooltip: 'sidebar.service_calls_service_types',
-      },
-    ],
   },
   {
     title: 'sidebar.sales',
