@@ -6,6 +6,8 @@ import {
   LayoutDashboard,
   Wifi,
   Radio,
+  Cable,
+  NotepadTextDashed,
   SatelliteDish,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,27 +16,48 @@ import { cn } from '@/lib/utils'
 import { NocOverview } from '@/components/pages/noc/overview'
 import { FTTxDashboard } from '@/components/pages/noc/fttx/FttxDashboard'
 import { OLTsONXs } from '@/components/pages/noc/fttx/FttxOltsOnxs'
+import { OnxTemplates } from '@/components/pages/noc/fttx/FttxOnxTemplates'
 import { WirelessDashboard } from '@/components/pages/noc/wireless/WirelessDashboard'
 import { AccessPoints } from '@/components/pages/noc/wireless/WirelessAccessPoint'
 import { CPEs } from '@/components/pages/noc/wireless/WirelessCPEs'
 
-const tabs = [
-  { value: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-  { value: 'fttx', label: 'FTTx Dashboard', icon: Wifi },
-  { value: 'olts', label: 'OLTs', icon: Radio },
-  { value: 'wireless', label: 'Wireless Dashboard', icon: Wifi },
-  { value: 'aps', label: 'Access Points', icon: Radio },
-  { value: 'cpes', label: 'CPEs', icon: SatelliteDish },
+const tabGroups = [
+  {
+    label: 'Overview',
+    icon: LayoutDashboard,
+    items: [
+      { value: 'overview', label: 'Dashboard', icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'FTTx',
+    icon: Cable,
+    items: [
+      { value: 'fttx', label: 'FTTx Dashboard', icon: LayoutDashboard },
+      { value: 'olts', label: 'OLTs / ONXs', icon: Radio },
+      { value: 'templates', label: 'ONx Templates', icon: NotepadTextDashed },
+    ],
+  },
+  {
+    label: 'Wireless',
+    icon: Wifi,
+    items: [
+      { value: 'wireless', label: 'Wireless Dashboard', icon: LayoutDashboard },
+      { value: 'aps', label: 'Access Points', icon: Radio },
+      { value: 'cpes', label: 'CPEs', icon: SatelliteDish },
+    ],
+  },
 ]
 
 export default function NOCPage() {
-  const [selectedTab, setSelectedTab] = React.useState('dashboard')
+  const [selectedTab, setSelectedTab] = React.useState('overview')
 
   const renderContent = () => {
     switch (selectedTab) {
       case 'overview': return <NocOverview />
       case 'fttx': return <FTTxDashboard />
       case 'olts': return <OLTsONXs />
+      case 'templates': return <OnxTemplates />
       case 'wireless': return <WirelessDashboard />
       case 'aps': return <AccessPoints />
       case 'cpes': return <CPEs />
@@ -46,25 +69,38 @@ export default function NOCPage() {
     <div className="h-screen w-screen overflow-hidden bg-muted">
       <div className="flex h-full w-full overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-[240px] h-full overflow-y-auto p-4 border-r bg-muted/40 space-y-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
-            const isActive = selectedTab === tab.value
-            return (
-              <Button
-                key={tab.value}
-                variant="ghost"
-                className={cn(
-                  'w-full justify-start font-normal text-sm rounded-lg',
-                  isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
-                )}
-                onClick={() => setSelectedTab(tab.value)}
-              >
-                <Icon className="w-4 h-4 mr-2" />
-                {tab.label}
-              </Button>
-            )
-          })}
+        <aside className="w-[240px] h-full overflow-y-auto p-4 border-r bg-muted/40 space-y-4">
+          {tabGroups.map((group) => (
+            <div
+              key={group.label}
+              className="rounded-md p-3 space-y-2 bg-muted/10 shadow-sm"
+            >
+              <div className="flex items-center text-xs text-muted-foreground font-semibold">
+                {group.icon && <group.icon className="w-3 h-3 mr-2" />}
+                {group.label}
+              </div>
+              <div className="space-y-1">
+                {group.items.map((tab) => {
+                  const Icon = tab.icon
+                  const isActive = selectedTab === tab.value
+                  return (
+                    <Button
+                      key={tab.value}
+                      variant="ghost"
+                      className={cn(
+                        'w-full justify-start font-normal text-sm rounded-lg pl-6',
+                        isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
+                      )}
+                      onClick={() => setSelectedTab(tab.value)}
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {tab.label}
+                    </Button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </aside>
 
         {/* Main Content */}
@@ -74,4 +110,4 @@ export default function NOCPage() {
       </div>
     </div>
   )
-} 
+}
