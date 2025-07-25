@@ -30,7 +30,7 @@ const manufacturerFields = [
   { name: 'email', label: 'Email', type: 'email' },
 ];
 
-export function InventoryManufacturer() {
+export default function InventoryManufacturer() {
   const { toast } = useToast();
   const { t: translate } = useLocale();
 

@@ -118,77 +118,15 @@ export const sidebarNav: SidebarNavItem[] = [
   },
   {
     title: 'sidebar.sales',
+    href: '/admin/sales/',
     icon: TrendingUp,
     tooltip: 'sidebar.sales',
-    children: [
-      {
-        title: 'sidebar.sales_dashboard',
-        href: '/admin/sales/dashboard',
-        icon: LayoutDashboard,
-        tooltip: 'sidebar.sales_dashboard',
-      },
-      {
-        title: 'sidebar.sales_leads',
-        href: '/admin/sales/leads',
-        icon: Users,
-        tooltip: 'sidebar.sales_leads',
-      },
-      {
-        title: 'sidebar.sales_opportunities',
-        href: '/admin/sales/opportunities',
-        icon: Target,
-        tooltip: 'sidebar.sales_opportunities',
-      },
-      {
-        title: 'sidebar.sales_proposals',
-        href: '/admin/sales/proposals',
-        icon: FileTextIcon,
-        tooltip: 'sidebar.sales_proposals',
-      },
-      {
-        title: 'sidebar.sales_sales_orders',
-        href: '/admin/sales/orders',
-        icon: ShoppingCart,
-        tooltip: 'sidebar.sales_sales_orders',
-      },
-    ],
   },
   {
     title: 'sidebar.messenger',
+    href: '/admin/messenger/',
     icon: MessageSquare,
     tooltip: 'sidebar.messenger',
-    children: [
-      {
-        title: 'sidebar.messenger_chat',
-        href: '/admin/messenger/chat',
-        icon: MessageCircle,
-        tooltip: 'sidebar.messenger_chat',
-      },
-      {
-        title: 'sidebar.messenger_departments',
-        href: '/admin/messenger/departments',
-        icon: Users,
-        tooltip: 'sidebar.messenger_departments',
-      },
-      {
-        title: 'sidebar.messenger_channels',
-        href: '/admin/messenger/channels',
-        icon: Radio,
-        tooltip: 'sidebar.messenger_channels',
-      },
-      {
-        title: 'sidebar.messenger_flow',
-        href: '/admin/messenger/flow',
-        icon: Workflow,
-        tooltip: 'sidebar.messenger_flow',
-      },
-      {
-        title: 'sidebar.messenger_configure',
-        href: '/admin/messenger/configure',
-        icon: Settings2,
-        tooltip: 'sidebar.messenger_configure',
-      },
-    ],
   },
   {
     title: 'sidebar.reports',
@@ -198,22 +136,9 @@ export const sidebarNav: SidebarNavItem[] = [
   },
   {
     title: 'sidebar.hr',
+    href: '/admin/hr',
     icon: BriefcaseBusiness,
     tooltip: 'sidebar.hr',
-    children: [
-      {
-        title: 'sidebar.hr_dashboard',
-        href: '/admin/hr/dashboard',
-        icon: LayoutDashboard,
-        tooltip: 'sidebar.hr_dashboard',
-      },
-      {
-        title: 'sidebar.hr_employees',
-        href: '/admin/hr/employees',
-        icon: Users,
-        tooltip: 'sidebar.hr_employees',
-      },
-    ],
   },
   {
     title: 'sidebar.settings',

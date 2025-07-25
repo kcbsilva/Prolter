@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 
-export function InventoryVehicles() {
+export default function InventoryVehicles() {
   return (
     <div className="space-y-4">
       <Card>

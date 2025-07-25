@@ -1,63 +1,45 @@
-// src/app/inventory/page.tsx
+// src/app/sales/page.tsx
 'use client'
 
 import * as React from 'react'
 import dynamic from 'next/dynamic'
 import {
   LayoutDashboard,
-  Filter,
-  Factory,
-  Truck,
-  Package,
-  Warehouse,
-  Bus,
+  Users,
+  TrendingUp,
+  FileText,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 // Dynamic imports for code splitting
-const InventoryDashboard = dynamic(
-  () => import('@/components/pages/inventory/InventoryDashboard').then(mod => mod.default),
+const SalesDashboard = dynamic(
+  () => import('@/components/pages/sales/SalesDashboard').then(mod => mod.default),
   { loading: () => <div>Loading Dashboard...</div> }
 )
-const InventoryCategories = dynamic(
-  () => import('@/components/pages/inventory/categories/InventoryCategories').then(mod => mod.default),
-  { loading: () => <div>Loading Categories...</div> }
+const SalesLeads = dynamic(
+  () => import('@/components/pages/sales/leads/SalesLeads').then(mod => mod.default),
+  { loading: () => <div>Loading Leads...</div> }
 )
-const InventoryManufacturer = dynamic(
-  () => import('@/components/pages/inventory/manufacturers/InventoryManufacturer').then(mod => mod.default),
-  { loading: () => <div>Loading Manufacturers...</div> }
+const SalesOpportunities = dynamic(
+  () => import('@/components/pages/sales/opportunities/SalesOpportunities').then(mod => mod.default),
+  { loading: () => <div>Loading Opportunities...</div> }
 )
-const InventorySuppliers = dynamic(
-  () => import('@/components/pages/inventory/suppliers/InventorySuppliers').then(mod => mod.default),
-  { loading: () => <div>Loading Suppliers...</div> }
-)
-const InventoryProducts = dynamic(
-  () => import('@/components/pages/inventory/products/InventoryProducts').then(mod => mod.default),
-  { loading: () => <div>Loading Products...</div> }
-)
-const InventoryWarehouses = dynamic(
-  () => import('@/components/pages/inventory/warehouses/InventoryWarehouses').then(mod => mod.default),
-  { loading: () => <div>Loading Warehouses...</div> }
-)
-const InventoryVehicles = dynamic(
-  () => import('@/components/pages/inventory/vehicles/InventoryVehicles').then(mod => mod.default),
-  { loading: () => <div>Loading Vehicles...</div> }
+const SalesProposals = dynamic(
+  () => import('@/components/pages/sales/proposals/SalesProposals').then(mod => mod.default),
+  { loading: () => <div>Loading Proposals...</div> }
 )
 
-type TabValue = 'dashboard' | 'categories' | 'manufacturers' | 'suppliers' | 'products' | 'warehouses' | 'vehicles'
+type TabValue = 'dashboard' | 'leads' | 'opportunities' | 'proposals'
 
 const tabs = [
   { value: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { value: 'categories', label: 'Categories', icon: Filter },
-  { value: 'manufacturers', label: 'Manufacturers', icon: Factory },
-  { value: 'suppliers', label: 'Suppliers', icon: Truck },
-  { value: 'products', label: 'Products', icon: Package },
-  { value: 'warehouses', label: 'Warehouses', icon: Warehouse },
-  { value: 'vehicles', label: 'Vehicles', icon: Bus },
+  { value: 'leads', label: 'Leads', icon: Users },
+  { value: 'opportunities', label: 'Opportunities', icon: TrendingUp },
+  { value: 'proposals', label: 'Proposals', icon: FileText },
 ] as const
 
-export default function InventoryPage() {
+export default function SalesPage() {
   const [selectedTab, setSelectedTab] = React.useState<TabValue>('dashboard')
 
   // Sync tab state with URL hash
@@ -84,13 +66,10 @@ export default function InventoryPage() {
   }
 
   const componentMap: Record<TabValue, React.ReactNode> = {
-    dashboard: <InventoryDashboard />,
-    categories: <InventoryCategories />,
-    manufacturers: <InventoryManufacturer />,
-    suppliers: <InventorySuppliers />,
-    products: <InventoryProducts />,
-    warehouses: <InventoryWarehouses />,
-    vehicles: <InventoryVehicles />
+    dashboard: <SalesDashboard />,
+    leads: <SalesLeads />,
+    opportunities: <SalesOpportunities />,
+    proposals: <SalesProposals />
   }
 
   return (
@@ -98,7 +77,7 @@ export default function InventoryPage() {
       <div className="flex h-full w-full overflow-hidden">
         {/* Sidebar */}
         <aside 
-          aria-label="Inventory navigation"
+          aria-label="Sales navigation"
           className="w-[240px] h-full overflow-y-auto p-4 border-r bg-muted/40 space-y-1"
         >
           {tabs.map((tab) => {

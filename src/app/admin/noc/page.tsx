@@ -9,6 +9,7 @@ import {
   Cable,
   NotepadTextDashed,
   SatelliteDish,
+  Network,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -20,6 +21,10 @@ import { OnxTemplates } from '@/components/pages/noc/fttx/FttxOnxTemplates'
 import { WirelessDashboard } from '@/components/pages/noc/wireless/WirelessDashboard'
 import { AccessPoints } from '@/components/pages/noc/wireless/WirelessAccessPoint'
 import { CPEs } from '@/components/pages/noc/wireless/WirelessCPEs'
+import { DevicesDashboard } from '@/components/pages/noc/devices/DevicesDashboard'
+import { NocRouters } from '@/components/pages/noc/devices/NocRouters'
+import { NocSwitches } from '@/components/pages/noc/devices/NocSwitches'
+
 
 const tabGroups = [
   {
@@ -47,6 +52,15 @@ const tabGroups = [
       { value: 'cpes', label: 'CPEs', icon: SatelliteDish },
     ],
   },
+  {
+    label: 'Devices',
+    icon: Network,
+    items: [
+      { value: 'devices', label: 'Devices Dashboard', icon: LayoutDashboard },
+      { value: 'routers', label: 'Routers', icon: Radio },
+      { value: 'switches', label: 'Switches', icon: SatelliteDish },
+    ],
+  },
 ]
 
 export default function NOCPage() {
@@ -61,6 +75,10 @@ export default function NOCPage() {
       case 'wireless': return <WirelessDashboard />
       case 'aps': return <AccessPoints />
       case 'cpes': return <CPEs />
+      case 'devices': return <DevicesDashboard />
+      case 'routers': return <NocRouters />
+      case 'switches': return <NocSwitches />
+
       default: return <NocOverview />
     }
   }
