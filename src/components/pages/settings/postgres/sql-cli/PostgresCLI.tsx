@@ -12,7 +12,7 @@ import { Play, Eraser, Terminal } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 
-export default function PostgresSqlCliPage() {
+export default function PostgresCLI() {
   const { t } = useLocale();
   const { toast } = useToast();
   const [sqlQuery, setSqlQuery] = React.useState('');

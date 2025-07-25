@@ -7,9 +7,11 @@ import {
   Wifi,
   Radio,
   Cable,
-  NotepadTextDashed,
-  SatelliteDish,
+  FileTerminal,
+  ChevronsLeftRightEllipsis,
   Network,
+  EthernetPort,
+  Router
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -39,8 +41,8 @@ const tabGroups = [
     icon: Cable,
     items: [
       { value: 'fttx', label: 'FTTx Dashboard', icon: LayoutDashboard },
-      { value: 'olts', label: 'OLTs / ONXs', icon: Radio },
-      { value: 'templates', label: 'ONx Templates', icon: NotepadTextDashed },
+      { value: 'olts', label: 'OLTs / ONXs', icon: EthernetPort },
+      { value: 'templates', label: 'ONx Templates', icon: FileTerminal },
     ],
   },
   {
@@ -49,7 +51,7 @@ const tabGroups = [
     items: [
       { value: 'wireless', label: 'Wireless Dashboard', icon: LayoutDashboard },
       { value: 'aps', label: 'Access Points', icon: Radio },
-      { value: 'cpes', label: 'CPEs', icon: SatelliteDish },
+      { value: 'cpes', label: 'CPEs', icon: Router },
     ],
   },
   {
@@ -57,8 +59,8 @@ const tabGroups = [
     icon: Network,
     items: [
       { value: 'devices', label: 'Devices Dashboard', icon: LayoutDashboard },
-      { value: 'routers', label: 'Routers', icon: Radio },
-      { value: 'switches', label: 'Switches', icon: SatelliteDish },
+      { value: 'routers', label: 'Routers', icon: Router },
+      { value: 'switches', label: 'Switches', icon: ChevronsLeftRightEllipsis },
     ],
   },
 ]
@@ -88,16 +90,25 @@ export default function NOCPage() {
       <div className="flex h-full w-full overflow-hidden">
         {/* Sidebar */}
         <aside className="w-[240px] h-full overflow-y-auto p-4 border-r bg-muted/40 space-y-4">
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold flex items-center">
+              <Network className="w-4 h-4 mr-2" />
+              NOC
+            </h2>
+          </div>
+
           {tabGroups.map((group) => (
-            <div
+            <fieldset
               key={group.label}
-              className="rounded-md p-3 space-y-2 bg-muted/10 shadow-sm"
+              className="rounded-md p-3 space-y-2 bg-muted/10 shadow-sm border border-muted-foreground/10"
             >
-              <div className="flex items-center text-xs text-muted-foreground font-semibold">
-                {group.icon && <group.icon className="w-3 h-3 mr-2" />}
-                {group.label}
-              </div>
-              <div className="space-y-1">
+              <legend className="px-2 text-xs text-muted-foreground font-medium">
+                <div className="flex items-center">
+                  {group.icon && <group.icon className="w-3 h-3 mr-2" />}
+                  {group.label}
+                </div>
+              </legend>
+              <div className="space-y-1 pt-1">
                 {group.items.map((tab) => {
                   const Icon = tab.icon
                   const isActive = selectedTab === tab.value
@@ -106,18 +117,18 @@ export default function NOCPage() {
                       key={tab.value}
                       variant="ghost"
                       className={cn(
-                        'w-full justify-start font-normal text-sm rounded-lg pl-6',
+                        'w-full justify-start font-normal text-xs rounded-lg pl-5',
                         isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
                       )}
                       onClick={() => setSelectedTab(tab.value)}
                     >
-                      <Icon className="w-4 h-4 mr-2" />
+                      <Icon className="w-3 h-3 mr-2" />
                       {tab.label}
                     </Button>
                   )
                 })}
               </div>
-            </div>
+            </fieldset>
           ))}
         </aside>
 

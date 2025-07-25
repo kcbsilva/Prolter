@@ -8,7 +8,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { ListDatabases } from './ListDatabases';
 import { CreateDatabaseModal } from './CreateDatabaseModal';
 
-export default function DatabasesContent() {
+export default function PostgresDatabases() {
   const { t } = useLocale();
   const [isAddOpen, setIsAddOpen] = React.useState(false);
 

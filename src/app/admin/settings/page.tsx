@@ -121,8 +121,65 @@ const PlansTV = dynamic(
     ),
   { loading: () => <div>Loading Internet Plans...</div> }
 );
-//const UserSettings = dynamic(() => import('@/components/pages/settings/UserSettings').then(mod => mod.default),
-// { loading: () => <div>Loading User Settings...</div> })
+
+// Dynamic imports for Database
+
+const PostgresDatabases = dynamic(
+  () =>
+    import(
+      "@/components/pages/settings/postgres/databases/PostgresDatabases"
+    ).then((mod) => mod.default),
+  { loading: () => <div>Loading Databases...</div> }
+);
+
+const PostgresTables = dynamic(
+  () =>
+    import("@/components/pages/settings/postgres/tables/PostgresTables").then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div>Loading Tables...</div> }
+);
+
+const PostgresCLI = dynamic(
+  () =>
+    import("@/components/pages/settings/postgres/sql-cli/PostgresCLI").then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div>Loading Databases...</div> }
+);
+
+// Dynamic imports for System
+
+const POPPage = dynamic(
+  () =>
+    import("@/components/pages/settings/pops/PoPPage").then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div>Loading PoPs...</div> }
+);
+
+const SettingsSecurity = dynamic(
+  () =>
+    import("@/components/pages/settings/security/SettingsSecurity").then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div>Loading Security Settings...</div> }
+);
+
+const SystemMonitor = dynamic(
+  () =>
+    import("@/components/pages/settings/system-monitor/SystemMonitor").then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div>Loading System Monitor...</div> }
+);
+const SystemUsers = dynamic(
+  () =>
+    import("@/components/pages/settings/users/SystemUsers").then(
+      (mod) => mod.default
+    ),
+  { loading: () => <div>Loading User Settings...</div> }
+);
 
 const tabGroups = [
   {
@@ -159,7 +216,6 @@ const tabGroups = [
     label: "Database",
     icon: Database,
     items: [
-      { value: "postgres", label: "PostgreSQL", icon: Database },
       { value: "databases", label: "Databases", icon: Database },
       { value: "sql-cli", label: "SQL CLI", icon: Terminal },
       { value: "tables", label: "Tables", icon: Table },
@@ -210,9 +266,21 @@ export default function SettingsPage() {
         return <PlansMobile />;
       case "tv":
         return <PlansTV />;
+      case "databases":
+        return <PostgresDatabases />;
+      case "tables":
+        return <PostgresTables />;
+      case "sql-cli":
+        return <PostgresCLI />;
+      case "pops":
+        return <POPPage />;
+      case "security":
+        return <SettingsSecurity />;
+      case "monitor":
+        return <SystemMonitor />;
+      case "users":
+        return <SystemUsers />;
 
-      // Add more cases for other tabs as needed
-      // Add other cases as needed
       default:
         return (
           <div className="space-y-4">
@@ -235,22 +303,24 @@ export default function SettingsPage() {
         {/* Sidebar */}
         <aside className="w-[240px] h-full overflow-y-auto p-4 border-r bg-muted/40 space-y-4">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold flex items-center">
-              <Settings className="w-5 h-5 mr-2" />
+            <h2 className="text-sm font-semibold flex items-center">
+              <Settings className="w-4 h-4 mr-2" />
               Settings
             </h2>
           </div>
 
           {tabGroups.map((group) => (
-            <div
+            <fieldset
               key={group.label}
-              className="rounded-md p-3 space-y-2 bg-muted/10 shadow-sm"
+              className="rounded-md p-3 space-y-2 bg-muted/10 shadow-sm border border-muted-foreground/10"
             >
-              <div className="flex items-center text-xs text-muted-foreground font-semibold">
-                {group.icon && <group.icon className="w-3 h-3 mr-2" />}
-                {group.label}
-              </div>
-              <div className="space-y-1">
+              <legend className="px-2 text-xs text-muted-foreground font-medium">
+                <div className="flex items-center">
+                  {group.icon && <group.icon className="w-3 h-3 mr-2" />}
+                  {group.label}
+                </div>
+              </legend>
+              <div className="space-y-1 pt-1">
                 {group.items.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = selectedTab === tab.value;
@@ -259,20 +329,20 @@ export default function SettingsPage() {
                       key={tab.value}
                       variant="ghost"
                       className={cn(
-                        "w-full justify-start font-normal text-sm rounded-lg pl-6",
+                        "w-full justify-start font-normal text-xs rounded-lg pl-5",
                         isActive
                           ? "bg-primary/10 text-primary"
                           : "text-muted-foreground"
                       )}
                       onClick={() => setSelectedTab(tab.value)}
                     >
-                      <Icon className="w-4 h-4 mr-2" />
+                      <Icon className="w-3 h-3 mr-2" />
                       {tab.label}
                     </Button>
                   );
                 })}
               </div>
-            </div>
+            </fieldset>
           ))}
         </aside>
 

@@ -6,7 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { ListUsers } from '@/components/settings/users/ListUsers'
 import { UsersCards } from '@/components/settings/users/UsersCards'
 
-export default function UserSettingsPage() {
+export default function SystemUsers() {
   return (
     <main className="p-6 space-y-6">
       <div className="flex items-center justify-between">

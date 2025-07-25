@@ -84,12 +84,12 @@ export default function HRPage() {
                 aria-selected={isActive}
                 aria-controls={`tabpanel-${tab.value}`}
                 className={cn(
-                  'w-full justify-start font-normal text-sm rounded-lg',
+                  'w-full justify-start font-normal text-xs rounded-lg',
                   isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
                 )}
                 onClick={() => handleTabChange(tab.value)}
               >
-                <Icon className="w-4 h-4 mr-2" />
+                <Icon className="w-3 h-3 mr-2" />
                 {tab.label}
               </Button>
             )

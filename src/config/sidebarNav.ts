@@ -1,61 +1,21 @@
 // src/config/sidebarNav.ts
 import {
-  LayoutDashboard, ShieldCheck, Settings, Users, MapPin, TowerControl, Cable, Power, Box, Puzzle, Warehouse, Globe, GitFork,
-  Split,
-  Code,
-  Router as RouterIcon,
-  Share2,
-  Server as ServerIcon,
+  LayoutDashboard,
+  Settings,
+  Users,
   DollarSign,
   BarChart3,
-  Plug,
   MessageSquare,
-  Text,
-  Settings2,
-  ListChecks,
-  Wifi,
-  Tv,
-  Smartphone,
-  PhoneCall,
-  Combine,
-  ListFilter,
   Archive,
-  Factory,
-  LayoutGrid,
-  Package as PackageIcon,
-  Truck,
-  FileText as FileTextIcon,
-  GitBranch,
-  Network as NetworkIcon,
-  Database,
-  Users2,
-  Bus,
-  BriefcaseBusiness,
-  FileCode,
   Wrench,
-  BookOpen,
-  SlidersHorizontal,
-  Briefcase,
-  Building,
-  Cog,
-  Dot,
   TrendingUp,
-  Target,
-  ShoppingCart,
-  MessageCircle,
-  Workflow,
-  Radio, 
-  GitMerge, 
+  BriefcaseBusiness,
+  Network as NetworkIcon,
   Webhook,
-  KeyRound, 
-  Table2, // Added for Tables
-  Terminal, // Added for SQL CLI
 } from 'lucide-react';
 import { TbRouteScan } from "react-icons/tb";
 import type { LucideIcon } from 'lucide-react';
 import type { IconType } from 'react-icons';
-import { GrSystem } from "react-icons/gr";
-import { MdOutlineVpnKey } from "react-icons/md";
 
 export interface SidebarNavItem {
   title: string;
@@ -142,188 +102,8 @@ export const sidebarNav: SidebarNavItem[] = [
   },
   {
     title: 'sidebar.settings',
+    href: '/admin/settings',
     icon: Settings,
     tooltip: 'sidebar.settings',
-    children: [
-      {
-        title: 'sidebar.settings_global',
-        href: '/admin/settings/global',
-        icon: Cog,
-        tooltip: 'sidebar.settings_global',
-      },
-      {
-        title: 'sidebar.settings_system',
-        icon: GrSystem,
-        tooltip: 'sidebar.settings_system',
-        children: [
-          {
-            title: 'sidebar.settings_system_pops',
-            href: '/admin/settings/system/pops',
-            icon: Building,
-            tooltip: 'sidebar.settings_system_pops',
-          },
-        ],
-      },
-      {
-        title: 'sidebar.settings_plans',
-        icon: ListChecks,
-        tooltip: 'sidebar.settings_plans',
-        children: [
-          {
-            title: 'sidebar.settings_plans_internet',
-            href: '/admin/settings/plans/internet',
-            icon: Wifi,
-            tooltip: 'sidebar.settings_plans_internet',
-          },
-          {
-            title: 'sidebar.settings_plans_tv',
-            href: '/admin/settings/plans/tv',
-            icon: Tv,
-            tooltip: 'sidebar.settings_plans_tv',
-          },
-          {
-            title: 'sidebar.settings_plans_mobile',
-            href: '/admin/settings/plans/mobile',
-            icon: Smartphone,
-            tooltip: 'sidebar.settings_plans_mobile',
-          },
-          {
-            title: 'sidebar.settings_plans_landline',
-            href: '/admin/settings/plans/landline',
-            icon: PhoneCall,
-            tooltip: 'sidebar.settings_plans_landline',
-          },
-          {
-            title: 'sidebar.settings_plans_combos',
-            href: '/admin/settings/plans/combos',
-            icon: Combine,
-            tooltip: 'sidebar.settings_plans_combos',
-          },
-        ],
-      },
-      {
-        title: 'sidebar.settings_network',
-        icon: NetworkIcon,
-        tooltip: 'sidebar.settings_network',
-        children: [
-          {
-            title: 'sidebar.settings_network_ip',
-            href: '/admin/settings/network/ip',
-            icon: Code,
-            tooltip: 'sidebar.settings_network_ip',
-          },
-          {
-            title: 'sidebar.settings_network_devices',
-            href: '/admin/settings/network/devices',
-            icon: RouterIcon,
-            tooltip: 'sidebar.settings_network_devices',
-          },
-          {
-            title: 'sidebar.settings_network_cgnat',
-            href: '/admin/settings/network/cgnat',
-            icon: Share2,
-            tooltip: 'sidebar.settings_network_cgnat',
-          },
-          {
-            title: 'sidebar.settings_network_radius',
-            href: '/admin/settings/network/radius',
-            icon: ServerIcon,
-            tooltip: 'sidebar.settings_network_radius',
-          },
-          {
-            title: 'sidebar.settings_network_vlan',
-            href: '/admin/settings/network/vlan',
-            icon: Split,
-            tooltip: 'sidebar.settings_network_vlan',
-          },
-          {
-            title: 'sidebar.settings_network_vpn',
-            href: '/admin/settings/network/vpn',
-            icon: MdOutlineVpnKey,
-            tooltip: 'sidebar.settings_network_vpn',
-          },
-        ],
-      },
-      {
-        title: 'sidebar.settings_postgres',
-        icon: Database,
-        tooltip: 'sidebar.settings_postgres',
-        children: [
-          {
-            title: 'sidebar.settings_postgres_databases',
-            href: '/admin/settings/postgres/databases',
-            icon: Database, // Or List
-            tooltip: 'sidebar.settings_postgres_databases',
-          },
-          {
-            title: 'sidebar.settings_postgres_tables',
-            href: '/admin/settings/postgres/tables',
-            icon: Table2,
-            tooltip: 'sidebar.settings_postgres_tables',
-          },
-          {
-            title: 'sidebar.settings_postgres_sql_cli',
-            href: '/admin/settings/postgres/sql-cli',
-            icon: Terminal,
-            tooltip: 'sidebar.settings_postgres_sql_cli',
-          },
-        ],
-      },
-      {
-        title: 'sidebar.settings_security',
-        href: '/admin/settings/security',
-        icon: ShieldCheck,
-        tooltip: 'sidebar.settings_security',
-      },
-      {
-        title: 'sidebar.settings_license',
-        href: '/admin/settings/license',
-        icon: KeyRound,
-        tooltip: 'sidebar.settings_license',
-      },
-      {
-        title: 'sidebar.settings_system_monitor',
-        href: '/admin/settings/system-monitor',
-        icon: RouterIcon,
-        tooltip: 'sidebar.settings_system_monitor',
-      },
-      {
-        title: 'sidebar.settings_integrations',
-        icon: Plug,
-        tooltip: 'sidebar.settings_integrations',
-        children: [
-          {
-            title: 'sidebar.settings_integrations_whatsapp',
-            href: '/admin/settings/integrations/whatsapp',
-            icon: MessageSquare,
-            tooltip: 'sidebar.settings_integrations_whatsapp',
-          },
-          {
-            title: 'sidebar.settings_integrations_telegram',
-            href: '/admin/settings/integrations/telegram',
-            icon: MessageSquare,
-            tooltip: 'sidebar.settings_integrations_telegram',
-          },
-          {
-            title: 'sidebar.settings_integrations_meta',
-            href: '/admin/settings/integrations/meta',
-            icon: MessageSquare,
-            tooltip: 'sidebar.settings_integrations_meta',
-          },
-          {
-            title: 'sidebar.settings_integrations_sms',
-            href: '/admin/settings/integrations/sms',
-            icon: Text,
-            tooltip: 'sidebar.settings_integrations_sms',
-          },
-        ],
-      },
-      {
-        title: 'sidebar.settings_users',
-        href: '/admin/settings/users',
-        icon: Users,
-        tooltip: 'sidebar.settings_users',
-      },
-    ],
   },
 ];

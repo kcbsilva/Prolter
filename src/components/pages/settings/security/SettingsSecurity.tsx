@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ShieldCheck } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 
-export default function SecuritySettingsPage() {
+export default function SettingsSecurity() {
   const { t } = useLocale();
   const iconSize = "h-2.5 w-2.5"; // Reduced icon size
 

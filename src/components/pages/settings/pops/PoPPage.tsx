@@ -12,7 +12,7 @@ import PoPDeleteDialog from '@/components/settings/system/pop/PoPDeleteDialog';
 import { useToast } from '@/hooks/use-toast';
 import { Pop, PopData } from '@/types/pops';
 
-export default function PoPPage() {
+export default function POPPage() {
   const [pops, setPops] = React.useState<Pop[]>([]);
   const [addOpen, setAddOpen] = React.useState(false);
   const [editPoP, setEditPoP] = React.useState<Pop | null>(null);

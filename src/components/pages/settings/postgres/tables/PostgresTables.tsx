@@ -32,7 +32,7 @@ interface TableColumn {
   data_type: string;
 }
 
-export default function PostgresTablesPage() {
+export default function PostgresTables() {
   const { t } = useLocale();
   const [databases, setDatabases] = useState<Database[]>([]);
   const [selectedDb, setSelectedDb] = useState<string>('');

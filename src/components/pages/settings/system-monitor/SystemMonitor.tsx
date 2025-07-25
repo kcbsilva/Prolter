@@ -27,7 +27,7 @@ interface MonitoredService {
   error?: string;
 }
 
-export default function SystemMonitorPage() {
+export default function SystemMonitor() {
   const { t } = useLocale();
   const { toast } = useToast();
 
