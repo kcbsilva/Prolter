@@ -196,14 +196,34 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
   };
 
   const nextStep = async () => {
-    // For step 1, only validate subscriber_type
+    console.log('nextStep called, current step:', step);
+    console.log('subscriberType:', subscriberType);
+    
+    let fieldsToValidate: (keyof SubscriberFormData)[] = [];
+  
     if (step === 1) {
-      const valid = await form.trigger('subscriber_type');
-      if (!valid) return;
-    } else {
-      const valid = await form.trigger();
-      if (!valid) return;
+      fieldsToValidate = ['subscriber_type'];
+    } else if (step === 2) {
+      // Validate step 2 fields based on subscriber type
+      if (subscriberType === 'Residential') {
+        fieldsToValidate = ['full_name', 'birthday', 'tax_id'];
+      } else if (subscriberType === 'Commercial') {
+        fieldsToValidate = ['company_name', 'established_date', 'tax_id'];
+      }
     }
+  
+    console.log('Fields to validate:', fieldsToValidate);
+    console.log('Current form values:', form.getValues());
+    
+    const valid = await form.trigger(fieldsToValidate);
+    console.log('Validation result:', valid);
+    
+    if (!valid) {
+      console.log('Validation failed, form errors:', form.formState.errors);
+      return;
+    }
+    
+    console.log('Moving to next step');
     setStep((prev) => prev + 1);
   };
 
