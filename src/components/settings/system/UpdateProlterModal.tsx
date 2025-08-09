@@ -1,82 +1,42 @@
-// ✅ COMPONENT: src/components/system/UpdateProlterModal.tsx
+// src/components/system/UpdateProlterModal.tsx
 'use client';
 
 import * as React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { Progress } from '@/components/ui/progress';
 
-interface UpdateProlterModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+type Props = { open: boolean; onOpenChange: (open: boolean) => void };
 
-const updateSteps = [
-  { id: 'git', label: 'Getting New Files' },
-  { id: 'build', label: 'Installing New Files' },
-  { id: 'restart', label: 'Restarting Prolter' },
-];
-
-export function UpdateProlterModal({ open, onOpenChange }: UpdateProlterModalProps) {
-  const router = useRouter();
-  const [currentStep, setCurrentStep] = React.useState(0);
-  const [errors, setErrors] = React.useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = React.useState(false);
-  const [rawOutput, setRawOutput] = React.useState<string | null>(null);
+export function UpdateProlterModal({ open, onOpenChange }: Props) {
+  const [busy, setBusy] = React.useState(false);
+  const [output, setOutput] = React.useState<string>('');
+  const [error, setError] = React.useState<string | null>(null);
+  const [done, setDone] = React.useState(false);
 
   React.useEffect(() => {
     if (!open) return;
 
-    const runUpdateSteps = async () => {
-      setIsUpdating(true);
-      setErrors(null);
-      setRawOutput(null);
-      setCurrentStep(0);
+    const run = async () => {
+      setBusy(true);
+      setDone(false);
+      setError(null);
+      setOutput('');
 
-      for (let i = 0; i < updateSteps.length; i++) {
-        const step = updateSteps[i];
-        try {
-          const res = await fetch(`/api/system/update/step/${step.id}`, { method: 'POST' });
-
-          if (!res.ok) {
-            // Try to parse JSON, fall back to raw text (for <html> errors)
-            let errorMessage;
-            try {
-              const data = await res.json();
-              errorMessage = data?.error || 'Unknown JSON error';
-              setRawOutput(JSON.stringify(data, null, 2));
-            } catch {
-              const rawText = await res.text();
-              errorMessage = rawText.includes('<!DOCTYPE')
-                ? 'Received HTML instead of JSON. The API route may be missing or broken.'
-                : rawText;
-              setRawOutput(rawText);
-            }
-
-            setErrors(`${step.label} failed:\n${errorMessage}`);
-            break;
-          }
-
-          const data = await res.json();
-          setRawOutput(data?.output || null);
-
-          setCurrentStep(i + 1);
-          await new Promise(res => setTimeout(res, 600));
-        } catch (err: any) {
-          setErrors(`Fetch error: ${err.message}`);
-          break;
-        }
-      }
-
-      setIsUpdating(false);
-
-      if (currentStep === updateSteps.length - 1) {
-        setTimeout(() => router.push('/login'), 1500);
+      try {
+        const res = await fetch('/api/system/update', { method: 'POST' });
+        const text = await res.text();
+        setOutput(text);
+        if (!res.ok) throw new Error('Update failed');
+        setDone(true);
+      } catch (e: any) {
+        setError(e?.message || 'Unknown error');
+      } finally {
+        setBusy(false);
       }
     };
 
-    runUpdateSteps();
+    run();
   }, [open]);
 
   return (
@@ -85,39 +45,21 @@ export function UpdateProlterModal({ open, onOpenChange }: UpdateProlterModalPro
         <DialogHeader>
           <DialogTitle>Updating Prolter</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <Progress value={(currentStep / updateSteps.length) * 100} />
-          <ul className="text-sm list-disc pl-5 space-y-1">
-            {updateSteps.map((step, i) => (
-              <li
-                key={step.id}
-                className={i < currentStep ? 'text-green-600' : i === currentStep ? 'text-blue-600' : 'text-muted-foreground'}
-              >
-                {i < currentStep ? '✅' : i === currentStep ? '🔄' : '⏳'} {step.label}
-              </li>
-            ))}
-          </ul>
 
-          {rawOutput && (
+        <div className="space-y-4">
+          <Progress value={busy ? 70 : done ? 100 : error ? 0 : 0} />
+          {busy && <div className="text-sm text-muted-foreground">Running update…</div>}
+          {done && <div className="text-sm text-green-600">✅ Update complete.</div>}
+          {error && <div className="text-sm text-red-600">⚠️ {error}</div>}
+
+          {output && (
             <pre className="text-xs bg-muted p-2 rounded max-h-60 overflow-auto whitespace-pre-wrap">
-              {rawOutput}
+              {output}
             </pre>
           )}
 
-          {errors && (
-            <div className="text-red-600 text-sm border border-red-500 p-2 rounded whitespace-pre-wrap">
-              ⚠️ Update failed: {errors}
-            </div>
-          )}
-
-          {!errors && currentStep === updateSteps.length && (
-            <div className="text-green-600 text-sm">✅ Update complete. Redirecting...</div>
-          )}
-
           <div className="flex justify-end">
-            <Button onClick={() => onOpenChange(false)} disabled={isUpdating}>
-              Close
-            </Button>
+            <Button onClick={() => onOpenChange(false)} disabled={busy}>Close</Button>
           </div>
         </div>
       </DialogContent>
