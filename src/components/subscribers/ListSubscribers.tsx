@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TableRow, TableCell } from '@/components/ui/table';
@@ -116,14 +117,19 @@ export function ListSubscribers({
                 </span>
               </TableCell>
 
-              {/* NAME / BUSINESS in ALL CAPS */}
+              {/* NAME / BUSINESS clickable, ALL CAPS */}
               <TableCell className="text-center uppercase">
-                {subscriber.subscriberType === 'Residential'
-                  ? (subscriber.fullName ?? '')
-                  : (subscriber.companyName ?? '')}
+                <Link
+                  href={`/subscribers/${subscriber.id}/profile`}
+                  className="text-blue-600 hover:underline font-medium"
+                >
+                  {subscriber.subscriberType === 'Residential'
+                    ? (subscriber.fullName ?? '')
+                    : (subscriber.companyName ?? '')}
+                </Link>
               </TableCell>
 
-              {/* Tax ID / Business Number (digits only, 14 max) */}
+              {/* Tax ID / Business Number (digits only) */}
               <TableCell className="text-center">
                 <span className="font-mono tabular-nums text-xs">
                   {subscriber.subscriberType === 'Residential'
@@ -132,19 +138,19 @@ export function ListSubscribers({
                 </span>
               </TableCell>
 
-              {/* Address (wider) */}
+              {/* Address */}
               <TableCell className="text-center truncate" title={subscriber.address}>
                 {subscriber.address}
               </TableCell>
 
-              {/* Phone (monospace/fit) */}
+              {/* Phone */}
               <TableCell className="text-center">
                 <span className="font-mono tabular-nums text-xs">
                   {subscriber.phoneNumber}
                 </span>
               </TableCell>
 
-              {/* Actions centered */}
+              {/* Actions */}
               <TableCell className="text-center">
                 <div className="flex items-center justify-center gap-1">
                   <Button
