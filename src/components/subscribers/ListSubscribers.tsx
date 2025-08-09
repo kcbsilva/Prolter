@@ -11,7 +11,6 @@ import { SubscriberProfile } from './SubscriberProfile';
 import { UpdateSubscriberModal } from './UpdateSubscriberModal';
 import { RemoveSubscriberModal } from './RemoveSubscriberModal';
 import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
-import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -23,6 +22,9 @@ interface Props {
   onPageChange: (page: number) => void;
   perPage?: number;
 }
+
+const digitsOnly = (v?: string | null, max = 14) =>
+  (v ?? '').replace(/\D/g, '').slice(0, max);
 
 export function ListSubscribers({
   subscribers = [],
@@ -36,31 +38,19 @@ export function ListSubscribers({
   const [viewing, setViewing] = React.useState<Subscriber | null>(null);
   const [editing, setEditing] = React.useState<Subscriber | null>(null);
   const [removing, setRemoving] = React.useState<Subscriber | null>(null);
-  const [selected, setSelected] = React.useState<string[]>([]);
 
   const iconSize = 'h-4 w-4';
-
-  const toggleSelected = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
-  };
 
   return (
     <div className="flex flex-col gap-4">
       <PaginatedSkeletonTable
         columns={[
-          { key: 'select', label: '', className: 'w-4' },
-          // UUID ~36 chars -> 22ch leaves room with ellipsis if needed
-          { key: 'id', label: 'ID', className: 'text-xs w-[22ch]' },
-          { key: 'status', label: 'Status', className: 'text-xs w-[8rem]' },
-          { key: 'name', label: 'Name / Business', className: 'text-xs min-w-[16rem]' },
-          // max 14 digits (CNPJ) + separators -> ~16ch
-          { key: 'tax', label: 'Tax ID / Business Number', className: 'text-xs w-[16ch]' },
-          // wider to fit a full street address
-          { key: 'address', label: 'Address', className: 'text-xs min-w-[28rem]' },
-          // phone width ~international pattern
-          { key: 'phone', label: 'Phone Number', className: 'text-xs w-[16ch]' },
+          { key: 'id', label: 'ID', className: 'text-xs text-center w-[22ch]' },
+          { key: 'status', label: 'Status', className: 'text-xs text-center w-[8rem]' },
+          { key: 'name', label: 'Name / Business', className: 'text-xs text-center min-w-[16rem]' },
+          { key: 'tax', label: 'Tax ID / Business Number', className: 'text-xs text-center w-[16ch]' },
+          { key: 'address', label: 'Address', className: 'text-xs text-center min-w-[28rem]' },
+          { key: 'phone', label: 'Phone Number', className: 'text-xs text-center w-[16ch]' },
           { key: 'actions', label: 'Actions', className: 'text-xs text-center w-28' },
         ]}
         page={page}
@@ -71,13 +61,24 @@ export function ListSubscribers({
         {loading ? (
           Array.from({ length: perPage }).map((_, idx) => (
             <TableRow key={`skeleton-${idx}`} className="animate-pulse">
-              <TableCell><Skeleton className="h-4 w-4" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-[20ch]" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-[6rem]" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-[14rem]" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-[14ch]" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-[24rem]" /></TableCell>
-              <TableCell><Skeleton className="h-4 w-[14ch]" /></TableCell>
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-[20ch] mx-auto" />
+              </TableCell>
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-[6rem] mx-auto" />
+              </TableCell>
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-[14rem] mx-auto" />
+              </TableCell>
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-[14ch] mx-auto" />
+              </TableCell>
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-[24rem] mx-auto" />
+              </TableCell>
+              <TableCell className="text-center">
+                <Skeleton className="h-4 w-[14ch] mx-auto" />
+              </TableCell>
               <TableCell className="text-center">
                 <div className="flex items-center justify-center gap-2">
                   <Skeleton className="h-6 w-6" />
@@ -90,26 +91,18 @@ export function ListSubscribers({
         ) : subscribers.length > 0 ? (
           subscribers.map((subscriber) => (
             <TableRow key={subscriber.id}>
-              {/* Select */}
-              <TableCell>
-                <Checkbox
-                  checked={selected.includes(subscriber.id)}
-                  onCheckedChange={() => toggleSelected(subscriber.id)}
-                />
-              </TableCell>
-
               {/* UUID */}
-              <TableCell title={subscriber.id}>
-                <span className="font-mono text-xs truncate block max-w-[22ch]">
+              <TableCell className="text-center" title={subscriber.id}>
+                <span className="font-mono text-xs truncate inline-block max-w-[22ch] align-middle">
                   {subscriber.id}
                 </span>
               </TableCell>
 
               {/* Status with badge */}
-              <TableCell>
+              <TableCell className="text-center">
                 <span
                   className={cn(
-                    'text-xs font-medium px-2 py-0.5 rounded-full',
+                    'inline-block text-xs font-medium px-2 py-0.5 rounded-full',
                     {
                       'bg-green-100 text-green-700': subscriber.status === 'Active',
                       'bg-orange-100 text-orange-700': subscriber.status === 'Suspended',
@@ -124,28 +117,28 @@ export function ListSubscribers({
               </TableCell>
 
               {/* NAME / BUSINESS in ALL CAPS */}
-              <TableCell className="uppercase">
+              <TableCell className="text-center uppercase">
                 {subscriber.subscriberType === 'Residential'
                   ? (subscriber.fullName ?? '')
                   : (subscriber.companyName ?? '')}
               </TableCell>
 
-              {/* Tax ID / Business Number (compact, tabular) */}
-              <TableCell>
+              {/* Tax ID / Business Number (digits only, 14 max) */}
+              <TableCell className="text-center">
                 <span className="font-mono tabular-nums text-xs">
                   {subscriber.subscriberType === 'Residential'
-                    ? (subscriber.taxId || '—')
-                    : (subscriber.businessNumber || '—')}
+                    ? digitsOnly(subscriber.taxId)
+                    : digitsOnly(subscriber.businessNumber)}
                 </span>
               </TableCell>
 
               {/* Address (wider) */}
-              <TableCell className="truncate" title={subscriber.address}>
+              <TableCell className="text-center truncate" title={subscriber.address}>
                 {subscriber.address}
               </TableCell>
 
               {/* Phone (monospace/fit) */}
-              <TableCell>
+              <TableCell className="text-center">
                 <span className="font-mono tabular-nums text-xs">
                   {subscriber.phoneNumber}
                 </span>
@@ -187,7 +180,7 @@ export function ListSubscribers({
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={8} className="text-center text-muted-foreground py-8 text-xs">
+            <TableCell colSpan={7} className="text-center text-muted-foreground py-8 text-xs">
               No subscribers found.
             </TableCell>
           </TableRow>
