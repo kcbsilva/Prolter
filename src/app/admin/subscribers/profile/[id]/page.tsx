@@ -20,8 +20,8 @@ import { BillingTab } from '@/components/pages/subscribers/profile/BillingTab';
 import { ServiceCallsTab } from '@/components/pages/subscribers/profile/ServiceCallsTab';
 import { InventoryTab } from '@/components/pages/subscribers/profile/InventoryTab';
 import { DocumentsTab } from '@/components/pages/subscribers/profile/DocumentsTab';
-import { NotesTab } from '@/components/subscribers/profile/NotesTab';
-import { HistoryTab } from '@/components/subscribers/profile/HistoryTab';
+import { NotesTab } from '@/components/pages/subscribers/profile/NotesTab';
+import { HistoryTab } from '@/components/pages/subscribers/profile/HistoryTab';
 
 // ---- helpers you already had ----
 const getStatusBadgeVariant = (status: SubscriberStatus | ServiceStatus | undefined) => {
