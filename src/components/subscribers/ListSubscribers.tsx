@@ -120,7 +120,7 @@ export function ListSubscribers({
               {/* NAME / BUSINESS clickable, ALL CAPS */}
               <TableCell className="text-center uppercase">
                 <Link
-                  href={`/subscribers/${subscriber.id}/profile`}
+                  href={`/subscribers/profile${subscriber.id}`}
                   className="text-blue-600 hover:underline font-medium"
                 >
                   {subscriber.subscriberType === 'Residential'
