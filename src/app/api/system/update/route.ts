@@ -2,7 +2,6 @@
 import { NextResponse } from 'next/server';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-
 const sh = promisify(exec);
 
 async function run(cmd: string, opts: any) {
@@ -15,6 +14,8 @@ export async function POST() {
     env: {
       ...process.env,
       PATH: ['/usr/local/bin', '/usr/bin', '/bin', process.env.PATH].filter(Boolean).join(':'),
+      HOME: '/home/prolteradmin',
+      NPM_CONFIG_CACHE: '/opt/Prolter/.npm-cache',
       GIT_TERMINAL_PROMPT: '0',
       CI: '1',
     },
@@ -28,16 +29,14 @@ export async function POST() {
     const pullOut = await run('bash -c "git pull"', opts);
     output += pullOut + '\n';
 
-    // Detect "Already up to date." or "Already up-to-date."
     const alreadyUpToDate = /Already\s+up(?:-|\s)to(?:-|\s)date\.?/i.test(pullOut);
-
     if (alreadyUpToDate) {
       output += '== No changes detected\nSystem is already up to date\n';
       return new NextResponse(output, { status: 200 });
     }
 
     output += '== Installing deps\n';
-    output += await run('bash -c "npm ci --cache ./.npm-cache"', opts);
+    output += await run('bash -c "npm ci"', opts); // cache comes from env
 
     output += '\n== Building\n';
     output += await run('bash -c "npm run build"', opts);
@@ -48,14 +47,7 @@ export async function POST() {
     output += '\n== Done\n';
     return new NextResponse(output, { status: 200 });
   } catch (e: any) {
-    const out = [
-      e?.stdout?.toString?.(),
-      e?.stderr?.toString?.(),
-      e?.message
-    ]
-      .filter(Boolean)
-      .join('\n');
-
+    const out = [e?.stdout?.toString?.(), e?.stderr?.toString?.(), e?.message].filter(Boolean).join('\n');
     return new NextResponse(out || 'Unknown error', { status: 500 });
   }
 }
