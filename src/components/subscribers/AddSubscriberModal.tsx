@@ -196,9 +196,6 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
   };
 
   const nextStep = async () => {
-    console.log('nextStep called, current step:', step);
-    console.log('subscriberType:', subscriberType);
-    
     let fieldsToValidate: (keyof SubscriberFormData)[] = [];
   
     if (step === 1) {
@@ -212,18 +209,9 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
       }
     }
   
-    console.log('Fields to validate:', fieldsToValidate);
-    console.log('Current form values:', form.getValues());
-    
     const valid = await form.trigger(fieldsToValidate);
-    console.log('Validation result:', valid);
+    if (!valid) return;
     
-    if (!valid) {
-      console.log('Validation failed, form errors:', form.formState.errors);
-      return;
-    }
-    
-    console.log('Moving to next step');
     setStep((prev) => prev + 1);
   };
 

@@ -21,6 +21,7 @@ interface Props {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  perPage?: number;
 }
 
 export function ListSubscribers({
@@ -30,6 +31,7 @@ export function ListSubscribers({
   page,
   totalPages,
   onPageChange,
+  perPage = 10,
 }: Props) {
   const [viewing, setViewing] = React.useState<Subscriber | null>(null);
   const [editing, setEditing] = React.useState<Subscriber | null>(null);
@@ -49,13 +51,17 @@ export function ListSubscribers({
       <PaginatedSkeletonTable
         columns={[
           { key: 'select', label: '', className: 'w-4' },
-          { key: 'id', label: 'ID', className: 'text-xs w-8' },
-          { key: 'status', label: 'Status', className: 'text-xs' },
-          { key: 'name', label: 'Name / Business', className: 'text-xs' },
-          { key: 'tax', label: 'Tax ID / Business Number', className: 'text-xs' },
-          { key: 'address', label: 'Address', className: 'text-xs' },
-          { key: 'phone', label: 'Phone Number', className: 'text-xs' },
-          { key: 'actions', label: 'Actions', className: 'text-xs text-right w-28' },
+          // UUID ~36 chars -> 22ch leaves room with ellipsis if needed
+          { key: 'id', label: 'ID', className: 'text-xs w-[22ch]' },
+          { key: 'status', label: 'Status', className: 'text-xs w-[8rem]' },
+          { key: 'name', label: 'Name / Business', className: 'text-xs min-w-[16rem]' },
+          // max 14 digits (CNPJ) + separators -> ~16ch
+          { key: 'tax', label: 'Tax ID / Business Number', className: 'text-xs w-[16ch]' },
+          // wider to fit a full street address
+          { key: 'address', label: 'Address', className: 'text-xs min-w-[28rem]' },
+          // phone width ~international pattern
+          { key: 'phone', label: 'Phone Number', className: 'text-xs w-[16ch]' },
+          { key: 'actions', label: 'Actions', className: 'text-xs text-center w-28' },
         ]}
         page={page}
         totalPages={totalPages}
@@ -63,21 +69,28 @@ export function ListSubscribers({
         onRefresh={refetch}
       >
         {loading ? (
-          Array.from({ length: 5 }).map((_, idx) => (
-            <TableRow key={idx}>
-              {[...Array(7)].map((_, col) => (
-                <TableCell key={col}>
-                  <Skeleton className="h-4 w-full max-w-[150px]" />
-                </TableCell>
-              ))}
-              <TableCell className="text-right">
-                <Skeleton className="h-4 w-20 ml-auto" />
+          Array.from({ length: perPage }).map((_, idx) => (
+            <TableRow key={`skeleton-${idx}`} className="animate-pulse">
+              <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-[20ch]" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-[6rem]" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-[14rem]" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-[14ch]" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-[24rem]" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-[14ch]" /></TableCell>
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <Skeleton className="h-6 w-6" />
+                  <Skeleton className="h-6 w-6" />
+                  <Skeleton className="h-6 w-6" />
+                </div>
               </TableCell>
             </TableRow>
           ))
         ) : subscribers.length > 0 ? (
-          subscribers.map((subscriber, idx) => (
+          subscribers.map((subscriber) => (
             <TableRow key={subscriber.id}>
+              {/* Select */}
               <TableCell>
                 <Checkbox
                   checked={selected.includes(subscriber.id)}
@@ -85,8 +98,14 @@ export function ListSubscribers({
                 />
               </TableCell>
 
-              <TableCell>{idx + 1}</TableCell>
+              {/* UUID */}
+              <TableCell title={subscriber.id}>
+                <span className="font-mono text-xs truncate block max-w-[22ch]">
+                  {subscriber.id}
+                </span>
+              </TableCell>
 
+              {/* Status with badge */}
               <TableCell>
                 <span
                   className={cn(
@@ -104,50 +123,65 @@ export function ListSubscribers({
                 </span>
               </TableCell>
 
-              <TableCell>
+              {/* NAME / BUSINESS in ALL CAPS */}
+              <TableCell className="uppercase">
                 {subscriber.subscriberType === 'Residential'
-                  ? subscriber.fullName
-                  : subscriber.companyName}
+                  ? (subscriber.fullName ?? '')
+                  : (subscriber.companyName ?? '')}
               </TableCell>
 
+              {/* Tax ID / Business Number (compact, tabular) */}
               <TableCell>
-                {subscriber.subscriberType === 'Residential'
-                  ? subscriber.taxId || '—'
-                  : subscriber.businessNumber || '—'}
+                <span className="font-mono tabular-nums text-xs">
+                  {subscriber.subscriberType === 'Residential'
+                    ? (subscriber.taxId || '—')
+                    : (subscriber.businessNumber || '—')}
+                </span>
               </TableCell>
 
-              <TableCell>{subscriber.address}</TableCell>
+              {/* Address (wider) */}
+              <TableCell className="truncate" title={subscriber.address}>
+                {subscriber.address}
+              </TableCell>
 
-              <TableCell>{subscriber.phoneNumber}</TableCell>
+              {/* Phone (monospace/fit) */}
+              <TableCell>
+                <span className="font-mono tabular-nums text-xs">
+                  {subscriber.phoneNumber}
+                </span>
+              </TableCell>
 
-              <TableCell className="text-right space-x-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setViewing(subscriber)}
-                >
-                  <Eye className={iconSize} />
-                  <span className="sr-only">View</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={() => setEditing(subscriber)}
-                >
-                  <Pencil className={iconSize} />
-                  <span className="sr-only">Edit</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={() => setRemoving(subscriber)}
-                >
-                  <Trash2 className={iconSize} />
-                  <span className="sr-only">Delete</span>
-                </Button>
+              {/* Actions centered */}
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => setViewing(subscriber)}
+                  >
+                    <Eye className={iconSize} />
+                    <span className="sr-only">View</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => setEditing(subscriber)}
+                  >
+                    <Pencil className={iconSize} />
+                    <span className="sr-only">Edit</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => setRemoving(subscriber)}
+                  >
+                    <Trash2 className={iconSize} />
+                    <span className="sr-only">Delete</span>
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))
