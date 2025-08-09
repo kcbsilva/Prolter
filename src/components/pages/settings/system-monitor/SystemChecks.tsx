@@ -32,19 +32,24 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
   const [isTogglingDebug, setIsTogglingDebug] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function fetchDebugStatus() {
       try {
         const res = await fetch('/api/debug/status');
         const data = await res.json();
-        setDebugMode(data.debug);
+        if (!cancelled) setDebugMode(!!data.debug);
       } catch {
-        setDebugMode(false);
+        if (!cancelled) setDebugMode(false);
       }
     }
 
     fetchDebugStatus();
     const interval = setInterval(fetchDebugStatus, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   const handleRestartService = async (serviceId: string) => {
@@ -62,20 +67,13 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || 'Unknown error');
 
-      toast({
-        title: t('restart_success'),
-        description: t('restart_success_message'),
-      });
+      toast({ title: t('restart_success'), description: t('restart_success_message') });
 
       setServices(prev =>
         prev.map(s => (s.id === serviceId ? { ...s, status: 'Active', error: undefined } : s))
       );
     } catch (err: any) {
-      toast({
-        title: t('restart_failed'),
-        description: err.message,
-        variant: 'destructive',
-      });
+      toast({ title: t('restart_failed'), description: err.message, variant: 'destructive' });
       setServices(prev =>
         prev.map(s => (s.id === serviceId ? { ...s, status: 'Inactive', error: err.message } : s))
       );
@@ -84,53 +82,24 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
 
   const handleUpdateService = async (serviceId: string) => {
     if (serviceId === 'prolter') {
-      try {
-        const res = await fetch('/api/system/update/preflight');
-        const data = await res.json();
+      setShowUpdateModal(true);
+      return;
+    }
 
-        if (!res.ok || data.success === false) {
-          toast({
-            title: 'Permission Issue',
-            description: data.issues?.join('\n') || data.error || 'Unknown error',
-            variant: 'destructive',
-          });
-          return;
-        }
+    toast({ title: t('update_started'), description: t('updating_service', { service: serviceId }) });
 
-        setShowUpdateModal(true);
-      } catch (err: any) {
-        toast({
-          title: 'Preflight Failed',
-          description: err.message,
-          variant: 'destructive',
-        });
-      }
-    } else {
-      toast({
-        title: t('update_started'),
-        description: t('updating_service', { service: serviceId }),
+    try {
+      const res = await fetch('/api/settings/system-monitor/services/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ service: serviceId }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || 'Unknown error');
 
-      try {
-        const res = await fetch('/api/settings/system-monitor/services/update', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ service: serviceId }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || 'Unknown error');
-
-        toast({
-          title: t('update_success'),
-          description: data.output || t('update_finished'),
-        });
-      } catch (err: any) {
-        toast({
-          title: t('update_failed'),
-          description: err.message,
-          variant: 'destructive',
-        });
-      }
+      toast({ title: t('update_success'), description: data.output || t('update_finished') });
+    } catch (err: any) {
+      toast({ title: t('update_failed'), description: err.message, variant: 'destructive' });
     }
   };
 
@@ -139,30 +108,27 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
     try {
       const res = await fetch('/api/debug/toggle', { method: 'POST' });
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || 'Unknown error');
 
-      setDebugMode(data.status === 'started');
+      const started = data.status === 'started';
+      setDebugMode(started);
       toast({
-        title: `Debug ${data.status === 'started' ? 'Enabled' : 'Stopped'}`,
+        title: `Debug ${started ? 'Enabled' : 'Stopped'}`,
         description: `Prolter debug mode is now ${data.status}`,
       });
     } catch (err: any) {
-      toast({
-        title: 'Failed to toggle debug mode',
-        description: err.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Failed to toggle debug mode', description: err.message, variant: 'destructive' });
     } finally {
       setIsTogglingDebug(false);
     }
   };
 
+  // Sort so that "prolter" is always at the top
   const sortedServices = [...services].sort((a, b) => {
+    if (a.id === 'prolter') return -1;
+    if (b.id === 'prolter') return 1;
     if (a.id === 'ubuntu') return -1;
     if (b.id === 'ubuntu') return 1;
-    if (a.id === 'prolter') return 1;
-    if (b.id === 'prolter') return -1;
     return 0;
   });
 
@@ -193,6 +159,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
                   />
                   <span className="text-xs font-medium">{t(service.nameKey)}</span>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <Button
                     variant="outline"
@@ -204,6 +171,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
                     <Power className="mr-1.5 h-3 w-3" />
                     {t('service_action_restart')}
                   </Button>
+
                   {['ubuntu', 'prolter'].includes(service.id) && (
                     <Button
                       variant="secondary"
@@ -216,6 +184,7 @@ export function SystemChecks({ services, setServices, isLoading }: Props) {
                       {t('service_action_update')}
                     </Button>
                   )}
+
                   {service.id === 'prolter' && (
                     <Button
                       variant="ghost"

@@ -1,4 +1,4 @@
-// src/components/system/UpdateProlterModal.tsx
+// src/components/settings/system/UpdateProlterModal.tsx
 'use client';
 
 import * as React from 'react';
