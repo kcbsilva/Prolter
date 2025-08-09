@@ -1,4 +1,4 @@
--- PostgreSQL schema for SuperISP
+-- PostgreSQL schema for Prolter
 
 -- Roles and permissions
 CREATE TABLE roles (

@@ -1,4 +1,3 @@
-// src/components/subscribers/UpdateSubscriberModal.tsx
 'use client';
 
 import * as React from 'react';
@@ -23,8 +22,10 @@ import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/contexts/LocaleContext';
 import type { Subscriber } from '@/types/subscribers';
 
-/* 👉 make sure the schema is exported here */
 import { subscriberSchema } from '@/lib/validators/subscriber';
+
+// local helper to sanitize inputs at render-time (matches Add modal)
+const toDigits = (v: string, max = 14) => v.replace(/\D/g, '').slice(0, max);
 
 export type UpdateSubscriberModalProps = {
   open: boolean;
@@ -142,7 +143,49 @@ export function UpdateSubscriberModal({
               )}
             />
 
-            {/* TODO: Add rest of the fields as needed (same structure as Add modal) */}
+            {/* Tax ID (digits-only) */}
+            <FormField
+              control={form.control}
+              name="tax_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('add_subscriber.tax_id_label', 'Tax ID')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={14}
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(toDigits(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Business Number (digits-only) */}
+            <FormField
+              control={form.control}
+              name="business_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('add_subscriber.business_number_label', 'Business Number')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={14}
+                      value={field.value ?? ''}
+                      onChange={(e) => field.onChange(toDigits(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* You can add the remaining fields mirrored from Add modal as needed */}
 
             <DialogFooter className="md:col-span-2 mt-2">
               <Button type="submit" disabled={form.formState.isSubmitting}>

@@ -1,4 +1,3 @@
-// src/components/subscribers/AddSubscriberModal.tsx
 'use client';
 
 import * as React from 'react';
@@ -39,7 +38,12 @@ export type AddSubscriberModalProps = {
   onSuccess?: () => void;
 };
 
-const subscriberSchema = z
+// helper for digits-only coercion
+const toDigits = (v: unknown, max = 14) =>
+  (typeof v === 'string' ? v : String(v ?? '')).replace(/\D/g, '').slice(0, max);
+
+// schema: enforce digits-only for tax_id & business_number (<=14)
+export const subscriberSchema = z
   .object({
     subscriber_type: z.enum(['Residential', 'Commercial']),
     full_name: z.string().optional(),
@@ -51,8 +55,8 @@ const subscriberSchema = z
     email: z.string().email(),
     phone_number: z.string().min(1),
     mobile_number: z.string().optional(),
-    tax_id: z.string().optional(),
-    business_number: z.string().optional(),
+    tax_id: z.preprocess((v) => toDigits(v), z.string().max(14).optional()),
+    business_number: z.preprocess((v) => toDigits(v), z.string().max(14).optional()),
     id_number: z.string().optional(),
   })
   .refine((d) => d.subscriber_type !== 'Residential' || (d.full_name && d.full_name.length > 0), {
@@ -98,6 +102,8 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
       address: '',
       email: '',
       phone_number: '',
+      tax_id: '',
+      business_number: '',
     },
   });
 
@@ -123,11 +129,11 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {field.value
                     ? format(
-                      typeof field.value === 'string'
-                        ? new Date(field.value)
-                        : field.value,
-                      'PPP'
-                    )
+                        typeof field.value === 'string'
+                          ? new Date(field.value)
+                          : field.value,
+                        'PPP'
+                      )
                     : t('add_subscriber.pick_date', 'Pick a date')}
                 </Button>
               </FormControl>
@@ -197,32 +203,34 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
 
   const nextStep = async () => {
     let fieldsToValidate: (keyof SubscriberFormData)[] = [];
-  
+
     if (step === 1) {
       fieldsToValidate = ['subscriber_type'];
     } else if (step === 2) {
-      // Validate step 2 fields based on subscriber type
       if (subscriberType === 'Residential') {
         fieldsToValidate = ['full_name', 'birthday', 'tax_id'];
       } else if (subscriberType === 'Commercial') {
         fieldsToValidate = ['company_name', 'established_date', 'tax_id'];
       }
     }
-  
+
     const valid = await form.trigger(fieldsToValidate);
     if (!valid) return;
-    
+
     setStep((prev) => prev + 1);
   };
 
   const prevStep = () => setStep((prev) => prev - 1);
-
   const isFinalStep = step === 3;
 
   return (
     <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
       <DialogContent className="max-w-2xl bg-background border shadow-xl">
-        <DialogHeader />
+        <DialogHeader>
+          <DialogTitle className="text-sm">
+            {t('add_subscriber.title', 'Add Subscriber')}
+          </DialogTitle>
+        </DialogHeader>
 
         <div className="flex items-center justify-between px-4 pb-6">
           {[
@@ -238,8 +246,8 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
                     step === s
                       ? 'bg-primary border-primary'
                       : step > s
-                        ? 'bg-green-500 border-green-500'
-                        : 'bg-muted border-border'
+                      ? 'bg-green-500 border-green-500'
+                      : 'bg-muted border-border'
                   )}
                 >
                   {step > s && <Check className="w-4 h-4 text-white" />}
@@ -341,13 +349,22 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
                   </>
                 )}
 
+                {/* DIGITS-ONLY: Tax ID */}
                 <FormField
                   control={form.control}
                   name="tax_id"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('add_subscriber.tax_id_label', 'Tax ID')}</FormLabel>
-                      <FormControl><Input {...field} /></FormControl>
+                      <FormControl>
+                        <Input
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={14}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(toDigits(e.target.value))}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -407,13 +424,22 @@ export function AddSubscriberModal({ open, onClose, onSuccess }: AddSubscriberMo
                   )}
                 />
 
+                {/* DIGITS-ONLY: Business Number */}
                 <FormField
                   control={form.control}
                   name="business_number"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t('add_subscriber.business_number_label', 'Business Number')}</FormLabel>
-                      <FormControl><Input {...field} /></FormControl>
+                      <FormControl>
+                        <Input
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          maxLength={14}
+                          value={field.value ?? ''}
+                          onChange={(e) => field.onChange(toDigits(e.target.value))}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
