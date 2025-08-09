@@ -1,19 +1,20 @@
 // src/app/subscribers/profile/[id]/page.tsx
-'use client';
+// Server Component – loads subscriber from Postgres and renders tabs
 
-import * as React from 'react';
-import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
+import { db } from '@/lib/db';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { useLocale } from '@/contexts/LocaleContext';
 import { cn } from '@/lib/utils';
-import { User, Building, DollarSign, FileSignature, Server as ServerIcon, Wrench, Package as PackageIcon, FileText, ClipboardList, History as HistoryIcon, ListFilter as ListFilterIcon, CheckCircle, XCircle, Clock, CalendarClock, Handshake } from 'lucide-react';
-import type { Subscriber, SubscriberStatus, ServiceStatus, SubscriberService, Invoice, PaymentPlan, PromiseToPay } from '@/types/subscribers'
+import {
+  User, Building, DollarSign, FileSignature,
+  Server as ServerIcon, Wrench, Package as PackageIcon,
+  FileText, ClipboardList, History as HistoryIcon,
+} from 'lucide-react';
+import type { Subscriber, SubscriberStatus, ServiceStatus } from '@/types/subscribers';
 
-// Tabs
+// Tabs (your existing client components)
 import { InformationTab } from '@/components/pages/subscribers/profile/InformationTab';
 import { ServicesTab } from '@/components/pages/subscribers/profile/ServicesTab';
 import { BillingTab } from '@/components/pages/subscribers/profile/BillingTab';
@@ -23,8 +24,12 @@ import { DocumentsTab } from '@/components/pages/subscribers/profile/DocumentsTa
 import { NotesTab } from '@/components/pages/subscribers/profile/NotesTab';
 import { HistoryTab } from '@/components/pages/subscribers/profile/HistoryTab';
 
-// ---- helpers you already had ----
-const getStatusBadgeVariant = (status: SubscriberStatus | ServiceStatus | undefined) => {
+// Ensure Node runtime for 'pg'
+export const runtime = 'nodejs';
+
+type PageProps = { params: { id: string } };
+
+const statusBadge = (status: SubscriberStatus | ServiceStatus | undefined) => {
   switch (status) {
     case 'Active': return 'bg-green-100 text-green-800';
     case 'Suspended': return 'bg-yellow-100 text-yellow-800';
@@ -35,32 +40,36 @@ const getStatusBadgeVariant = (status: SubscriberStatus | ServiceStatus | undefi
   }
 };
 
-// Mock data loader (replace with real fetch)
-const getSubscriberData = (id: string | undefined): Subscriber | null => {
-  if (!id) return null;
+// Map DB row → app type
+function mapRowToSubscriber(row: any): Subscriber {
+  return {
+    // Prefer the UUID externally; fall back to integer id if needed
+    id: row.public_id ?? row.id,
+    subscriberType: row.subscriberType,
+    fullName: row.fullName ?? undefined,
+    companyName: row.companyName ?? undefined,
+    birthday: row.birthday ?? undefined,
+    establishedDate: row.establishedDate ?? undefined,
+    address: row.address,
+    pointOfReference: row.pointOfReference ?? undefined,
+    email: row.email,
+    phoneNumber: row.phoneNumber,
+    mobileNumber: row.mobileNumber ?? undefined,
+    taxId: row.taxId ?? undefined,
+    businessNumber: row.businessNumber ?? undefined,
+    idNumber: row.idNumber ?? undefined,
+    signupDate: row.signupDate,
+    status: row.status,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
 
-  const base: Subscriber = {
-    id: id, // keep as string
-    subscriberType: 'Residential',
-    fullName: 'Alice Wonderland',
-    address: '123 Fantasy Lane',
-    email: 'alice@example.com',
-    phoneNumber: '555-1111',
-    mobileNumber: '555-1010',
-    signupDate: new Date(),
-    status: 'Active',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    services: [
-      { id: 'svc-1', type: 'Internet', plan: 'Fiber 100', popId: 'pop-1', status: 'Active', technology: 'Fiber', downloadSpeed: '100 Mbps', uploadSpeed: '50 Mbps', ipAddress: '203.0.113.10', onlineStatus: 'Online', authenticationType: 'PPPoE', pppoeUsername: 'alice@isp.com', pppoePassword: 'password', xponSn: 'HWTC12345678' },
-    ],
+    // Fill these later with real queries
+    services: [],
     billing: {
       balance: 0,
       nextBillDate: '',
       pastInvoices: [],
-      pendingInvoices: [
-        { id: 'inv-1', contractId: 'CTR-001', dateMade: '2025-08-01', dueDate: '2025-08-15', value: 50.00, wallet: 'VISA **** 1234', status: 'Due' },
-      ],
+      pendingInvoices: [],
       canceledInvoices: [],
       paymentPlans: [],
       promisesToPay: [],
@@ -71,93 +80,144 @@ const getSubscriberData = (id: string | undefined): Subscriber | null => {
     notes: [],
     history: [],
   };
+}
 
-  if (id === '2') {
-    base.id = '2';
-    base.subscriberType = 'Commercial';
-    base.fullName = undefined;
-    base.companyName = 'Bob The Builder Inc.';
-    base.status = 'Suspended';
+// Try UUID (public_id) first; if not, try integer id
+async function loadSubscriber(idParam: string): Promise<Subscriber | null> {
+  const byUuidSQL = `
+    SELECT
+      id,
+      public_id,
+      subscriber_type    AS "subscriberType",
+      full_name          AS "fullName",
+      company_name       AS "companyName",
+      birthday,
+      established_date   AS "establishedDate",
+      address,
+      point_of_reference AS "pointOfReference",
+      email,
+      phone_number       AS "phoneNumber",
+      mobile_number      AS "mobileNumber",
+      tax_id             AS "taxId",
+      business_number    AS "businessNumber",
+      id_number          AS "idNumber",
+      signup_date        AS "signupDate",
+      status,
+      created_at         AS "createdAt",
+      updated_at         AS "updatedAt"
+    FROM subscribers
+    WHERE public_id = $1::uuid
+    LIMIT 1;
+  `;
+
+  const byIntSQL = `
+    SELECT
+      id,
+      public_id,
+      subscriber_type    AS "subscriberType",
+      full_name          AS "fullName",
+      company_name       AS "companyName",
+      birthday,
+      established_date   AS "establishedDate",
+      address,
+      point_of_reference AS "pointOfReference",
+      email,
+      phone_number       AS "phoneNumber",
+      mobile_number      AS "mobileNumber",
+      tax_id             AS "taxId",
+      business_number    AS "businessNumber",
+      id_number          AS "idNumber",
+      signup_date        AS "signupDate",
+      status,
+      created_at         AS "createdAt",
+      updated_at         AS "updatedAt"
+    FROM subscribers
+    WHERE id = $1::int
+    LIMIT 1;
+  `;
+
+  const looksLikeUuid =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idParam);
+
+  if (looksLikeUuid) {
+    const { rows } = await db.query(byUuidSQL, [idParam]);
+    if (rows[0]) return mapRowToSubscriber(rows[0]);
   }
 
-  return base;
-};
-
-export default function SubscriberProfilePage() {
-  const { id } = useParams<{ id: string }>();
-  const subscriber = React.useMemo(() => getSubscriberData(id), [id]);
-
-  const { t } = useLocale();
-  const { toast } = useToast();
-
-  if (!subscriber) {
-    return <div className="p-6 text-sm text-muted-foreground">Subscriber not found.</div>;
+  if (/^\d+$/.test(idParam)) {
+    const { rows } = await db.query(byIntSQL, [Number(idParam)]);
+    if (rows[0]) return mapRowToSubscriber(rows[0]);
   }
 
-  // Billing badge count for tab
-  const pendingDue = subscriber.billing?.pendingInvoices?.filter(i => i.status === 'Due') ?? [];
-  const pendingInvoiceCount = pendingDue.length;
+  // one last attempt as UUID (in case pattern block was too strict)
+  try {
+    const { rows } = await db.query(byUuidSQL, [idParam]);
+    if (rows[0]) return mapRowToSubscriber(rows[0]);
+  } catch {
+    // ignore
+  }
 
-  const handleEdit = () =>
-    toast({ title: t('subscriber_profile.edit_toast_title'), description: t('subscriber_profile.edit_toast_description') });
+  return null;
+}
 
-  const handleDelete = () =>
-    toast({ title: t('subscriber_profile.delete_toast_title'), description: t('subscriber_profile.delete_toast_description'), variant: 'destructive' });
+export default async function SubscriberProfilePage({ params }: PageProps) {
+  const subscriber = await loadSubscriber(params.id);
+  if (!subscriber) return notFound();
+
+  const pendingInvoiceCount =
+    subscriber.billing?.pendingInvoices?.filter(i => i.status === 'Due')?.length ?? 0;
 
   return (
     <div className="flex flex-col gap-6 p-4">
+      {/* Header */}
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            {subscriber.subscriberType === 'Residential' ? (
-              <User className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Building className="h-4 w-4 text-muted-foreground" />
-            )}
+            {subscriber.subscriberType === 'Residential'
+              ? <User className="h-4 w-4 text-muted-foreground" />
+              : <Building className="h-4 w-4 text-muted-foreground" />
+            }
             <CardTitle className="text-base">
-              {subscriber.subscriberType === 'Residential' ? subscriber.fullName : subscriber.companyName} (ID: {subscriber.id})
+              {subscriber.subscriberType === 'Residential'
+                ? subscriber.fullName
+                : subscriber.companyName}{' '}
+              (ID: {subscriber.id})
             </CardTitle>
-            <Badge className={cn("text-xs ml-2", getStatusBadgeVariant(subscriber.status))}>
+            <Badge className={cn('text-xs ml-2', statusBadge(subscriber.status))}>
               {subscriber.status}
             </Badge>
-            <div className="ml-auto flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleEdit}>{t('subscriber_profile.edit_button')}</Button>
-              <Button variant="destructive" size="sm" onClick={handleDelete}>{t('subscriber_profile.delete_button')}</Button>
-            </div>
           </div>
         </CardHeader>
       </Card>
 
+      {/* Tabs */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-5 md:grid-cols-9">
-          <TabsTrigger value="overview"><User className="mr-1.5 h-3 w-3" />{t('subscriber_profile.overview_tab')}</TabsTrigger>
-          <TabsTrigger value="contracts"><FileSignature className="mr-1.5 h-3 w-3" />{t('subscriber_profile.contracts_tab')}</TabsTrigger>
-          <TabsTrigger value="services"><ServerIcon className="mr-1.5 h-3 w-3" />{t('subscriber_profile.services_tab')}</TabsTrigger>
+          <TabsTrigger value="overview"><User className="mr-1.5 h-3 w-3" />Overview</TabsTrigger>
+          <TabsTrigger value="contracts"><FileSignature className="mr-1.5 h-3 w-3" />Contracts</TabsTrigger>
+          <TabsTrigger value="services"><ServerIcon className="mr-1.5 h-3 w-3" />Services</TabsTrigger>
           <TabsTrigger value="billing" className="relative flex items-center justify-center gap-1">
             <DollarSign className="h-3 w-3" />
-            <span>{t('subscriber_profile.billing_tab')}</span>
+            <span>Billing</span>
             {pendingInvoiceCount > 0 && (
               <span className="absolute -top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white bg-primary">
                 {pendingInvoiceCount}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="service-calls"><Wrench className="mr-1.5 h-3 w-3" />{t('subscriber_profile.service_calls_tab')}</TabsTrigger>
-          <TabsTrigger value="inventory"><PackageIcon className="mr-1.5 h-3 w-3" />{t('subscriber_profile.inventory_tab')}</TabsTrigger>
-          <TabsTrigger value="documents"><FileText className="mr-1.5 h-3 w-3" />{t('subscriber_profile.documents_tab')}</TabsTrigger>
-          <TabsTrigger value="notes"><ClipboardList className="mr-1.5 h-3 w-3" />{t('subscriber_profile.notes_tab')}</TabsTrigger>
-          <TabsTrigger value="history"><HistoryIcon className="mr-1.5 h-3 w-3" />{t('subscriber_profile.history_tab')}</TabsTrigger>
+          <TabsTrigger value="service-calls"><Wrench className="mr-1.5 h-3 w-3" />Service Calls</TabsTrigger>
+          <TabsTrigger value="inventory"><PackageIcon className="mr-1.5 h-3 w-3" />Inventory</TabsTrigger>
+          <TabsTrigger value="documents"><FileText className="mr-1.5 h-3 w-3" />Documents</TabsTrigger>
+          <TabsTrigger value="notes"><ClipboardList className="mr-1.5 h-3 w-3" />Notes</TabsTrigger>
+          <TabsTrigger value="history"><HistoryIcon className="mr-1.5 h-3 w-3" />History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
           <InformationTab subscriber={subscriber} />
         </TabsContent>
 
-        <TabsContent value="contracts">
-          {/* fill later */}
-          <div className="text-xs text-muted-foreground p-6">No contracts yet.</div>
-        </TabsContent>
-
+        {/* These will show but currently receive only base subscriber (services/billing are empty).
+           Add real queries and pass data when you're ready. */}
         <TabsContent value="services">
           <ServicesTab subscriber={subscriber} />
         </TabsContent>
