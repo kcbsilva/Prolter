@@ -289,6 +289,7 @@ After=network.target postgresql.service
 Requires=postgresql.service
 
 [Service]
+NoNewPrivileges=no
 Type=simple
 User=prolteradmin
 Group=prolteradmin
