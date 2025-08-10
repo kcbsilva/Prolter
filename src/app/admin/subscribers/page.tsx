@@ -8,11 +8,11 @@ import { SubscribersCards } from '@/components/subscribers/SubscribersCards'
 import { ClientBar } from '@/components/subscribers/ClientBar'
 import { Subscriber } from '@/types/subscribers'
 
-type Status = 'Active' | 'Suspended' | 'Inactive'
+type Status = Subscriber['status'] extends infer S ? Extract<S, 'Active' | 'Suspended' | 'Inactive'> : 'Active' | 'Suspended' | 'Inactive'
 
 const PER_PAGE = 10
 const SEARCH_DEBOUNCE_MS = 300
-const MIN_LOADING_MS = 250 // ensures the skeleton is visible briefly
+const MIN_LOADING_MS = 250 // ensure the skeleton is visible briefly
 
 interface ApiResponse {
   subscribers: Subscriber[]
@@ -72,8 +72,12 @@ export default function SubscribersPage() {
 
       const data: ApiResponse = await res.json()
       setSubscribers(data.subscribers ?? [])
-      setTotalPages(data.totalPages ?? 1)
-      setTotalCount(data.totalCount ?? data.subscribers?.length ?? 0)
+      setTotalPages(Math.max(1, data.totalPages ?? 1))
+      setTotalCount(
+        typeof data.totalCount === 'number'
+          ? data.totalCount
+          : data.subscribers?.length ?? 0
+      )
     } catch (e: any) {
       if (e?.name !== 'AbortError') {
         console.error('Failed to load subscribers:', e)
@@ -82,11 +86,16 @@ export default function SubscribersPage() {
         setTotalCount(0)
       }
     } finally {
-      // enforce a minimum time in "loading" to let the skeleton show
+      // enforce a minimum loading time so the skeleton is visible
       const elapsed = Date.now() - startedAt
       const remaining = Math.max(0, MIN_LOADING_MS - elapsed)
-      const t = setTimeout(() => setLoading(false), remaining)
-      return () => clearTimeout(t)
+      if (remaining > 0) {
+        await new Promise((r) => setTimeout(r, remaining))
+      }
+      // if this request was aborted, don't flip loading off (the next call will handle it)
+      if (!controller.signal.aborted) {
+        setLoading(false)
+      }
     }
   }, [page, statusFilter, debouncedSearch])
 
@@ -108,15 +117,14 @@ export default function SubscribersPage() {
   const handleSearchChange = React.useCallback((v: string) => setSearch(v), [])
   const handleStatusChange = React.useCallback((v: Status[]) => setStatusFilter(v), [])
 
+  const effectiveTotal = totalCount ?? subscribers.length
+
   return (
     <main className="p-6 space-y-8">
-      <SubscribersCards
-        loading={loading}
-        total={totalCount ?? subscribers.length}
-      />
+      <SubscribersCards loading={loading} total={effectiveTotal} />
 
       <ClientBar
-        total={totalCount ?? subscribers.length}
+        total={effectiveTotal}
         search={search}
         onSearchChange={handleSearchChange}
         statusFilter={statusFilter}
@@ -131,7 +139,7 @@ export default function SubscribersPage() {
         page={page}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        perPage={PER_PAGE} // pass per-page so skeleton rows match
+        perPage={PER_PAGE} // keep skeleton row count consistent
       />
 
       <AddSubscriberModal
