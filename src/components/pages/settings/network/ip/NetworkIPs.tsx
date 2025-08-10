@@ -1,5 +1,3 @@
-// src/app/settings/network/ip/page.tsx
-
 'use client';
 
 import * as React from 'react';
@@ -11,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Dialog, DialogTrigger, Dialog as _D, // alias to keep types imported for children
+  Dialog, DialogTrigger, Dialog as _D,
 } from '@/components/ui/dialog';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -35,7 +33,7 @@ import { EmptyState } from '@/components/pages/settings/network/ip/_components/E
 import {
   IPBlock, IPBlockStatus, IPVersion, createBlockSchema,
 } from '@/components/pages/settings/network/ip/_lib/types';
-import { formatDate, fuzzyIncludes } from '@/components/pages/settings/network/ip/_lib/utils';
+import { formatDate, fuzzyIncludes, formatTotalCount } from '@/components/pages/settings/network/ip/_lib/utils';
 
 export default function NetworkIPs() {
   const { t } = useLocale();
@@ -57,16 +55,26 @@ export default function NetworkIPs() {
     const timer = setTimeout(() => {
       setBlocks([
         {
-          id: '1', version: 'IPv4', cidr: '10.0.0.0/24',
-          description: 'Private LAN range', status: 'active',
+          id: '1',
+          version: 'IPv4',
+          cidr: '10.0.0.0/24',
+          description: 'Private LAN range',
+          status: 'active',
           createdAt: new Date(Date.now() - 86400000).toISOString(),
           updatedAt: new Date().toISOString(),
+          usedIPs: 12,
+          totalStatic: 8,
         },
         {
-          id: '2', version: 'IPv6', cidr: '2001:db8::/48',
-          description: 'Documentation block example', status: 'reserved',
+          id: '2',
+          version: 'IPv6',
+          cidr: '2001:db8::/64',
+          description: 'Documentation block example',
+          status: 'reserved',
           createdAt: new Date(Date.now() - 172800000).toISOString(),
           updatedAt: new Date().toISOString(),
+          usedIPs: 42,
+          totalStatic: 5,
         },
       ]);
       setLoading(false);
@@ -79,7 +87,7 @@ export default function NetworkIPs() {
       .filter((b) => (versionFilter === 'all' ? true : b.version === versionFilter))
       .filter((b) => (statusFilter === 'all' ? true : b.status === statusFilter))
       .filter((b) =>
-        query ? fuzzyIncludes(b.cidr, query) || fuzzyIncludes(b.description ?? '', query) : true
+        query ? fuzzyIncludes(b.cidr, query) || fuzzyIncludes(b.description ?? '', query) || fuzzyIncludes(b.id, query) : true
       );
   }, [blocks, versionFilter, statusFilter, query]);
 
@@ -99,6 +107,8 @@ export default function NetworkIPs() {
       status: data.status,
       createdAt: now,
       updatedAt: now,
+      usedIPs: 0,
+      totalStatic: 0,
     };
     setBlocks((prev) => [newBlock, ...prev]);
     toast({ title: t('network_ip_page.toast_created', 'IP block created') });
@@ -139,8 +149,8 @@ export default function NetworkIPs() {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('common.search', 'Search by CIDR or description')}
-              className="pl-8 w-[220px]"
+              placeholder={t('common.search', 'Search by ID, CIDR or description')}
+              className="pl-8 w-[260px]"
             />
           </div>
 
@@ -237,26 +247,39 @@ export default function NetworkIPs() {
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-muted/60 backdrop-blur supports-[backdrop-filter]:bg-muted/40">
                     <tr className="text-left">
-                      <Th>{t('network_ip_page.version', 'Version')}</Th>
-                      <Th>CIDR</Th>
+                      <Th>ID</Th>
                       <Th>{t('common.description', 'Description')}</Th>
-                      <Th>{t('common.status', 'Status')}</Th>
-                      <Th>{t('common.updated', 'Updated')}</Th>
+                      <Th>{t('network_ip_page.version', 'Version')}</Th>
+                      <Th>{t('network_ip_page.total_ips', 'Total IPs (used/total)')}</Th>
+                      <Th>{t('network_ip_page.total_static', 'Total Static')}</Th>
                       <Th className="text-right">{t('common.actions', 'Actions')}</Th>
                     </tr>
                   </thead>
                   <tbody>
                     {pageItems.map((b) => (
                       <tr key={b.id} className="border-t hover:bg-muted/30">
+                        {/* ID */}
+                        <Td className="font-mono text-xs">{b.id}</Td>
+
+                        {/* Description */}
+                        <Td className="truncate max-w-[320px]" title={b.description}>
+                          {b.description || '-'}
+                        </Td>
+
+                        {/* Version */}
                         <Td>
                           <Badge variant={b.version === 'IPv4' ? 'default' : 'secondary'}>{b.version}</Badge>
                         </Td>
-                        <Td className="font-medium">{b.cidr}</Td>
-                        <Td className="truncate max-w-[260px]" title={b.description}>
-                          {b.description || '-'}
+
+                        {/* Total IPs (used/total) */}
+                        <Td>
+                          {(b.usedIPs ?? 0).toLocaleString()} / {formatTotalCount(b.version, b.cidr)}
                         </Td>
-                        <Td><StatusBadge status={b.status} /></Td>
-                        <Td className="text-muted-foreground">{formatDate(b.updatedAt)}</Td>
+
+                        {/* Total Static */}
+                        <Td>{(b.totalStatic ?? 0).toLocaleString()}</Td>
+
+                        {/* Actions */}
                         <Td className="text-right">
                           <RowActions onEdit={() => setEditing(b)} onDelete={() => removeBlock(b.id)} />
                         </Td>

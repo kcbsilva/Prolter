@@ -10,7 +10,7 @@ import {
 import { Loader2, XCircle } from "lucide-react";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useToast } from "@/hooks/use-toast";
-import { createBlockSchema, IPBlockStatus, IPVersion } from "../_lib/types";
+import { createBlockSchema, IPBlockStatus, IPVersion } from "@/components/pages/settings/network/ip/_lib/types";
 
 export type CreateOrEditProps = {
   title: string;
