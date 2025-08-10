@@ -249,6 +249,7 @@ export default function NetworkIPs() {
                     <tr className="text-left">
                       <Th>ID</Th>
                       <Th>{t('common.description', 'Description')}</Th>
+                      <Th>{t('network_ip_page.range', 'Range')}</Th>
                       <Th>{t('network_ip_page.version', 'Version')}</Th>
                       <Th>{t('network_ip_page.total_ips', 'Total IPs (used/total)')}</Th>
                       <Th>{t('network_ip_page.total_static', 'Total Static')}</Th>
@@ -270,6 +271,9 @@ export default function NetworkIPs() {
                         <Td>
                           <Badge variant={b.version === 'IPv4' ? 'default' : 'secondary'}>{b.version}</Badge>
                         </Td>
+
+                        {/* Range (CIDR) */}
+                        <Td className="font-mono text-xs">{b.cidr}</Td>
 
                         {/* Total IPs (used/total) */}
                         <Td>
