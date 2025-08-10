@@ -1,8 +1,9 @@
 // src/app/admin/login/page.tsx
 
 'use client';
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
+import { useState, useEffect, FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,89 +27,93 @@ import { ProlterLogo } from '@/components/prolter-logo';
 type IpApiResponse = { ip: string };
 
 export default function AdminLoginPage() {
+  // form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // ui
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // redirect
+  const [redirectUrl, setRedirectUrl] = useState("/admin/dashboard");
+  // ip
   const [publicIP, setPublicIP] = useState<string | null>(null);
   const [ipLoading, setIpLoading] = useState(true);
-  const [redirectUrl, setRedirectUrl] = useState("/admin/dashboard");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isAuthenticated, isLoading: authIsLoading } = useAuth();
   const { t } = useLocale();
 
-  // Parse redirect_url query parameter on mount
+  // Parse redirect_url from query (Next.js-native)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const redirect = params.get("redirect_url");
-      if (redirect && redirect.startsWith("/admin")) {
-        setRedirectUrl(redirect);
-      }
+    const redirect = searchParams.get("redirect_url");
+    if (redirect && redirect.startsWith("/admin")) {
+      setRedirectUrl(redirect);
     }
-  }, []);
+  }, [searchParams]);
 
-  // Fetch public IP with cleanup on unmount
+  // Fetch public IP (simple + safe)
   useEffect(() => {
-    const controller = new AbortController();
+    let isMounted = true;
 
-    fetch("https://api.ipify.org?format=json", { signal: controller.signal })
-      .then((res) => res.json() as Promise<IpApiResponse>)
-      .then((data) => {
-        setPublicIP(data.ip || "Unavailable");
-        setIpLoading(false);
-      })
-      .catch((e) => {
-        if (e.name !== 'AbortError') {
-          console.error("IP fetch error:", e);
-          setPublicIP("Unavailable");
-          setIpLoading(false);
-        }
-      });
+    (async () => {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        if (!res.ok) throw new Error("IP fetch failed");
+        const data: IpApiResponse = await res.json();
+        if (isMounted) setPublicIP(data.ip || "Unavailable");
+      } catch {
+        if (isMounted) setPublicIP("Unavailable");
+      } finally {
+        if (isMounted) setIpLoading(false);
+      }
+    })();
 
     return () => {
-      controller.abort();
+      isMounted = false;
     };
   }, []);
 
-  // If authenticated and not submitting, redirect to desired page
+  // If authenticated and not currently sending a login request, redirect
   useEffect(() => {
     if (isAuthenticated && !isSubmitting) {
       router.replace(redirectUrl);
     }
   }, [isAuthenticated, isSubmitting, redirectUrl, router]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  // Submit
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError("");
     setIsSubmitting(true);
 
     try {
       await login(email, password, redirectUrl);
-      // If login does not redirect internally, the above effect will redirect
+      // If login doesn't hard-redirect, the effect above will handle it.
+      // Optionally: send publicIP to backend for audit/logging.
     } catch (loginError: any) {
-      if (loginError.message === 'auth.email_not_confirmed') {
-        setError(
-          t(
-            'auth.email_not_confirmed_error',
-            'Your email address has not been confirmed. Please check your inbox (and spam folder) for a confirmation link.'
-          )
-        );
-      } else {
-        setError(
-          loginError.message || t('login.error_failed', 'Login failed. Please check your credentials.')
-        );
-      }
+      const errorMap: Record<string, string> = {
+        'auth.email_not_confirmed': t(
+          'auth.email_not_confirmed_error',
+          'Your email address has not been confirmed. Please check your inbox (and spam folder) for a confirmation link.'
+        ),
+      };
+
+      setError(
+        errorMap[loginError?.message] ??
+          loginError?.message ??
+          t('login.error_failed', 'Login failed. Please check your credentials.')
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (authIsLoading && !isSubmitting) {
+  // Show a loader when auth is initializing or a submission is in-flight
+  if (authIsLoading) {
     return (
       <div className="flex min-h-screen w-full items-center justify-center bg-background">
-        <div className="flex space-x-2">
+        <div className="flex space-x-2" role="status" aria-live="polite" aria-label={t('login.loading_status', 'Loading authentication status')}>
           <div className="h-3 w-3 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
           <div className="h-3 w-3 bg-accent rounded-full animate-bounce [animation-delay:-0.15s]" />
           <div className="h-3 w-3 bg-foreground rounded-full animate-bounce" />
@@ -117,14 +122,14 @@ export default function AdminLoginPage() {
     );
   }
 
+  const isBusy = isSubmitting;
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-background">
       <div className="flex flex-1">
         {/* Branding section for larger screens */}
         <div className="hidden lg:flex lg:w-3/4 bg-muted flex-col items-center justify-center p-12 text-center relative overflow-hidden">
-          <ProlterLogo
-            className="w-4/5 max-w-2xl h-auto"
-          />
+          <ProlterLogo className="w-4/5 max-w-2xl h-auto" />
         </div>
 
         {/* Login form section */}
@@ -140,24 +145,29 @@ export default function AdminLoginPage() {
               <CardDescription className="text-muted-foreground text-center px-2">
                 {t("login.description", "Enter your credentials to access the admin panel.")}
               </CardDescription>
-              <div className="my-2 border-t border-border w-full"></div>
+              <div className="my-2 border-t border-border w-full" />
             </CardHeader>
 
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div className="space-y-1.5">
                   <Label htmlFor="email">{t("login.username_label", "Email")}</Label>
                   <Input
                     id="email"
                     type="email"
                     autoComplete="username"
+                    autoFocus
                     placeholder={t("login.username_placeholder", "Enter your email")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    disabled={isSubmitting || authIsLoading}
+                    aria-required="true"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "login-error" : undefined}
+                    disabled={isBusy}
                   />
                 </div>
+
                 <div className="space-y-1.5">
                   <div className="flex justify-between items-center">
                     <Label htmlFor="password">{t("login.password_label", "Password")}</Label>
@@ -173,21 +183,26 @@ export default function AdminLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    disabled={isSubmitting || authIsLoading}
+                    aria-required="true"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "login-error" : undefined}
+                    disabled={isBusy}
                   />
                 </div>
+
                 {error && (
-                  <p className="text-xs text-destructive" aria-live="assertive">{error}</p>
+                  <p id="login-error" className="text-xs text-destructive" aria-live="assertive">
+                    {error}
+                  </p>
                 )}
+
                 <Button
                   type="submit"
                   className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-                  disabled={isSubmitting || authIsLoading}
+                  disabled={isBusy}
                 >
-                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {isSubmitting
-                    ? t('login.loading', 'Signing In...')
-                    : t("login.submit_button", "Sign In")}
+                  {isBusy && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
+                  {isBusy ? t('login.loading', 'Signing In...') : t("login.submit_button", "Sign In")}
                 </Button>
               </form>
             </CardContent>
