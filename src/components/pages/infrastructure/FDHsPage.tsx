@@ -31,7 +31,7 @@ type FdhTemplate = z.infer<typeof fdhTemplateSchema> & { id: string };
 const placeholderTemplates: FdhTemplate[] = [];
 const manufacturers: string[] = ['Huawei', 'Corning', 'Prysmian'];
 
-export function FDHsPage() {
+export default function FDHsPage() {
   const { t } = useLocale();
   const { toast } = useToast();
   const [templates, setTemplates] = React.useState<FdhTemplate[]>(placeholderTemplates);

@@ -1,82 +1,51 @@
-// src/app/finances/page.tsx
 'use client'
 
 import * as React from 'react'
+import dynamic from 'next/dynamic'
+import { SidebarTabsLayout } from '@/components/layout/SidebarTabsLayout'
 import {
   LayoutDashboard,
-  BookText,
-  Settings,
-  List,
   DollarSign,
+  BookOpen,
+  Tag
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
-import { FinanceDashboardPage } from '@/components/pages/finances/FinanceDashboardPage'
-import { CashBookPage } from '@/components/pages/finances/CashBookPage'
-import { EntryCategoriesPage } from '@/components/pages/finances/EntryCategoriesPage'
-import { FinancialConfigPage } from '@/components/pages/finances/FinancialConfigPage'
+// Dynamic imports for performance
+const FinanceDashboard = dynamic(
+  () => import('@/components/pages/finances/FinanceDashboardPage').then(mod => mod.default),
+  { loading: () => <div>Loading Dashboard...</div> }
+)
+const CashBookPage = dynamic(
+  () => import('@/components/pages/finances/CashBookPage').then(mod => mod.default),
+  { loading: () => <div>Loading Cash Book...</div> }
+)
+const EntryCategoriesPage = dynamic(
+  () => import('@/components/pages/finances/EntryCategoriesPage').then(mod => mod.default),
+  { loading: () => <div>Loading Categories...</div> }
+)
 
-const tabs = [
-  { value: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { value: 'cashbook', label: 'Cash Book', icon: BookText },
-  { value: 'entrycategories', label: 'Entry Categories', icon: List },
-  { value: 'configurations', label: 'Financial Configurations', icon: Settings },
-]
+export default function FinancesPage() {
+  const tabs = [
+    { value: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { value: 'cash-book', label: 'Cash Book', icon: DollarSign },
+    { value: 'entry-categories', label: 'Entry Categories', icon: Tag }
+  ] as { value: string; label: string; icon: LucideIcon }[]
 
-export default function FinancialPage() {
-  const [selectedTab, setSelectedTab] = React.useState('dashboard')
-
-  const renderContent = () => {
-    switch (selectedTab) {
-      case 'dashboard': return <FinanceDashboardPage />
-      case 'cashbook': return <CashBookPage />
-      case 'entrycategories': return <EntryCategoriesPage />
-      case 'configurations': return <FinancialConfigPage />
-      default: return <FinanceDashboardPage />
-    }
+  const componentMap = {
+    dashboard: <FinanceDashboard />,
+    'cash-book': <CashBookPage />,
+    'entry-categories': <EntryCategoriesPage />
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-muted">
-      <div className="flex h-full w-full overflow-hidden">
-        {/* Sidebar */}
-        <aside className="w-[240px] h-full overflow-y-auto p-4 border-r bg-muted/40 space-y-4">
-          <div className="mb-4">
-            <h2 className="text-sm font-semibold flex items-center">
-              <DollarSign className="w-4 h-4 mr-2" />
-              Finances
-            </h2>
-          </div>
-
-          <div className="space-y-1">
-            {tabs.map((tab) => {
-              const Icon = tab.icon
-              const isActive = selectedTab === tab.value
-              return (
-                <Button
-                  key={tab.value}
-                  variant="ghost"
-                  className={cn(
-                    'w-full justify-start font-normal text-xs rounded-lg pl-5',
-                    isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
-                  )}
-                  onClick={() => setSelectedTab(tab.value)}
-                >
-                  <Icon className="w-3 h-3 mr-2" />
-                  {tab.label}
-                </Button>
-              )
-            })}
-          </div>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 min-w-0 h-full overflow-y-auto p-6 bg-white">
-          {renderContent()}
-        </main>
-      </div>
-    </div>
+    <SidebarTabsLayout
+      title="Finances"
+      titleIcon={BookOpen}
+      tabs={tabs}
+      defaultTab="dashboard"
+      componentMap={componentMap}
+    />
   )
 }

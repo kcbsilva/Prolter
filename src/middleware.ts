@@ -1,3 +1,5 @@
+// src/middleware.ts
+
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const config = {

@@ -1,4 +1,4 @@
-// src/app/settings/network/cgnat/page.tsx
+// src/app/settings/network/cgnat/page.js
 'use client';
 
 import * as React from 'react';
@@ -66,14 +66,7 @@ const cgnatRuleSchema = z.object({
   status: z.enum(['Active', 'Inactive']).default('Active'),
 });
 
-type CgnatRuleFormData = z.infer<typeof cgnatRuleSchema>;
-
-interface CgnatRule extends CgnatRuleFormData {
-  id: string;
-  createdAt: Date;
-}
-
-const placeholderCgnatRules: CgnatRule[] = [
+const placeholderCgnatRules = [
   { id: 'cgnat-1', networkOut: '203.0.113.10', natNetwork: '100.64.0.1', type: 'Vertical', firstPort: 10000, numberOfPorts: 1000, protocol: 'TCP', status: 'Active', createdAt: new Date() },
   { id: 'cgnat-2', networkOut: '203.0.113.20', natNetwork: '100.64.0.2', type: 'Horizontal', firstPort: 20000, numberOfPorts: 500, protocol: 'UDP/TCP', status: 'Active', createdAt: new Date(Date.now() - 86400000) },
   { id: 'cgnat-3', networkOut: '203.0.113.30', natNetwork: '100.64.0.3', type: 'Vertical', firstPort: 30000, numberOfPorts: 2000, protocol: 'TCP', status: 'Inactive', createdAt: new Date(Date.now() - 172800000) },
@@ -82,11 +75,11 @@ const placeholderCgnatRules: CgnatRule[] = [
 export default function CgnatPage() {
   const { t } = useLocale();
   const { toast } = useToast();
-  const [rules, setRules] = React.useState<CgnatRule[]>(placeholderCgnatRules);
+  const [rules, setRules] = React.useState(placeholderCgnatRules);
   const [isAddRuleDialogOpen, setIsAddRuleDialogOpen] = React.useState(false);
-  const iconSize = "h-2.5 w-2.5"; // Reduced icon size
+  const iconSize = "h-2.5 w-2.5";
 
-  const form = useForm<CgnatRuleFormData>({
+  const form = useForm({
     resolver: zodResolver(cgnatRuleSchema),
     defaultValues: {
       networkOut: '',
@@ -99,8 +92,8 @@ export default function CgnatPage() {
     },
   });
 
-  const handleAddRuleSubmit = (data: CgnatRuleFormData) => {
-    const newRule: CgnatRule = {
+  const handleAddRuleSubmit = (data) => {
+    const newRule = {
       ...data,
       id: `cgnat-${Date.now()}`,
       createdAt: new Date(),
@@ -114,11 +107,11 @@ export default function CgnatPage() {
     setIsAddRuleDialogOpen(false);
   };
 
-  const getStatusBadgeVariant = (status: 'Active' | 'Inactive') => {
+  const getStatusBadgeVariant = (status) => {
     return status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
   };
 
-  const handleExport = (format: 'Linux' | 'MikroTik', ruleId: string) => {
+  const handleExport = (format, ruleId) => {
     toast({
         title: t('cgnat_page.export_action_title', 'Export Rule (Simulated)'),
         description: t('cgnat_page.export_action_description', 'Exporting rule {id} to {format} format.')
@@ -132,7 +125,7 @@ export default function CgnatPage() {
     <div className="flex flex-col gap-6">
       <div className="flex justify-between items-center">
         <h1 className="text-base font-semibold flex items-center gap-2">
-          <Share2 className={`${iconSize} text-primary`} /> {/* Icon added */}
+          <Share2 className={`${iconSize} text-primary`} />
           {t('cgnat_page.title', 'CGNAT Configuration')}
         </h1>
         <div className="flex items-center gap-2">
@@ -313,7 +306,7 @@ export default function CgnatPage() {
                       <TableCell className="text-xs">{rule.protocol}</TableCell>
                       <TableCell className="text-xs">
                          <Badge variant={rule.status === 'Active' ? 'default' : 'secondary'} className={`text-xs ${getStatusBadgeVariant(rule.status)}`}>
-                           {t(`cgnat_page.status_${rule.status.toLowerCase()}` as any, rule.status)}
+                           {t(`cgnat_page.status_${rule.status.toLowerCase()}`, rule.status)}
                          </Badge>
                       </TableCell>
                       <TableCell className="text-right">

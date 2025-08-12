@@ -8,7 +8,7 @@ import { Puzzle, FileText as FileTextIcon } from 'lucide-react'; // Removed Plus
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast'; // Added useToast
 
-export function AccessoriesPage() {
+export default function AccessoriesPage() {
   const { t } = useLocale();
   const { toast } = useToast(); // Added toast
   const iconSize = "h-3 w-3";

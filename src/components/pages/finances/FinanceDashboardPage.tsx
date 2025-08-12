@@ -23,7 +23,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 
-export function FinanceDashboardPage() {
+export default function FinanceDashboardPage() {
     const [hydrated, setHydrated] = useState(false)
     useEffect(() => setHydrated(true), [])
 

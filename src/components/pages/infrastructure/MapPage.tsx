@@ -35,7 +35,7 @@ import { Input } from '@/components/ui/input';
 import { useLocale } from '@/contexts/LocaleContext';
 import { MapComponent } from '@/components/map-component';
 
-export function MapPage() {
+export default function MapPage() {
   const { t } = useLocale();
   const iconSize = 'h-3 w-3';
 

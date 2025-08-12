@@ -94,7 +94,12 @@ export default function ListSubscribersPage() {
     refetch
   } = useQuery<Subscriber[], Error>({
     queryKey: ['subscribersList'],
-    queryFn: listSubscribers,
+    queryFn: () => listSubscribers(), // Wrap in arrow function
+  });
+  
+  const { data: subscriberStats } = useQuery<SubscriberStats, Error>({
+    queryKey: ['subscriberStats'],
+    queryFn: () => getSubscriberStats(), // Wrap in arrow function
   });
 
   const { data: subscriberStats } = useQuery<SubscriberStats, Error>({

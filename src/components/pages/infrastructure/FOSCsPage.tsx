@@ -42,7 +42,7 @@ type FoscTemplate = z.infer<typeof foscSchema> & { id: string };
 
 const manufacturers = ['Furukawa', 'FiberHome', 'Prysmian'];
 
-export function FOSCsPage() {
+export default function FOSCsPage() {
   const { t } = useLocale();
   const [open, setOpen] = React.useState(false);
   const [templates, setTemplates] = React.useState<FoscTemplate[]>([]);

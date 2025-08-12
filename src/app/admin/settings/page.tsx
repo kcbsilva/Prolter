@@ -347,7 +347,7 @@ export default function SettingsPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 h-full overflow-y-auto p-6 bg-white">
+        <main className="flex-1 min-w-0 h-full overflow-y-auto p-6 bg-background">
           {renderContent()}
         </main>
       </div>

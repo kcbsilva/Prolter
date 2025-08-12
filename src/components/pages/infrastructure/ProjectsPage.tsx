@@ -13,7 +13,7 @@ import { RemoveProjectDialog } from '@/components/maps/projects/RemoveProjectDia
 
 import type { MapProject, Pop } from '@/types/maps';
 
-export function ProjectsPage() {
+export default function ProjectsPage() {
   const { t } = useLocale();
 
   const [projects, setProjects] = React.useState<MapProject[] | null>(null);
