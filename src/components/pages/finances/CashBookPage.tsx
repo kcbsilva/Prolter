@@ -13,7 +13,7 @@ import { AddEntryDialog } from '@/components/pages/finances/cash-book/AddEntryDi
 import { UpdateEntryDialog } from '@/components/pages/finances/cash-book/UpdateEntryDialog';
 import { DeleteEntryDialog } from '@/components/pages/finances/cash-book/DeleteEntryDialog';
 
-export function CashBookPage() {
+export default function CashBookPage() {
   const { t, locale } = useLocale();
   const { toast } = useToast();
 

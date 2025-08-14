@@ -1,4 +1,4 @@
-// src/app/admin/settings/global/page.tsx
+// src/app/admin/settings/global/page.js
 'use client';
 
 import * as React from 'react';
@@ -25,23 +25,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useLocale, type Locale } from '@/contexts/LocaleContext';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const globalSettingsSchema = z.object({
   companyName: z.string().min(1, 'Company name is required'),
   companyLogoUrl: z.string().url('Invalid URL format').optional().or(z.literal('')),
   defaultCurrency: z.string().length(3, 'Currency code must be 3 letters (e.g., USD)'),
   timezone: z.string().min(1, 'Timezone is required'),
-  language: z.enum(['en'], { // Only 'en' is supported
+  language: z.enum(['en'], {
     required_error: "Please select a default language.",
   }).default('en'),
 });
 
-type GlobalSettingsFormData = z.infer<typeof globalSettingsSchema>;
-
 // Placeholder for where settings would be stored/fetched in a real app
 // For now, it's just in-memory.
-let initialSettings: GlobalSettingsFormData = {
+let initialSettings = {
   companyName: 'NetHub ISP',
   companyLogoUrl: '',
   defaultCurrency: 'USD',
@@ -50,31 +48,29 @@ let initialSettings: GlobalSettingsFormData = {
 };
 
 // Simulate API calls
-const loadGlobalSettings = async (): Promise<GlobalSettingsFormData> => {
+const loadGlobalSettings = async () => {
   console.log("Simulating loading global settings...");
-  // Ensure loaded settings conform to the new schema (language 'en')
   return { ...initialSettings, language: 'en' };
 };
 
-const saveGlobalSettings = async (data: GlobalSettingsFormData): Promise<void> => {
+const saveGlobalSettings = async (data) => {
   console.log("Simulating saving global settings:", data);
-  initialSettings = { ...data, language: 'en' }; // Ensure language is always 'en' on save
+  initialSettings = { ...data, language: 'en' };
 };
-
 
 export default function GlobalSettings() {
   const { toast } = useToast();
   const { t, setLocale } = useLocale();
   const iconSize = "h-3 w-3";
 
-  const form = useForm<GlobalSettingsFormData>({
+  const form = useForm({
     resolver: zodResolver(globalSettingsSchema),
     defaultValues: {
       companyName: '',
       companyLogoUrl: '',
       defaultCurrency: '',
       timezone: '',
-      language: 'en', // Default to 'en'
+      language: 'en',
     },
   });
 
@@ -85,11 +81,11 @@ export default function GlobalSettings() {
         companyLogoUrl: settings.companyLogoUrl || '',
         defaultCurrency: settings.defaultCurrency || '',
         timezone: settings.timezone || '',
-        language: 'en' as Locale, // Force language to 'en'
+        language: 'en',
       };
       form.reset(validatedSettings);
       if (typeof window !== 'undefined') {
-         setLocale('en'); // Set locale context to 'en'
+         setLocale('en');
       }
     }).catch(error => {
       toast({
@@ -99,15 +95,14 @@ export default function GlobalSettings() {
       });
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // form removed from deps to avoid re-triggering on its own reset
+  }, []);
 
-  const onSubmit = async (data: GlobalSettingsFormData) => {
+  const onSubmit = async (data) => {
     try {
-      // Ensure language is 'en' before saving
-      const dataToSave = { ...data, language: 'en' as Locale };
+      const dataToSave = { ...data, language: 'en' };
       await saveGlobalSettings(dataToSave);
       if (typeof window !== 'undefined') {
-        setLocale('en'); // Ensure context is also 'en'
+        setLocale('en');
       }
       toast({
         title: t('global_settings.save_success_title'),
@@ -124,7 +119,7 @@ export default function GlobalSettings() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-base font-semibold">{t('global_settings.title')}</h1>
+      <h1 className="text-base font-semibold">{t('globalSettings.title')}</h1>
       <Card>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -193,11 +188,11 @@ export default function GlobalSettings() {
                      <FormLabel>{t('global_settings.language_label')}</FormLabel>
                      <Select
                         onValueChange={(value) => {
-                            if (value === 'en') { // Only allow 'en'
-                                field.onChange(value as Locale);
+                            if (value === 'en') {
+                                field.onChange(value);
                             }
                         }}
-                        value={field.value || 'en'} // Ensure value is always 'en'
+                        value={field.value || 'en'}
                      >
                        <FormControl>
                          <SelectTrigger>
@@ -206,7 +201,6 @@ export default function GlobalSettings() {
                        </FormControl>
                        <SelectContent>
                          <SelectItem value="en">{t('global_settings.language_english')}</SelectItem>
-                         {/* Other language options removed */}
                        </SelectContent>
                      </Select>
                      <FormMessage />

@@ -25,7 +25,7 @@ const mockCategories: EntryCategory[] = [
   { id: 'cat-2', name: 'Office', type: 'Expense', parentCategoryId: STATIC_EXPENSE_ID, createdAt: new Date() },
 ];
 
-export function EntryCategoriesPage() {
+export default function EntryCategoriesPage() {
   const { t } = useLocale();
   const { toast } = useToast();
 

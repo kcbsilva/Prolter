@@ -8,7 +8,7 @@ import { GitBranch, FileText as FileTextIcon } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 
-export function DuctsPage() {
+export default function DuctsPage() {
   const { t } = useLocale();
   const { toast } = useToast();
   const iconSize = "h-3 w-3";

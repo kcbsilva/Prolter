@@ -29,7 +29,7 @@ const simulatedPolls: HydroPoll[] = [
   },
 ];
 
-export function HydroPollsPage() {
+export default function HydroPollsPage() {
   const { t } = useLocale();
   const router = useRouter();
 

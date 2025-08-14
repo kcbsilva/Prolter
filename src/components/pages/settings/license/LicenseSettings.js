@@ -1,4 +1,4 @@
-//src/app/admin/settings/license/page.tsx
+//src/app/admin/settings/license/page.js
 
 'use client';
 
@@ -14,7 +14,7 @@ export default function LicenseSettings() {
   const iconSize = 'h-2.5 w-2.5';
 
   const [licenseKey, setLicenseKey] = React.useState('');
-  const [status, setStatus] = React.useState<'idle' | 'checking' | 'valid' | 'invalid' | 'error'>('idle');
+  const [status, setStatus] = React.useState('idle');
 
   const checkLicense = async () => {
     setStatus('checking');

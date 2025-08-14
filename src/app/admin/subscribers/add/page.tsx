@@ -39,14 +39,10 @@ import { addSubscriber } from '@/services/postgres/subscribers';
 import type { SubscriberData } from '@/types/subscribers';
 import { useRouter } from 'next/navigation';
 
-const subscriberSchema = z.object({
-  subscriber_type: z.enum(['Residential', 'Commercial'], {
-    required_error: "You need to select a subscriber type.",
-  }),
-  full_name: z.string().optional(),
-  company_name: z.string().optional(),
-  birthday: z.date().optional(),
-  established_date: z.date().optional(),
+// ----------------------
+// Validation Schema
+// ----------------------
+const baseSchema = z.object({
   address: z.string().min(1, 'Address is required'),
   point_of_reference: z.string().optional(),
   email: z.string().email('Invalid email address'),
@@ -55,44 +51,44 @@ const subscriberSchema = z.object({
   tax_id: z.string().optional(),
   business_number: z.string().optional(),
   id_number: z.string().optional(),
-  signup_date: z.date().optional(), 
+  signup_date: z.date().optional(),
   status: z.enum(['Active', 'Inactive', 'Suspended', 'Planned', 'Canceled']).default('Active').optional(),
-}).refine(data => data.subscriber_type !== 'Residential' || (data.full_name && data.full_name.length > 0), {
-  message: "Full Name is required for Residential subscribers.",
-  path: ["full_name"],
-}).refine(data => data.subscriber_type !== 'Residential' || data.birthday, {
-    message: "Birthday is required for Residential subscribers.",
-    path: ["birthday"],
-}).refine(data => data.subscriber_type !== 'Residential' || (data.tax_id && data.tax_id.length > 0), {
-    message: "Tax ID is required for Residential subscribers.",
-    path: ["tax_id"],
-}).refine(data => data.subscriber_type !== 'Commercial' || (data.company_name && data.company_name.length > 0), {
-  message: "Company Name is required for Commercial subscribers.",
-  path: ["company_name"],
-}).refine(data => data.subscriber_type !== 'Commercial' || data.established_date, {
-    message: "Established Date is required for Commercial subscribers.",
-    path: ["established_date"],
-}).refine(data => data.subscriber_type !== 'Commercial' || (data.tax_id && data.tax_id.length > 0), {
-    message: "CNPJ (Tax ID) is required for Commercial subscribers.",
-    path: ["tax_id"],
 });
 
+const residentialSchema = baseSchema.extend({
+  subscriber_type: z.literal('Residential'),
+  full_name: z.string().min(1, 'Full Name is required'),
+  birthday: z.date({ required_error: 'Birthday is required' }),
+  tax_id: z.string().min(1, 'Tax ID is required'),
+});
+
+const commercialSchema = baseSchema.extend({
+  subscriber_type: z.literal('Commercial'),
+  company_name: z.string().min(1, 'Company Name is required'),
+  established_date: z.date({ required_error: 'Established Date is required' }),
+  tax_id: z.string().min(1, 'CNPJ (Tax ID) is required'),
+});
+
+const subscriberSchema = z.discriminatedUnion('subscriber_type', [
+  residentialSchema,
+  commercialSchema,
+]);
 
 type SubscriberFormZodData = z.infer<typeof subscriberSchema>;
 
+// ----------------------
+// Component
+// ----------------------
 export default function AddSubscriberPage() {
   const { toast } = useToast();
   const { t } = useLocale();
   const router = useRouter();
   const iconSize = "h-3 w-3";
+
   const form = useForm<SubscriberFormZodData>({
     resolver: zodResolver(subscriberSchema),
     defaultValues: {
       subscriber_type: undefined,
-      full_name: '',
-      company_name: '',
-      birthday: undefined,
-      established_date: undefined,
       address: '',
       point_of_reference: '',
       email: '',
@@ -103,7 +99,7 @@ export default function AddSubscriberPage() {
       id_number: '',
       signup_date: new Date(),
       status: 'Active',
-    },
+    } as any, // allow partial defaults
   });
 
   const subscriberType = form.watch('subscriber_type');
@@ -112,16 +108,24 @@ export default function AddSubscriberPage() {
     try {
       const subscriberServiceData: SubscriberData = {
         ...data,
-        birthday: data.birthday ? data.birthday : null,
-        established_date: data.established_date ? data.established_date : null,
-        signup_date: data.signup_date ? data.signup_date : new Date(),
+        birthday: 'birthday' in data ? data.birthday ?? null : null,
+        established_date: 'established_date' in data ? data.established_date ?? null : null,
+        signup_date: data.signup_date ?? new Date(),
       };
+
       const newSubscriber = await addSubscriber(subscriberServiceData);
-      const name = newSubscriber.subscriberType === 'Residential' ? newSubscriber.fullName : newSubscriber.companyName;
+      const name =
+        newSubscriber.subscriberType === 'Residential'
+          ? newSubscriber.fullName
+          : newSubscriber.companyName;
+
       toast({
         title: t('add_subscriber.add_success_toast_title'),
-        description: t('add_subscriber.add_success_toast_description', 'Details for {name} saved with ID {id}.').replace('{name}', name || 'N/A').replace('{id}', newSubscriber.id.toString()),
+        description: t('add_subscriber.add_success_toast_description', 'Details for {name} saved with ID {id}.')
+          .replace('{name}', name || 'N/A')
+          .replace('{id}', newSubscriber.id.toString()),
       });
+
       form.reset();
       router.push('/admin/subscribers/list');
     } catch (error: any) {
@@ -131,8 +135,11 @@ export default function AddSubscriberPage() {
         variant: 'destructive',
       });
     }
-  }, [router, toast, t]);
+  }, [router, toast, t, form]);
 
+  // ----------------------
+  // Render
+  // ----------------------
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-base font-semibold">{t('add_subscriber.title')}</h1>
@@ -144,16 +151,17 @@ export default function AddSubscriberPage() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Subscriber Type */}
               <FormField
                 control={form.control}
                 name="subscriber_type"
                 render={({ field }) => (
                   <FormItem className="space-y-3 md:col-span-2">
-                    <FormLabel>{t('add_subscriber.type_label')}</FormLabel>
+                    <FormLabel>{t('add_subscriber.type_label')} <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                         className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-4"
                       >
                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -161,7 +169,7 @@ export default function AddSubscriberPage() {
                             <RadioGroupItem value="Residential" />
                           </FormControl>
                           <FormLabel className="font-normal flex items-center gap-2 text-xs">
-                             <User className={`${iconSize} text-muted-foreground`}/> {t('add_subscriber.type_residential')}
+                            <User className={`${iconSize} text-muted-foreground`} /> {t('add_subscriber.type_residential')}
                           </FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
@@ -169,7 +177,7 @@ export default function AddSubscriberPage() {
                             <RadioGroupItem value="Commercial" />
                           </FormControl>
                           <FormLabel className="font-normal flex items-center gap-2 text-xs">
-                             <Building className={`${iconSize} text-muted-foreground`}/> {t('add_subscriber.type_commercial')}
+                            <Building className={`${iconSize} text-muted-foreground`} /> {t('add_subscriber.type_commercial')}
                           </FormLabel>
                         </FormItem>
                       </RadioGroup>
@@ -179,6 +187,7 @@ export default function AddSubscriberPage() {
                 )}
               />
 
+              {/* Residential Fields */}
               {subscriberType === 'Residential' && (
                 <>
                   <FormField
@@ -186,7 +195,7 @@ export default function AddSubscriberPage() {
                     name="full_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('add_subscriber.fullname_label')}</FormLabel>
+                        <FormLabel>{t('add_subscriber.fullname_label')} <span className="text-red-500">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t('add_subscriber.fullname_placeholder')} {...field} />
                         </FormControl>
@@ -199,22 +208,15 @@ export default function AddSubscriberPage() {
                     name="birthday"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>{t('add_subscriber.birthday_label')}</FormLabel>
+                        <FormLabel>{t('add_subscriber.birthday_label')} <span className="text-red-500">*</span></FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "pl-3 text-left font-normal text-xs",
-                                  !field.value && "text-muted-foreground"
-                                )}
+                                variant="outline"
+                                className={cn("pl-3 text-left font-normal text-xs", !field.value && "text-muted-foreground")}
                               >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>{t('add_subscriber.birthday_placeholder')}</span>
-                                )}
+                                {field.value ? format(field.value, "PPP") : <span>{t('add_subscriber.birthday_placeholder')}</span>}
                                 <CalendarIcon className={`ml-auto ${iconSize} opacity-50`} />
                               </Button>
                             </FormControl>
@@ -224,9 +226,7 @@ export default function AddSubscriberPage() {
                               mode="single"
                               selected={field.value}
                               onSelect={field.onChange}
-                              disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
-                              }
+                              disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                               initialFocus
                             />
                           </PopoverContent>
@@ -235,35 +235,36 @@ export default function AddSubscriberPage() {
                       </FormItem>
                     )}
                   />
-                   <FormField
-                      control={form.control}
-                      name="tax_id"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('add_subscriber.taxid_label')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('add_subscriber.taxid_placeholder')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                   />
-                    <FormField
-                      control={form.control}
-                      name="id_number"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('add_subscriber.id_number_label', 'ID Number (RG)')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('add_subscriber.id_number_placeholder', 'e.g., 12.345.678-9')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={form.control}
+                    name="tax_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('add_subscriber.taxid_label')} <span className="text-red-500">*</span></FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('add_subscriber.taxid_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="id_number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('add_subscriber.id_number_label')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('add_subscriber.id_number_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </>
               )}
 
+              {/* Commercial Fields */}
               {subscriberType === 'Commercial' && (
                 <>
                   <FormField
@@ -271,7 +272,7 @@ export default function AddSubscriberPage() {
                     name="company_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{t('add_subscriber.company_name_label')}</FormLabel>
+                        <FormLabel>{t('add_subscriber.company_name_label')} <span className="text-red-500">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder={t('add_subscriber.company_name_placeholder')} {...field} />
                         </FormControl>
@@ -284,22 +285,15 @@ export default function AddSubscriberPage() {
                     name="established_date"
                     render={({ field }) => (
                       <FormItem className="flex flex-col">
-                        <FormLabel>{t('add_subscriber.established_date_label')}</FormLabel>
+                        <FormLabel>{t('add_subscriber.established_date_label')} <span className="text-red-500">*</span></FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
-                                variant={"outline"}
-                                className={cn(
-                                  "pl-3 text-left font-normal text-xs",
-                                  !field.value && "text-muted-foreground"
-                                )}
+                                variant="outline"
+                                className={cn("pl-3 text-left font-normal text-xs", !field.value && "text-muted-foreground")}
                               >
-                                {field.value ? (
-                                  format(field.value, "PPP")
-                                ) : (
-                                  <span>{t('add_subscriber.established_date_placeholder')}</span>
-                                )}
+                                {field.value ? format(field.value, "PPP") : <span>{t('add_subscriber.established_date_placeholder')}</span>}
                                 <CalendarIcon className={`ml-auto ${iconSize} opacity-50`} />
                               </Button>
                             </FormControl>
@@ -318,49 +312,50 @@ export default function AddSubscriberPage() {
                       </FormItem>
                     )}
                   />
-                   <FormField
-                      control={form.control}
-                      name="tax_id"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('add_subscriber.cnpj_label', 'CNPJ *')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('add_subscriber.cnpj_placeholder', 'e.g., XX.XXX.XXX/0001-XX')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                   />
-                    <FormField
-                      control={form.control}
-                      name="business_number"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>{t('add_subscriber.state_registration_label', 'State Registration')}</FormLabel>
-                          <FormControl>
-                            <Input placeholder={t('add_subscriber.state_registration_placeholder', 'e.g., XXX.XXX.XXX.XXX')} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                   />
+                  <FormField
+                    control={form.control}
+                    name="tax_id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('add_subscriber.cnpj_label')} <span className="text-red-500">*</span></FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('add_subscriber.cnpj_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="business_number"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('add_subscriber.state_registration_label')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('add_subscriber.state_registration_placeholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </>
               )}
 
-               <FormField
-                 control={form.control}
-                 name="address"
-                 render={({ field }) => (
-                   <FormItem className="md:col-span-2">
-                     <FormLabel>{t('add_subscriber.address_label')}</FormLabel>
-                     <FormControl>
-                       <Input placeholder={t('add_subscriber.address_placeholder')} {...field} />
-                     </FormControl>
-                     <FormMessage />
-                   </FormItem>
-                 )}
-               />
-               <FormField
+              {/* Shared Fields */}
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>{t('add_subscriber.address_label')} <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input placeholder={t('add_subscriber.address_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
                 control={form.control}
                 name="point_of_reference"
                 render={({ field }) => (
@@ -373,71 +368,77 @@ export default function AddSubscriberPage() {
                   </FormItem>
                 )}
               />
-               <FormField
-                 control={form.control}
-                 name="email"
-                 render={({ field }) => (
-                   <FormItem>
-                     <FormLabel>{t('add_subscriber.email_label')}</FormLabel>
-                     <FormControl>
-                       <Input type="email" placeholder={t('add_subscriber.email_placeholder')} {...field} />
-                     </FormControl>
-                     <FormMessage />
-                   </FormItem>
-                 )}
-               />
-                <FormField
-                  control={form.control}
-                  name="phone_number"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('add_subscriber.phone_label')}</FormLabel>
-                      <FormControl>
-                        <Input type="tel" placeholder={t('add_subscriber.phone_placeholder')} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                   control={form.control}
-                   name="mobile_number"
-                   render={({ field }) => (
-                     <FormItem>
-                       <FormLabel>{t('add_subscriber.mobile_label')}</FormLabel>
-                       <FormControl>
-                         <Input type="tel" placeholder={t('add_subscriber.mobile_placeholder')} {...field} />
-                       </FormControl>
-                       <FormMessage />
-                     </FormItem>
-                   )}
-                 />
-                  <FormField
-                    control={form.control}
-                    name="signup_date"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>{t('add_subscriber.signup_date_label', 'Signup Date')}</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant={"outline"}
-                                className={cn("pl-3 text-left font-normal text-xs",!field.value && "text-muted-foreground")}
-                              >
-                                {field.value ? format(field.value, "PPP") : <span>{t('add_subscriber.signup_date_placeholder', 'Select signup date')}</span>}
-                                <CalendarIcon className={`ml-auto ${iconSize} opacity-50`} />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date()} initialFocus />
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('add_subscriber.email_label')} <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder={t('add_subscriber.email_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('add_subscriber.phone_label')} <span className="text-red-500">*</span></FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder={t('add_subscriber.phone_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="mobile_number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('add_subscriber.mobile_label')}</FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder={t('add_subscriber.mobile_placeholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="signup_date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>{t('add_subscriber.signup_date_label')}</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn("pl-3 text-left font-normal text-xs", !field.value && "text-muted-foreground")}
+                          >
+                            {field.value ? format(field.value, "PPP") : <span>{t('add_subscriber.signup_date_placeholder')}</span>}
+                            <CalendarIcon className={`ml-auto ${iconSize} opacity-50`} />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) => date > new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
               <Button type="submit" disabled={!subscriberType || form.formState.isSubmitting}>

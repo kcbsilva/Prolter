@@ -34,12 +34,12 @@ interface WidgetConfig {
 const widgetConfigs: Record<DashboardView, Record<string, WidgetConfig>> = {
   General: {
     planPerformance: { component: <PlanPerformanceChart />, departments: ['commercial', 'supervisor'], label: 'Plan Performance' },
-    alerts: { component: <AlertsTimeline />, departments: ['network', 'support', 'supervisor'], label: 'Alerts Timeline' },
+    alerts: { component: <AlertsTimeline />, departments: ['network', 'support', 'supervisor'], label: 'Alerts & Incidents' },
     technician: { component: <TechnicianInsightsCard />, departments: ['support', 'supervisor'], label: 'Technician Insights' },
     totalSubscribers: { component: <TotalSubscribersCard />, departments: ['commercial', 'supervisor'], label: 'Total Subscribers' },
-    mrr: { component: <MRRCard />, departments: ['financial', 'supervisor'], label: 'MRR' },
+    mrr: { component: <MRRCard />, departments: ['financial', 'supervisor'], label: 'Monthly Recurring Revenue' },
     networkUptime: { component: <NetworkUptimeCard />, departments: ['network', 'supervisor'], label: 'Network Uptime' },
-    openTickets: { component: <OpenTicketsCard />, departments: ['support', 'supervisor'], label: 'Open Tickets' },
+    openTickets: { component: <OpenTicketsCard />, departments: ['support', 'supervisor'], label: 'Open Support Tickets' },
     subscriberGrowth: { component: <SubscriberGrowthChart />, departments: ['commercial', 'supervisor'], label: 'Subscriber Growth' },
     recentActivity: { component: <RecentActivityList />, departments: ['supervisor'], label: 'Recent Activity' },
   },
@@ -72,91 +72,134 @@ const defaultLayouts: Record<DashboardView, Layout[]> = {
     { i: 'churnRetention', x: 4, y: 0, w: 4, h: 2 },
     { i: 'upcomingPayments', x: 0, y: 2, w: 8, h: 2 },
   ],
-  Network: [
-    { i: 'realtimeMap', x: 0, y: 0, w: 8, h: 4 },
-  ],
+  Network: [{ i: 'realtimeMap', x: 0, y: 0, w: 8, h: 4 }],
   Technician: [],
   Supervisor: [],
 };
 
-// Utility function for safe localStorage parsing
+// Safe localStorage parse
 function safeParse<T>(key: string, fallback: T): T {
   if (typeof window === 'undefined') return fallback;
   try {
-    const item = localStorage.getItem(key);
-    if (!item) return fallback;
-    return JSON.parse(item);
+    const raw = localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
   } catch {
     return fallback;
   }
 }
 
+// Collision checker (blocking overlaps hard)
+function hasCollision(layout: Layout[]): boolean {
+  for (let i = 0; i < layout.length; i++) {
+    const a = layout[i];
+    for (let j = i + 1; j < layout.length; j++) {
+      const b = layout[j];
+      const overlapX = a.x < b.x + b.w && a.x + a.w > b.x;
+      const overlapY = a.y < b.y + b.h && a.y + a.h > b.y;
+      if (overlapX && overlapY) return true;
+    }
+  }
+  return false;
+}
+
 export default function CustomDashboardPage() {
-  // Current user department - can be dynamic or from context
+  // Could be dynamic from auth/context
   const [currentDepartment] = React.useState<Department>('supervisor');
 
   const [hydrated, setHydrated] = React.useState(false);
   React.useEffect(() => setHydrated(true), []);
 
-  const [currentView, setCurrentView] = React.useState<DashboardView>(() => {
-    return safeParse<DashboardView>('dashboard-view', 'General');
-  });
+  const [currentView, setCurrentView] = React.useState<DashboardView>(() =>
+    safeParse<DashboardView>('dashboard-view', 'General')
+  );
 
-  const [layouts, setLayouts] = React.useState<Record<DashboardView, Layout[]>>(() => {
-    return safeParse<Record<DashboardView, Layout[]>>('dashboard-layouts', defaultLayouts);
-  });
+  const [layouts, setLayouts] = React.useState<Record<DashboardView, Layout[]>>(() =>
+    safeParse<Record<DashboardView, Layout[]>>('dashboard-layouts', defaultLayouts)
+  );
 
-  const [hidden, setHidden] = React.useState<Record<DashboardView, string[]>>(() => {
-    return safeParse<Record<DashboardView, string[]>>(
-      'dashboard-hidden',
-      { General: [], Financial: [], Network: [], Technician: [], Supervisor: [] }
-    );
-  });
+  const [hidden, setHidden] = React.useState<Record<DashboardView, string[]>>(() =>
+    safeParse<Record<DashboardView, string[]>>('dashboard-hidden', {
+      General: [],
+      Financial: [],
+      Network: [],
+      Technician: [],
+      Supervisor: [],
+    })
+  );
 
-  const [isEditing, setIsEditing] = React.useState<boolean>(() => {
-    return safeParse<boolean>('dashboard-editing', false);
-  });
+  const [isEditing, setIsEditing] = React.useState<boolean>(() =>
+    safeParse<boolean>('dashboard-editing', false)
+  );
 
-  const visibleWidgets = React.useMemo(() => {
-    const viewWidgets = widgetConfigs[currentView] || {};
-    const hiddenWidgets = hidden[currentView] || [];
-    return Object.entries(viewWidgets).filter(([key, config]) =>
-      config.departments.includes(currentDepartment) && !hiddenWidgets.includes(key)
-    );
-  }, [currentView, hidden, currentDepartment]);
+  // Keep a snapshot to revert when a drag/resize would collide
+  const prevLayoutRef = React.useRef<Layout[]>(layouts[currentView] || []);
 
-  const hiddenWidgets = React.useMemo(() => hidden[currentView] || [], [hidden, currentView]);
+  const viewWidgets = React.useMemo(() => widgetConfigs[currentView] || {}, [currentView]);
+  const hiddenKeys = React.useMemo(() => hidden[currentView] || [], [hidden, currentView]);
+
+  const visibleWidgets = React.useMemo(
+    () =>
+      Object.entries(viewWidgets).filter(
+        ([key, cfg]) => cfg.departments.includes(currentDepartment) && !hiddenKeys.includes(key)
+      ),
+    [viewWidgets, hiddenKeys, currentDepartment]
+  );
 
   if (!hydrated) return <div className="p-4 text-muted-foreground">Loading dashboard...</div>;
 
+  const persistLayouts = (next: Record<DashboardView, Layout[]>) => {
+    setLayouts(next);
+    localStorage.setItem('dashboard-layouts', JSON.stringify(next));
+  };
+
   const handleLayoutChange = (newLayout: Layout[]) => {
-    const updated = { ...layouts, [currentView]: newLayout };
-    setLayouts(updated);
-    localStorage.setItem('dashboard-layouts', JSON.stringify(updated));
+    // RGL calls this frequently while dragging; block overlaps strictly
+    if (hasCollision(newLayout)) return; // ignore invalid state
+    prevLayoutRef.current = newLayout;
+    persistLayouts({ ...layouts, [currentView]: newLayout });
+  };
+
+  const handleDragStart = () => {
+    prevLayoutRef.current = layouts[currentView] || [];
+  };
+
+  const handleDragStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, event: MouseEvent, element: HTMLElement) => {
+    // Final guard on drop
+    if (hasCollision(layout)) {
+      // Revert to the last good layout
+      persistLayouts({ ...layouts, [currentView]: prevLayoutRef.current });
+      console.warn('Blocked overlapping layout change (drag).');
+    }
+  };
+
+  const handleResizeStop = (layout: Layout[], oldItem: Layout, newItem: Layout, placeholder: Layout, event: MouseEvent, element: HTMLElement) => {
+    if (hasCollision(layout)) {
+      persistLayouts({ ...layouts, [currentView]: prevLayoutRef.current });
+      console.warn('Blocked overlapping layout change (resize).');
+    }
   };
 
   const handleRemove = (key: string) => {
-    const updated = { ...hidden, [currentView]: [...hiddenWidgets, key] };
+    const updated = { ...hidden, [currentView]: [...hiddenKeys, key] };
     setHidden(updated);
     localStorage.setItem('dashboard-hidden', JSON.stringify(updated));
   };
 
   const handleRestore = (key: string) => {
-    const updated = { ...hidden, [currentView]: hiddenWidgets.filter(k => k !== key) };
+    const updated = { ...hidden, [currentView]: hiddenKeys.filter((k) => k !== key) };
     setHidden(updated);
     localStorage.setItem('dashboard-hidden', JSON.stringify(updated));
   };
 
   const toggleEdit = () => {
-    const updated = !isEditing;
-    setIsEditing(updated);
-    localStorage.setItem('dashboard-editing', JSON.stringify(updated));
+    const next = !isEditing;
+    setIsEditing(next);
+    localStorage.setItem('dashboard-editing', JSON.stringify(next));
   };
 
   const resetCurrentView = () => {
     const updatedLayouts = { ...layouts, [currentView]: defaultLayouts[currentView] || [] };
-    setLayouts(updatedLayouts);
-    localStorage.setItem('dashboard-layouts', JSON.stringify(updatedLayouts));
+    persistLayouts(updatedLayouts);
 
     const updatedHidden = { ...hidden, [currentView]: [] };
     setHidden(updatedHidden);
@@ -165,8 +208,8 @@ export default function CustomDashboardPage() {
 
   return (
     <div className="p-4 w-full overflow-x-auto bg-background">
-      <div className="mb-4 flex gap-4 min-w-[1200px] items-end bg-transparent">
-        {/* Dashboard View Selector */}
+      {/* Controls */}
+      <div className="mb-4 flex gap-4 min-w-[1200px] items-center bg-transparent">
         <div className="flex flex-col">
           <label htmlFor="dashboard-view-select" className="text-xs text-muted-foreground mb-1 select-none">
             Dashboard View
@@ -181,33 +224,36 @@ export default function CustomDashboardPage() {
             }}
             className="px-3 py-2 text-sm border rounded h-[36px]"
           >
-            {Object.keys(widgetConfigs).map(view => (
-              <option key={view} value={view}>{view} Dashboard</option>
+            {Object.keys(widgetConfigs).map((view) => (
+              <option key={view} value={view}>
+                {view} Dashboard
+              </option>
             ))}
           </select>
         </div>
 
-        {/* Edit Toggle Button */}
+        {/* Edit (icon-only) */}
         <button
           onClick={toggleEdit}
-          className="h-[36px] px-3 py-1 rounded bg-primary text-white text-sm flex items-center gap-1"
+          className="h-[36px] w-[36px] flex items-center justify-center rounded bg-primary text-white"
           aria-pressed={isEditing}
           aria-label={isEditing ? 'Finish Editing Dashboard Layout' : 'Edit Dashboard Layout'}
           title={isEditing ? 'Finish Editing' : 'Edit Layout'}
         >
           {isEditing ? <Check className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
-          <span>{isEditing ? 'Done' : 'Edit'}</span>
         </button>
 
-        {/* Reset Button */}
+        {/* Reset */}
         <button
-          className="h-[36px] px-3 py-1 rounded border border-primary text-primary text-sm"
+          className="h-[36px] px-3 rounded border border-primary text-primary text-sm"
           onClick={() => {
             if (
               window.confirm(
                 'Reset layout and restore all widgets for this dashboard view to default? This cannot be undone.'
               )
-            ) resetCurrentView();
+            ) {
+              resetCurrentView();
+            }
           }}
           title="Reset to Default Layout"
           aria-label="Reset dashboard layout and widgets to defaults"
@@ -215,18 +261,19 @@ export default function CustomDashboardPage() {
           Reset Layout
         </button>
 
-        {/* Restore Hidden Widgets */}
-        {hiddenWidgets.length > 0 && (
+        {/* Restore Hidden */}
+        {hiddenKeys.length > 0 && (
           <div className="flex gap-2 items-center text-sm overflow-x-auto max-w-[400px]">
             <span className="font-medium whitespace-nowrap">Restore Widgets:</span>
-            {hiddenWidgets.map(key => {
-              const label = widgetConfigs[currentView][key]?.label || key;
+            {hiddenKeys.map((key) => {
+              const label = viewWidgets[key]?.label || key;
               return (
                 <button
                   key={key}
                   onClick={() => handleRestore(key)}
                   className="px-2 py-1 bg-primary text-white rounded whitespace-nowrap"
                   aria-label={`Restore widget ${label}`}
+                  title={`Restore widget ${label}`}
                 >
                   + {label}
                 </button>
@@ -236,22 +283,27 @@ export default function CustomDashboardPage() {
         )}
       </div>
 
+      {/* Grid */}
       <GridLayout
         className="layout"
-        layout={(layouts[currentView] || []).filter(item =>
-          visibleWidgets.some(([key]) => key === item.i)
-        )}
+        layout={(layouts[currentView] || []).filter((item) => visibleWidgets.some(([key]) => key === item.i))}
         cols={8}
         rowHeight={100}
         width={1200}
-        isDraggable={isEditing}
-        isResizable={isEditing}
-        onLayoutChange={handleLayoutChange}
-        preventCollision={true}
-        compactType={null}
         margin={[10, 10]}
+        compactType={null}
         useCSSTransforms={true}
         draggableHandle=".drag-handle"
+        isDraggable={isEditing}
+        isResizable={isEditing}
+        // Hard no-overlap policy
+        preventCollision={true}
+        allowOverlap={false as any} // ignored if older RGL; our guards still enforce
+        isBounded={true}
+        onLayoutChange={handleLayoutChange}
+        onDragStart={handleDragStart}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
       >
         {visibleWidgets.map(([key, config]) => (
           <div
@@ -275,6 +327,7 @@ export default function CustomDashboardPage() {
               <div
                 className="drag-handle cursor-move absolute top-1 left-1 z-10 text-xs text-muted-foreground select-none"
                 title="Drag handle"
+                aria-label="Drag handle"
               >
                 ≡
               </div>

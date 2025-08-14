@@ -8,13 +8,20 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
-  User, Building, DollarSign, FileSignature,
-  Server as ServerIcon, Wrench, Package as PackageIcon,
-  FileText, ClipboardList, History as HistoryIcon,
+  User,
+  Building,
+  DollarSign,
+  FileSignature,
+  Server as ServerIcon,
+  Wrench,
+  Package as PackageIcon,
+  FileText,
+  ClipboardList,
+  History as HistoryIcon,
 } from 'lucide-react';
 import type { Subscriber, SubscriberStatus, ServiceStatus } from '@/types/subscribers';
 
-// Tabs (your existing client components)
+// Tabs (client components)
 import { InformationTab } from '@/components/pages/subscribers/profile/InformationTab';
 import { ServicesTab } from '@/components/pages/subscribers/profile/ServicesTab';
 import { BillingTab } from '@/components/pages/subscribers/profile/BillingTab';
@@ -29,21 +36,50 @@ export const runtime = 'nodejs';
 
 type PageProps = { params: { id: string } };
 
-const statusBadge = (status: SubscriberStatus | ServiceStatus | undefined) => {
-  switch (status) {
-    case 'Active': return 'bg-green-100 text-green-800';
-    case 'Suspended': return 'bg-yellow-100 text-yellow-800';
-    case 'Inactive':
-    case 'Canceled':
-    case 'Planned': return 'bg-gray-100 text-gray-800';
-    default: return 'bg-secondary text-secondary-foreground';
-  }
+// Status → Tailwind classes
+const statusClassMap: Record<string, string> = {
+  Active: 'bg-green-100 text-green-800',
+  Suspended: 'bg-yellow-100 text-yellow-800',
+  Inactive: 'bg-gray-100 text-gray-800',
+  Canceled: 'bg-gray-100 text-gray-800',
+  Planned: 'bg-gray-100 text-gray-800',
 };
 
-// Map DB row → app type
+function statusBadge(status?: SubscriberStatus | ServiceStatus) {
+  return statusClassMap[status ?? ''] || 'bg-secondary text-secondary-foreground';
+}
+
+// Shared SELECT
+const baseSelect = `
+  SELECT
+    id,
+    public_id,
+    subscriber_type    AS "subscriberType",
+    full_name          AS "fullName",
+    company_name       AS "companyName",
+    birthday,
+    established_date   AS "establishedDate",
+    address,
+    point_of_reference AS "pointOfReference",
+    email,
+    phone_number       AS "phoneNumber",
+    mobile_number      AS "mobileNumber",
+    tax_id             AS "taxId",
+    business_number    AS "businessNumber",
+    id_number          AS "idNumber",
+    signup_date        AS "signupDate",
+    status,
+    created_at         AS "createdAt",
+    updated_at         AS "updatedAt"
+  FROM subscribers
+`;
+
+const byUuidSQL = `${baseSelect} WHERE public_id = $1::uuid LIMIT 1;`;
+const byIntSQL = `${baseSelect} WHERE id = $1::int LIMIT 1;`;
+
+// DB row → app type
 function mapRowToSubscriber(row: any): Subscriber {
   return {
-    // Prefer the UUID externally; fall back to integer id if needed
     id: row.public_id ?? row.id,
     subscriberType: row.subscriberType,
     fullName: row.fullName ?? undefined,
@@ -62,8 +98,6 @@ function mapRowToSubscriber(row: any): Subscriber {
     status: row.status,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-
-    // Fill these later with real queries
     services: [],
     billing: {
       balance: 0,
@@ -82,79 +116,28 @@ function mapRowToSubscriber(row: any): Subscriber {
   };
 }
 
-// Try UUID (public_id) first; if not, try integer id
 async function loadSubscriber(idParam: string): Promise<Subscriber | null> {
-  const byUuidSQL = `
-    SELECT
-      id,
-      public_id,
-      subscriber_type    AS "subscriberType",
-      full_name          AS "fullName",
-      company_name       AS "companyName",
-      birthday,
-      established_date   AS "establishedDate",
-      address,
-      point_of_reference AS "pointOfReference",
-      email,
-      phone_number       AS "phoneNumber",
-      mobile_number      AS "mobileNumber",
-      tax_id             AS "taxId",
-      business_number    AS "businessNumber",
-      id_number          AS "idNumber",
-      signup_date        AS "signupDate",
-      status,
-      created_at         AS "createdAt",
-      updated_at         AS "updatedAt"
-    FROM subscribers
-    WHERE public_id = $1::uuid
-    LIMIT 1;
-  `;
-
-  const byIntSQL = `
-    SELECT
-      id,
-      public_id,
-      subscriber_type    AS "subscriberType",
-      full_name          AS "fullName",
-      company_name       AS "companyName",
-      birthday,
-      established_date   AS "establishedDate",
-      address,
-      point_of_reference AS "pointOfReference",
-      email,
-      phone_number       AS "phoneNumber",
-      mobile_number      AS "mobileNumber",
-      tax_id             AS "taxId",
-      business_number    AS "businessNumber",
-      id_number          AS "idNumber",
-      signup_date        AS "signupDate",
-      status,
-      created_at         AS "createdAt",
-      updated_at         AS "updatedAt"
-    FROM subscribers
-    WHERE id = $1::int
-    LIMIT 1;
-  `;
-
   const looksLikeUuid =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idParam);
 
-  if (looksLikeUuid) {
-    const { rows } = await db.query(byUuidSQL, [idParam]);
-    if (rows[0]) return mapRowToSubscriber(rows[0]);
-  }
-
-  if (/^\d+$/.test(idParam)) {
-    const { rows } = await db.query(byIntSQL, [Number(idParam)]);
-    if (rows[0]) return mapRowToSubscriber(rows[0]);
-  }
-
-  // one last attempt as UUID (in case pattern block was too strict)
   try {
+    if (looksLikeUuid) {
+      const { rows } = await db.query(byUuidSQL, [idParam]);
+      if (rows[0]) return mapRowToSubscriber(rows[0]);
+    }
+
+    if (/^\d+$/.test(idParam)) {
+      const { rows } = await db.query(byIntSQL, [Number(idParam)]);
+      if (rows[0]) return mapRowToSubscriber(rows[0]);
+    }
+
+    // Fallback UUID try
     const { rows } = await db.query(byUuidSQL, [idParam]);
     if (rows[0]) return mapRowToSubscriber(rows[0]);
-  } catch {
-    // ignore
+  } catch (err) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error(`Error loading subscriber with param ${idParam}:`, err);
+    }
   }
 
   return null;
@@ -216,8 +199,6 @@ export default async function SubscriberProfilePage({ params }: PageProps) {
           <InformationTab subscriber={subscriber} />
         </TabsContent>
 
-        {/* These will show but currently receive only base subscriber (services/billing are empty).
-           Add real queries and pass data when you're ready. */}
         <TabsContent value="services">
           <ServicesTab subscriber={subscriber} />
         </TabsContent>

@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import CustomizableDashboard from '@/components/dashboard/sections/CustomizableDashboard';
+import CustomizableDashboard from '@/components/dashboard/sections/AppOverviewDashboard';
 
 export default function AdminDashboardPage() {
   return (
