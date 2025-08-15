@@ -94,6 +94,14 @@ const NetworkVPN = dynamic(
   { loading: () => <LoadingPlaceholder label="VPN Settings" /> }
 );
 
+const AuthWizard = dynamic(
+  () =>
+    import("@/components/pages/settings/network/authwizard/AuthWizard").then(
+      (m) => m.default
+    ),
+  { loading: () => <LoadingPlaceholder label="VPN Settings" /> }
+);
+
 const PlansCombos = dynamic(
   () =>
     import("@/components/pages/settings/plans/combos/PlansCombos").then(
@@ -223,6 +231,7 @@ const tabGroups = [
       { value: "radius", label: "RADIUS", icon: Server },
       { value: "vlan", label: "VLAN", icon: Network },
       { value: "vpn", label: "VPN", icon: Shield },
+      { value: "authwizard", label: "Auth Wizard", icon: Shield },
     ],
   },
   {
@@ -285,6 +294,7 @@ const tabComponents = {
   radius: NetworkRADIUS,
   vlan: NetworkVLAN,
   vpn: NetworkVPN,
+  authwizard: AuthWizard,
   combos: PlansCombos,
   internet: PlansInternet,
   landline: PlansLandline,
