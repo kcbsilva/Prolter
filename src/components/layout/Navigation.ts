@@ -1,4 +1,4 @@
-// src/config/sidebarNav.ts
+// src/components/layout/Navigation.ts
 import {
   LayoutDashboard,
   Settings,
@@ -26,7 +26,7 @@ export interface SidebarNavItem {
   children?: SidebarNavItem[];
 }
 
-export const sidebarNav: SidebarNavItem[] = [
+export const NavigationTree: SidebarNavItem[] = [
   {
     title: 'sidebar.dashboard',
     href: '/admin/dashboard',

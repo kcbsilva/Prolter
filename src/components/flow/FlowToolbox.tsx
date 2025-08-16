@@ -1,7 +1,6 @@
 // /src/components/flow/FlowToolbox.tsx
 'use client';
 
-import { Button } from '@/components/shared/ui/button';
 import { MessageCircle, AlertTriangle, Clock, Zap, Globe, Mail } from 'lucide-react';
 import * as React from 'react';
 

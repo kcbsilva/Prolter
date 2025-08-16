@@ -17,7 +17,7 @@ import { useTheme } from 'next-themes'
 import { FaWhatsapp, FaTelegram, FaLinkedin, FaFacebook } from 'react-icons/fa'
 import { MdAlternateEmail } from 'react-icons/md'
 import { AdminNavTree } from './AdminNavTree'
-import { sidebarNav } from '@/config/sidebarNav'
+import { NavigationTree } from '@/components/layout/Navigation'
 
 export function HeaderNav() {
   const pathname = usePathname()
@@ -57,7 +57,7 @@ export function HeaderNav() {
       <div className="h-12 flex items-center justify-between px-4 sm:px-6 border-b-2 bg-white text-black dark:bg-[#14213D] dark:text-white border-b-[#233B6E] dark:border-b-[#FCA311]">
         {/* Centered Navigation */}
         <nav className="flex items-center gap-4 text-xs sm:text-sm">
-          <AdminNavTree items={sidebarNav} layout="horizontal" />
+          <AdminNavTree items={NavigationTree} layout="horizontal" />
         </nav>
 
         {/* Right-aligned actions */}

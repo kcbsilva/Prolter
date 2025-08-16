@@ -14,15 +14,15 @@ import type { LucideIcon } from 'lucide-react'
 
 // Dynamic imports for performance
 const FinanceDashboard = dynamic(
-  () => import('@/components/pages/finances/FinanceDashboardPage').then(mod => mod.default),
+  () => import('@/components/admin/pages/finances/FinanceDashboardPage').then(mod => mod.default),
   { loading: () => <div>Loading Dashboard...</div> }
 )
 const CashBookPage = dynamic(
-  () => import('@/components/pages/finances/CashBookPage').then(mod => mod.default),
+  () => import('@/components/admin/pages/finances/CashBookPage').then(mod => mod.default),
   { loading: () => <div>Loading Cash Book...</div> }
 )
 const EntryCategoriesPage = dynamic(
-  () => import('@/components/pages/finances/EntryCategoriesPage').then(mod => mod.default),
+  () => import('@/components/admin/pages/finances/EntryCategoriesPage').then(mod => mod.default),
   { loading: () => <div>Loading Categories...</div> }
 )
 

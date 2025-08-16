@@ -8,10 +8,10 @@ import { PlusCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { ListEntries } from '@/components/pages/finances/cash-book/ListEntries';
-import { AddEntryDialog } from '@/components/pages/finances/cash-book/AddEntryDialog';
-import { UpdateEntryDialog } from '@/components/pages/finances/cash-book/UpdateEntryDialog';
-import { DeleteEntryDialog } from '@/components/pages/finances/cash-book/DeleteEntryDialog';
+import { ListEntries } from '@/components/admin/pages/finances/cash-book/ListEntries';
+import { AddEntryDialog } from '@/components/admin/pages/finances/cash-book/AddEntryDialog';
+import { UpdateEntryDialog } from '@/components/admin/pages/finances/cash-book/UpdateEntryDialog';
+import { DeleteEntryDialog } from '@/components/admin/pages/finances/cash-book/DeleteEntryDialog';
 
 export default function CashBookPage() {
   const { t, locale } = useLocale();

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import GridLayout, { Layout } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import { widgets } from '@/components/pages/finances/dashboard/widgets'
+import { widgets } from '@/components/admin/pages/finances/dashboard/widgets'
 import {
     Select,
     SelectTrigger,

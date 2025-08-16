@@ -145,7 +145,7 @@ function KPI({
 
 /* ----------------------------- The Page ------------------------------ */
 
-export default function AppOverviewDashboard() {
+export default function MainDashboard() {
   const [lastUpdated] = React.useState(() => new Date().toLocaleString());
 
   return (

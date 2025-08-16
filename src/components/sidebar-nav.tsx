@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
-import type { SidebarNavItem } from '@/config/sidebarNav';
+import type { SidebarNavItem } from '@/components/layout/Navigation';
 import {
   SidebarMenuItem,
   SidebarMenuButton,

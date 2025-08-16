@@ -2,12 +2,12 @@
 'use client';
 
 import * as React from 'react';
-import CustomizableDashboard from '@/components/dashboard/sections/AppOverviewDashboard';
+import MainDashboard from '@/components/admin/pages/dashboard/MainDashboard';
 
 export default function AdminDashboardPage() {
   return (
     <div className="p-1">
-      <CustomizableDashboard />
+      <MainDashboard />
     </div>
   );
 }

@@ -7,9 +7,9 @@ import type { LucideIcon } from 'lucide-react'
 
 import { SidebarTabsLayout } from '@/components/layout/SidebarTabsLayout'
 
-const HRDashboard = dynamic(() => import('@/components/pages/hr/HRDashboard').then(m => m.default))
-const HREmployees = dynamic(() => import('@/components/pages/hr/employees/HREmployees').then(m => m.default))
-const HRTimeSheets = dynamic(() => import('@/components/pages/hr/timesheets/HRTimeSheets').then(m => m.default))
+const HRDashboard = dynamic(() => import('@/components/admin/pages/hr/HRDashboard').then(m => m.default))
+const HREmployees = dynamic(() => import('@/components/admin/pages/hr/employees/HREmployees').then(m => m.default))
+const HRTimeSheets = dynamic(() => import('@/components/admin/pages/hr/timesheets/HRTimeSheets').then(m => m.default))
 
 export default function HRPage() {
   const tabs = [

@@ -11,10 +11,10 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-import { HubDashboard } from '@/components/pages/hub/HubDashboard'
-import { HubConnections } from '@/components/pages/hub/HubConnections'
-import { HubParticipants } from '@/components/pages/hub/HubParticipants'
-import { HubConfigurations } from '@/components/pages/hub/HubConfigurations'
+import { HubDashboard } from '@/components/admin/pages/hub/HubDashboard'
+import { HubConnections } from '@/components/admin/pages/hub/HubConnections'
+import { HubParticipants } from '@/components/admin/pages/hub/HubParticipants'
+import { HubConfigurations } from '@/components/admin/pages/hub/HubConfigurations'
 
 const tabs = [
   { value: 'dashboard', label: 'Hub Dashboard', icon: LayoutDashboard },

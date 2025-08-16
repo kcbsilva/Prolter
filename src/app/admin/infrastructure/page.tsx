@@ -17,18 +17,18 @@ import {
 import dynamic from 'next/dynamic'
 import { SidebarTabsLayout } from '@/components/layout/SidebarTabsLayout'
 
-const InfrastructureDashboardPage = dynamic(() => import('@/components/pages/infrastructure/InfrastructureDashboardPage').then(m => m.default))
-const ProjectsPage = dynamic(() => import('@/components/pages/infrastructure/ProjectsPage').then(m => m.default))
-const MapPage = dynamic(() => import('@/components/pages/infrastructure/MapPage').then(m => m.default))
-const HydroPollsPage = dynamic(() => import('@/components/pages/infrastructure/HydroPollsPage').then(m => m.default))
-const FDHsPage = dynamic(() => import('@/components/pages/infrastructure/FDHsPage').then(m => m.default))
-const FOSCsPage = dynamic(() => import('@/components/pages/infrastructure/FOSCsPage').then(m => m.default))
-const PEDsPage = dynamic(() => import('@/components/pages/infrastructure/PEDsPage').then(m => m.default))
-const SitesPage = dynamic(() => import('@/components/pages/infrastructure/SitesPage').then(m => m.default))
-const VaultsPage = dynamic(() => import('@/components/pages/infrastructure/VaultsPage').then(m => m.default))
-const DuctsPage = dynamic(() => import('@/components/pages/infrastructure/DuctsPage').then(m => m.default))
-const AccessoriesPage = dynamic(() => import('@/components/pages/infrastructure/AccessoriesPage').then(m => m.default))
-const SplittersPage = dynamic(() => import('@/components/pages/infrastructure/SplittersPage').then(m => m.default))
+const InfrastructureDashboardPage = dynamic(() => import('@/components/admin/pages/infrastructure/InfrastructureDashboardPage').then(m => m.default))
+const ProjectsPage = dynamic(() => import('@/components/admin/pages/infrastructure/ProjectsPage').then(m => m.default))
+const MapPage = dynamic(() => import('@/components/admin/pages/infrastructure/MapPage').then(m => m.default))
+const HydroPollsPage = dynamic(() => import('@/components/admin/pages/infrastructure/HydroPollsPage').then(m => m.default))
+const FDHsPage = dynamic(() => import('@/components/admin/pages/infrastructure/FDHsPage').then(m => m.default))
+const FOSCsPage = dynamic(() => import('@/components/admin/pages/infrastructure/FOSCsPage').then(m => m.default))
+const PEDsPage = dynamic(() => import('@/components/admin/pages/infrastructure/PEDsPage').then(m => m.default))
+const SitesPage = dynamic(() => import('@/components/admin/pages/infrastructure/SitesPage').then(m => m.default))
+const VaultsPage = dynamic(() => import('@/components/admin/pages/infrastructure/VaultsPage').then(m => m.default))
+const DuctsPage = dynamic(() => import('@/components/admin/pages/infrastructure/DuctsPage').then(m => m.default))
+const AccessoriesPage = dynamic(() => import('@/components/admin/pages/infrastructure/AccessoriesPage').then(m => m.default))
+const SplittersPage = dynamic(() => import('@/components/admin/pages/infrastructure/SplittersPage').then(m => m.default))
 
 export default function InfrastructurePage() {
   const tabs = [

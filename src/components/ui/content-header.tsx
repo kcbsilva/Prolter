@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/shared/ui/card';
 import { Input } from '@/components/shared/ui/input';
 import { Button } from '@/components/shared/ui/button';
 import { Plus, Search, Trash2 } from 'lucide-react';
-import { sidebarNav } from '@/config/sidebarNav';
+import { sidebarNav } from '@/components/layout/Navigation';
 import { useLocale } from '@/contexts/LocaleContext';
 import { cn } from '@/lib/utils';
 import { AddEntityModal } from '@/components/ui/modals/AddEntityModal';

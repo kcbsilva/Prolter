@@ -9,11 +9,11 @@ import { Card, CardContent } from '@/components/shared/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 
-import { ListCategories } from '@/components/pages/finances/entry-categories/ListCategories';
-import { AddCategoryModal } from '@/components/pages/finances/entry-categories/AddCategoryModal';
-import { UpdateCategoryModal } from '@/components/pages/finances/entry-categories/UpdateCategoryModal';
-import { RemoveCategoryDialog } from '@/components/pages/finances/entry-categories/RemoveCategoryDialog';
-import { EntryCategory } from '@/components/pages/finances/entry-categories/types';
+import { ListCategories } from '@/components/admin/pages/finances/dashboard/entry-categories/ListCategories';
+import { AddCategoryModal } from '@/components/admin/pages/finances/dashboard/entry-categories/AddCategoryModal';
+import { UpdateCategoryModal } from '@/components/admin/pages/finances/dashboard/entry-categories/UpdateCategoryModal';
+import { RemoveCategoryDialog } from '@/components/admin/pages/finances/dashboard/entry-categories/RemoveCategoryDialog';
+import { EntryCategory } from '@/components/admin/pages/finances/dashboard/entry-categories/types';
 
 const STATIC_INCOME_ID = 'static-income-root';
 const STATIC_EXPENSE_ID = 'static-expense-root';

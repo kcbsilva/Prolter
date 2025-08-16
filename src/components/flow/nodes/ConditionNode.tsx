@@ -4,7 +4,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Handle, NodeProps, Position } from 'reactflow';
 import { Input } from '@/components/shared/ui/input';
 
-export function ConditionNode({ id, data, selected }: NodeProps) {
+export function ConditionNode({ id, data }: NodeProps) {
   return (
     <div className="rounded-md border border-blue-300 bg-blue-50 shadow-sm">
       <Card className="w-64 bg-blue-50">

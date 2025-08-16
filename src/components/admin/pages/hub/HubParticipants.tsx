@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ListParticipants } from '@/components/hub/participants/ListParticipants';
-import { AddParticipantModal } from '@/components/hub/participants/AddParticipantModal';
-import { UpdateParticipantModal } from '@/components/hub/participants/UpdateParticipantModal';
-import { RemoveParticipantModal } from '@/components/hub/participants/RemoveParticipantModal';
+import { ListParticipants } from '@/components/admin/pages/hub/participants/ListParticipants';
+import { AddParticipantModal } from '@/components/admin/pages/hub/participants/AddParticipantModal';
+import { UpdateParticipantModal } from '@/components/admin/pages/hub/participants/UpdateParticipantModal';
+import { RemoveParticipantModal } from '@/components/admin/pages/hub/participants/RemoveParticipantModal';
 import { useLocale } from '@/contexts/LocaleContext';
 
 export function HubParticipants() {
