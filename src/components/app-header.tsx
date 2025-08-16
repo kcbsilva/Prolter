@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Menu as MenuIcon } from 'lucide-react';
 
 import { SearchPopover } from './header/search-popover';
-import { ThemeToggle } from './header/theme-toggle';
+import { ThemeToggle } from './ui/theme-toggle';
 import { UserMenu } from './header/user-menu';
 import { ChangelogMenu } from './header/changelog-menu';
 

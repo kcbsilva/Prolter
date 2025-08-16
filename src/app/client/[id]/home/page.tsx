@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { ArrowRight, FileText, CreditCard, MessageSquare } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
-export default function HomePage() {
+export default function ClientHome() {
   const { id } = useParams(); // later you can fetch the real customer name by id
   const customerName = "John Doe"; // mock data for now
 
   const links = [
-    { href: `/client/${id}/contracts`, label: "Contracts", icon: FileText },
-    { href: `/client/${id}/invoices`, label: "Invoices", icon: CreditCard },
-    { href: `/client/${id}/tickets`, label: "Support", icon: MessageSquare },
+    { href: `/client/${id}#contracts`, label: "Contracts", icon: FileText },
+    { href: `/client/${id}#billing`, label: "Billing", icon: CreditCard },
+    { href: `/client/${id}#tickets`, label: "Support", icon: MessageSquare },
   ];
 
   return (

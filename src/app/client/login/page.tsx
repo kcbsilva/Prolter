@@ -33,7 +33,7 @@ export default function ClientLoginPage() {
       setLoading(false);
       if (res.ok) {
         const data = await res.json();
-        router.push(`/client/${data.id}/home`);
+        router.push(`/client/${data.id}/`);
       } else {
         const data = await res.json();
         setError(data.error || 'Login failed');

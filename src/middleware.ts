@@ -86,7 +86,7 @@ export async function middleware(request: NextRequest) {
 
       if (isPublicClientPath || pathname === '/client') {
         return NextResponse.redirect(
-          new URL(`/client/${clientSession.id}/home`, request.url)
+          new URL(`/client/${clientSession.id}/`, request.url)
         );
       }
       return NextResponse.next();
