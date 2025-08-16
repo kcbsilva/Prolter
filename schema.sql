@@ -418,3 +418,50 @@ CREATE TABLE inventory_suppliers (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+--------------- Clients ------------------
+
+CREATE TABLE client_otp (
+  id SERIAL PRIMARY KEY,
+  client_id UUID NOT NULL REFERENCES client_users(id) ON DELETE CASCADE,
+  otp_code TEXT NOT NULL,
+  expires_at TIMESTAMP NOT NULL
+);
+
+-- Users (clients)
+CREATE TABLE client_users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+-- Contracts
+CREATE TABLE client_contracts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES client_users(id) ON DELETE CASCADE,
+  plan_name TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE,
+  status TEXT NOT NULL DEFAULT 'active'
+);
+
+-- Invoices
+CREATE TABLE client_invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES client_users(id) ON DELETE CASCADE,
+  amount NUMERIC(10,2) NOT NULL,
+  due_date DATE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'unpaid'
+);
+
+-- Tickets
+CREATE TABLE client_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID REFERENCES client_users(id) ON DELETE CASCADE,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open',
+  created_at TIMESTAMP DEFAULT now()
+);
