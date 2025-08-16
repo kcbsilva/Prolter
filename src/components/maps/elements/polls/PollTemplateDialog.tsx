@@ -4,14 +4,14 @@
 import * as React from 'react';
 import {
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
 import { PlusCircle, Pencil, Trash2 } from 'lucide-react';
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem
-} from '@/components/ui/select';
+} from '@/components/shared/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { PollTemplate } from './types';
 

@@ -5,9 +5,9 @@ import * as React from 'react';
 import {
   Card,
   CardContent
-} from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+} from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
+import { Textarea } from '@/components/shared/ui/textarea';
 import { Play, Eraser, Terminal } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';

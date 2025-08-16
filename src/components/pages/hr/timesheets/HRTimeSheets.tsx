@@ -2,9 +2,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Calendar } from '@/components/ui/calendar'
+import { Button } from '@/components/shared/ui/button'
+import { Input } from '@/components/shared/ui/input'
+import { Calendar } from '@/components/shared/ui/calendar'
 import {
   PlusCircle,
   Search,
@@ -19,7 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/shared/ui/table'
 
 type TimeSheet = {
   id: string

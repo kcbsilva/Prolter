@@ -4,8 +4,8 @@
 import * as React from 'react';
 import { Warehouse, FilePlus2, List } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -14,9 +14,9 @@ import {
   DialogTrigger,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
+} from '@/components/shared/ui/dialog';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
+import { Input } from '@/components/shared/ui/input';
 import {
   Form,
   FormField,
@@ -24,11 +24,11 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-} from '@/components/ui/form';
+} from '@/components/shared/ui/form';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/shared/ui/badge';
 
 const iconSize = 'h-4 w-4';
 

@@ -5,14 +5,14 @@ import * as React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ThemeToggle } from '@/components/shared/ui/theme-toggle'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/shared/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/shared/ui/dropdown-menu'
 import { useTheme } from 'next-themes'
 import { FaWhatsapp, FaTelegram, FaLinkedin, FaFacebook } from 'react-icons/fa'
 import { MdAlternateEmail } from 'react-icons/md'

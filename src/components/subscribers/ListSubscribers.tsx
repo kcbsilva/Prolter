@@ -3,9 +3,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { TableRow, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/shared/ui/button';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { TableRow, TableCell } from '@/components/shared/ui/table';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { Subscriber } from '@/types/subscribers';
 import { SubscriberProfile } from './SubscriberProfile';

@@ -2,8 +2,8 @@
 'use client';
 
 import * as React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/shared/ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shared/ui/tooltip';
 import { Building2, Phone, MessageCircle, HelpCircle, FileText } from 'lucide-react';
 
 export interface SignedFormBadgeProps {

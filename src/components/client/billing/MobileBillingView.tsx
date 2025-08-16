@@ -4,7 +4,7 @@
 import * as React from 'react';
 import { Billing } from '@/types/client/billing';
 import { BillingStatusBadge } from './BillingStatusBadge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card';
 
 interface MobileBillingViewProps {
   billings: Billing[];

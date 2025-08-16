@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { AddVPNModal } from '@/components/settings/network/vpn/AddVPNModal';
 import { UpdateVPNModal } from '@/components/settings/network/vpn/UpdateVPNModal';

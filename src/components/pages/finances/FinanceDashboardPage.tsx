@@ -12,16 +12,16 @@ import {
     SelectContent,
     SelectItem,
     SelectValue,
-} from '@/components/ui/select'
+} from '@/components/shared/ui/select'
 import {
     Dialog,
     DialogTrigger,
     DialogContent,
     DialogHeader,
     DialogTitle,
-} from '@/components/ui/dialog'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
+} from '@/components/shared/ui/dialog'
+import { Checkbox } from '@/components/shared/ui/checkbox'
+import { Button } from '@/components/shared/ui/button'
 
 export default function FinanceDashboardPage() {
     const [hydrated, setHydrated] = useState(false)

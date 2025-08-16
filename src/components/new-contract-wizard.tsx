@@ -10,8 +10,8 @@ import {
   DialogDescription,
   DialogFooter,
   DialogClose,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/components/shared/ui/form';
+import { Input } from '@/components/shared/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+} from '@/components/shared/ui/select';
+import { Checkbox } from '@/components/shared/ui/checkbox';
 import {
   Table,
   TableBody,
@@ -36,7 +36,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/shared/ui/table";
 import { CalendarIcon, Loader2, PlusCircle, Trash2, Check, Wifi, Tv, Phone as PhoneIcon, Smartphone, Combine as CombineIcon, Package as PackageIcon, DollarSign } from 'lucide-react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

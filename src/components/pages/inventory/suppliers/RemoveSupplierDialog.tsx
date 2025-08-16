@@ -11,10 +11,10 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from '@/components/ui/alert-dialog';
+} from '@/components/shared/ui/alert-dialog';
 import { Supplier } from '@/types/inventory';
 import { useLocale } from '@/contexts/LocaleContext';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/shared/ui/button';
 
 interface Props {
   supplier: Supplier | null;

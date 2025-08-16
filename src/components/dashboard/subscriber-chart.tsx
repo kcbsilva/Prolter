@@ -8,8 +8,8 @@ import {
   ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-} from "@/components/ui/chart"
-import type { ChartConfig } from "@/components/ui/chart"
+} from "@/components/shared/ui/chart"
+import type { ChartConfig } from "@/components/shared/ui/chart"
 
 // Placeholder data for the last 6 months
 const chartData = [

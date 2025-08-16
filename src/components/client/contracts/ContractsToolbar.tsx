@@ -2,8 +2,8 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Card, CardContent } from '@/components/shared/ui/card';
+import { ToggleGroup, ToggleGroupItem } from '@/components/shared/ui/toggle-group';
 
 interface ContractsToolbarProps {
   filters: { active: boolean; inactive: boolean };

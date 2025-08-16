@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Loader2 } from 'lucide-react';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/shared/ui/card';
 import { StepProgressBar } from '@/components/setup-wizard/StepProgressBar';
 
 import { WelcomeStep } from '@/components/setup-wizard/welcome';

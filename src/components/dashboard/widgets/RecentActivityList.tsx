@@ -1,8 +1,8 @@
 // src/components/dashboard/widgets/RecentActivityList.tsx
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 import { Activity } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/shared/ui/badge';
 
 const activities = [
   { id: '1', type: 'New Subscriber', description: 'John Doe signed up for the Pro plan.', time: '5 minutes ago', level: undefined },

@@ -11,8 +11,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { buttonVariants } from '@/components/ui/button';
+} from '@/components/shared/ui/alert-dialog';
+import { buttonVariants } from '@/components/shared/ui/button';
 import { useLocale } from '@/contexts/LocaleContext';
 import type { InventoryCategory } from '@/types/inventory';
 

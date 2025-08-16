@@ -2,8 +2,8 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
 import { Box, FileText as FileTextIcon, Edit, Trash2, Loader2, FilePlus2, List } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
@@ -14,8 +14,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from '@/components/ui/badge';
+} from "@/components/shared/ui/table";
+import { Badge } from '@/components/shared/ui/badge';
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "@/components/shared/ui/dialog";
 import {
   Form,
   FormControl,
@@ -32,19 +32,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from '@/components/ui/input';
+} from "@/components/shared/ui/form";
+import { Input } from '@/components/shared/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/shared/ui/select";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
 
 interface Ped {
   id: string;

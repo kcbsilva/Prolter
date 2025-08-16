@@ -4,14 +4,14 @@
 import * as React from 'react';
 import { Info } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/shared/ui/dropdown-menu';
 
 export function ChangelogMenu() {
   const { t } = useLocale();

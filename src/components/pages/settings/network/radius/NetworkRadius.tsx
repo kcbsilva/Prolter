@@ -4,8 +4,8 @@
 import * as React from 'react';
 import {
   Card, CardContent, CardHeader, CardTitle, CardDescription,
-} from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+} from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
 import { PlusCircle, Server } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { NasTable, NasType } from '@/components/settings/network/radius/NasTable';

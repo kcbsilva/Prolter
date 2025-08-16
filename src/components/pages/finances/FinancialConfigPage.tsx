@@ -2,9 +2,9 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/ui/card";
+import { Button, buttonVariants } from "@/components/shared/ui/button";
+import { Input } from "@/components/shared/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "@/components/shared/ui/dialog";
 import {
   Form,
   FormControl,
@@ -22,14 +22,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/components/shared/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/shared/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/shared/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -48,8 +48,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Switch } from "@/components/ui/switch";
+} from "@/components/shared/ui/table";
+import { Switch } from "@/components/shared/ui/switch";
 import {
   PlusCircle,
   Trash2,
@@ -65,7 +65,7 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 // Removed useQuery and MySQL getPops import
 import type { Pop } from "@/types/pops";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/shared/ui/skeleton";
 
 const dayOfMonthSchema = z.union([
   z.coerce.number().int().min(1).max(31),

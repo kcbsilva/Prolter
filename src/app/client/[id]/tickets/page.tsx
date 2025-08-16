@@ -1,7 +1,7 @@
 // src/app/client/[id]/tickets/page.tsx
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 
 export default function TicketsPage() {
   return (

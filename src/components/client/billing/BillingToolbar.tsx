@@ -2,9 +2,9 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { Toggle } from '@/components/ui/toggle';
+import { Button } from '@/components/shared/ui/button';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/shared/ui/select';
+import { Toggle } from '@/components/shared/ui/toggle';
 
 interface BillingToolbarProps {
   filter: 'all' | 'paid' | 'unpaid' | 'overdue';

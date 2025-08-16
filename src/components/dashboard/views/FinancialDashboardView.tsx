@@ -1,7 +1,7 @@
 // src/components/dashboard/views/FinancialDashboardView.tsx
 import * as React from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/ui/card';
 import { PieChart } from 'lucide-react';
 import TopSubscribersTable from '@/components/dashboard/widgets/TopSubscribersTable';
 import ChurnRetentionChart from '@/components/dashboard/charts/ChurnRetentionChart';

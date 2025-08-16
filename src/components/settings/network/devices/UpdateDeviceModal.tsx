@@ -4,16 +4,16 @@
 import * as React from 'react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Switch } from '@/components/shared/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared/ui/select';
 import { Device } from './AddDeviceModal';
 
 const deviceSchema = z.object({

@@ -2,7 +2,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card'
 import { motion } from 'framer-motion'
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())

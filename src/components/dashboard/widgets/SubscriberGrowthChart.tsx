@@ -1,6 +1,6 @@
 // src/components/dashboard/widgets/SubscriberGrowthChart.tsx
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/shared/ui/card';
 import { SubscriberChart } from '@/components/dashboard/subscriber-chart';
 
 export default function SubscriberGrowthChart() {

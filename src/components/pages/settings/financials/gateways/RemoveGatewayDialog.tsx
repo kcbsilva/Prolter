@@ -2,8 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/shared/ui/dialog";
+import { Button } from "@/components/shared/ui/button";
 
 export function RemoveGatewayDialog({ gateway, onClose }: { gateway: any; onClose: () => void }) {
   const [loading, setLoading] = React.useState(false);

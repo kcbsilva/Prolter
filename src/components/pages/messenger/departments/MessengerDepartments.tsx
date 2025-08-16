@@ -2,8 +2,8 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
 import { Users, PlusCircle } from 'lucide-react'; // Using Users icon for departments
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';

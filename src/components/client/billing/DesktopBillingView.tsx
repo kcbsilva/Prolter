@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shared/ui/table';
 import { Billing } from '@/types/client/billing';
 import { BillingStatusBadge } from './BillingStatusBadge';
 

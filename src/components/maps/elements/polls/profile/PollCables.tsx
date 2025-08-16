@@ -3,9 +3,9 @@
 
 import * as React from 'react';
 import { HydroPoll } from '../types';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shared/ui/table';
+import { Button } from '@/components/shared/ui/button';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 import { MapPin } from 'lucide-react';
 
 interface Props {

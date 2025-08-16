@@ -15,18 +15,18 @@ import {
   Search,
   CircleDollarSign,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/shared/ui/card";
+import { Button } from "@/components/shared/ui/button";
+import { Input } from "@/components/shared/ui/input";
+import { Badge } from "@/components/shared/ui/badge";
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+} from "@/components/shared/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/shared/ui/tabs";
 import {
   Table,
   TableHeader,
@@ -34,7 +34,7 @@ import {
   TableHead,
   TableBody,
   TableCell,
-} from "@/components/ui/table";
+} from "@/components/shared/ui/table";
 import { cn } from "@/lib/utils";
 import {
   ResponsiveContainer,

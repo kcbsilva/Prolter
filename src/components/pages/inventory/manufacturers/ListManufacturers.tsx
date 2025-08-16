@@ -3,13 +3,13 @@
 
 import React from 'react';
 import { Edit } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/shared/ui/button';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { Checkbox } from '@/components/shared/ui/checkbox';
 import {
   TableRow,
   TableCell,
-} from '@/components/ui/table';
+} from '@/components/shared/ui/table';
 import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
 import { RemoveManufacturerDialog } from './RemoveManufacturerDialog';
 import type { Manufacturer } from '@/types/inventory';

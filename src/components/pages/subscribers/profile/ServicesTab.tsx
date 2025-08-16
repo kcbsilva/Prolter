@@ -3,11 +3,11 @@
 
 import * as React from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
+import { Button } from '@/components/shared/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/shared/ui/dropdown-menu';
+import { Badge } from '@/components/shared/ui/badge';
 import { cn } from '@/lib/utils';
 import { Wifi, Tv, PhoneCall, Smartphone, ListFilter as ListFilterIcon, Combine as CombineIcon, MoreVertical } from 'lucide-react';
 import type { Subscriber, SubscriberService, ServiceStatus } from '@/types/subscribers';

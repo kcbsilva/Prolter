@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
 import {
   Form,
   FormControl,
@@ -16,11 +16,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+} from '@/components/shared/ui/form';
+import { Input } from '@/components/shared/ui/input';
+import { RadioGroup, RadioGroupItem } from '@/components/shared/ui/radio-group';
+import { Calendar } from '@/components/shared/ui/calendar';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/shared/ui/popover';
 import { CalendarIcon, User, Building, Save, Loader2, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';

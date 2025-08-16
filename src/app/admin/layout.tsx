@@ -3,7 +3,7 @@
 'use client';
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/shared/ui/sidebar';
 import { AppLayoutContent } from './admin-layout-content';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

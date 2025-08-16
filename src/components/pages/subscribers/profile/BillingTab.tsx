@@ -3,12 +3,12 @@
 
 import * as React from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent } from '@/components/shared/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/shared/ui/tabs';
+import { Button } from '@/components/shared/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/shared/ui/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shared/ui/table';
+import { Checkbox } from '@/components/shared/ui/checkbox';
 import { CreditCard, FileX, Receipt, Printer, Send, ListFilter as ListFilterIcon, Clock, CheckCircle, XCircle, CalendarClock, Handshake, FilePlus2, ChevronDown } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { fr as frLocale, ptBR as ptBRLocale, enUS as enUSLocale } from 'date-fns/locale';

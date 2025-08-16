@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
+} from "@/components/shared/ui/card";
 import {
   Table,
   TableBody,
@@ -16,9 +16,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from "@/components/shared/ui/table";
+import { Badge } from '@/components/shared/ui/badge';
+import { Button } from '@/components/shared/ui/button';
 import {
   BarChart,
   Bar,
@@ -37,11 +37,11 @@ import {
   ChartTooltipContent as ShadChartTooltipContent,
   ChartLegend as ShadChartLegend,
   ChartLegendContent as ShadChartLegendContent,
-} from "@/components/ui/chart";
-import type { ChartConfig } from "@/components/ui/chart";
+} from "@/components/shared/ui/chart";
+import type { ChartConfig } from "@/components/shared/ui/chart";
 import { DollarSign, Users, Target, TrendingUp, Activity, CalendarDays, Download } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared/ui/select';
 
 const salesStats = {
   newLeadsMonth: 120,

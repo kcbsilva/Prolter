@@ -2,9 +2,9 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardFooter } from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
 import { useLocale } from '@/contexts/LocaleContext';
 import { cn } from '@/lib/utils';
 import { User, Briefcase, CalendarDays, Fingerprint, Home, Landmark, PhoneCall, Smartphone, Mail, MapPinIcon } from 'lucide-react';

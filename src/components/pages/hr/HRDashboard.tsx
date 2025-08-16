@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+} from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
 import {
   BarChart,
   Bar,
@@ -28,11 +28,11 @@ import {
   ChartTooltipContent as ShadChartTooltipContent, // Renamed
   ChartLegend as ShadChartLegend, // Renamed
   ChartLegendContent as ShadChartLegendContent, // Renamed
-} from "@/components/ui/chart";
-import type { ChartConfig } from "@/components/ui/chart";
+} from "@/components/shared/ui/chart";
+import type { ChartConfig } from "@/components/shared/ui/chart";
 import { Users, UserPlus, UserMinus, TrendingDown, CalendarDays, Download } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared/ui/select';
 
 const hiresTerminationsData = [
   { month: 'Jan', hires: 5, terminations: 2 },

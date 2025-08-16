@@ -3,13 +3,13 @@
 import * as React from 'react';
 import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from '@/components/shared/ui/table';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useQuery } from '@tanstack/react-query';
 import { Users2, PlusCircle, Edit, Search, RefreshCw, Trash2 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 
 interface Participant {

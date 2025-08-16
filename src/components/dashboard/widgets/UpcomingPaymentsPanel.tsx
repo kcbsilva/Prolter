@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { CalendarDays, AlertCircle } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 
 const upcomingPayments = [
   { id: 'inv-1024', name: 'João Silva', amount: 'R$170,00', due: 'in 2 days' },

@@ -7,15 +7,15 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { sendPasswordResetEmail } from '@/services/postgres/users';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/shared/ui/card';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/shared/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/contexts/LocaleContext';
 import { Loader2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/shared/ui/separator';
 import { ProlterLogo } from '@/components/prolter-logo'; // Import the new ProlterLogo component
 
 const forgotPasswordSchema = z.object({

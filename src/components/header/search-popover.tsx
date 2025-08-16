@@ -4,13 +4,13 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Search, User, Box, Cable } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverAnchor,
-} from '@/components/ui/popover';
+} from '@/components/shared/ui/popover';
 import { useLocale } from '@/contexts/LocaleContext';
 import { cn } from '@/lib/utils';
 

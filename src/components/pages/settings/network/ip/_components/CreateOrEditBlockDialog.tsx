@@ -1,12 +1,12 @@
 "use client";
 import * as React from "react";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/shared/ui/button";
+import { Input } from "@/components/shared/ui/input";
+import { Label } from "@/components/shared/ui/label";
 import {
   DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/shared/ui/dialog";
 import { Loader2, XCircle } from "lucide-react";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useToast } from "@/hooks/use-toast";

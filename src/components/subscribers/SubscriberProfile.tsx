@@ -8,9 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
 import { Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Subscriber } from '@/types/subscribers';

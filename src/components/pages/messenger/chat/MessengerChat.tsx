@@ -8,12 +8,12 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/shared/ui/card';
+import { Button, buttonVariants } from '@/components/shared/ui/button'; // Import buttonVariants
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/shared/ui/avatar';
+import { Input } from '@/components/shared/ui/input';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
+import { Badge } from '@/components/shared/ui/badge';
 import { MessageCircle, Send, Paperclip, Search, UserCircle, MoreVertical, PlusCircle, UserCheck, Users as UsersIcon, Repeat, Check, CheckCheck } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { cn } from '@/lib/utils';
@@ -27,8 +27,8 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "@/components/shared/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shared/ui/tabs";
 
 interface Message {
   id: string;

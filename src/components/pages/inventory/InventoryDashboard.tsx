@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { Package, Factory, Warehouse, AlertTriangle, Truck } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 
 export default function InventoryDashboardPage() {
   return (

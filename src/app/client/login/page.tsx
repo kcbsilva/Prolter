@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/shared/ui/card';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
 
 // TODO: Set to false when OTP is fully implemented
 const BYPASS_OTP = true;

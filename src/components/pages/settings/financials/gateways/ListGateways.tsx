@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shared/ui/button";
 import { Edit, Trash } from "lucide-react";
 import { UpdateGatewayModal } from "./UpdateGatewayModal";
 import { RemoveGatewayDialog } from "./RemoveGatewayDialog";

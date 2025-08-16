@@ -1,5 +1,5 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shared/ui/button";
 import { PlusCircle, Code } from "lucide-react";
 
 export function EmptyState({ onAdd }: { onAdd: () => void }) {

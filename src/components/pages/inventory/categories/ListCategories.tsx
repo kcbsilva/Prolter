@@ -3,13 +3,13 @@
 
 import * as React from 'react';
 import { Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import {
   TableRow,
   TableCell,
-} from '@/components/ui/table';
+} from '@/components/shared/ui/table';
 import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/shared/ui/checkbox';
 import type { InventoryCategory } from '@/types/inventory';
 
 interface Props {

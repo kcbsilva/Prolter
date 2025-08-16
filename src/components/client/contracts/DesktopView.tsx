@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/shared/ui/table';
 import { ChevronDown } from 'lucide-react';
 import { SignedFormBadge } from '@/components/client/contracts/SignedFormBadge';
 import { Contract } from '@/types/client/contracts';

@@ -1,7 +1,7 @@
 // src/components/settings/network/vpn/DownloadConfigButton.tsx
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { Download } from 'lucide-react';
 import { VPNConnection } from '@/types/vpn';
 import {

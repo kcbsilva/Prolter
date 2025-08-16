@@ -3,9 +3,9 @@
 
 import * as React from 'react';
 import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
-import { TableRow, TableCell } from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
+import { TableRow, TableCell } from '@/components/shared/ui/table';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { Button } from '@/components/shared/ui/button';
 import { Edit, Trash2 } from 'lucide-react';
 import type { Supplier } from '@/types/inventory';
 

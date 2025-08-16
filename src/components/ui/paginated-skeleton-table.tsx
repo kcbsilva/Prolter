@@ -9,8 +9,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/table';
+import { Button } from '@/components/shared/ui/button';
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

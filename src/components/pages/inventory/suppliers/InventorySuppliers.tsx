@@ -1,7 +1,7 @@
 // src/components/inventory/suppliers/SuppliersPage.tsx
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/shared/ui/card';
 import { useLocale } from '@/contexts/LocaleContext';
 import { ContentHeader } from '@/components/ui/content-header';
 import { RemoveEntityDialog } from '@/components/ui/modals/RemoveEntityDialog';

@@ -7,8 +7,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { ProjectFormFields } from './ProjectFormFields';
 import type { Pop, MapProject } from '@/types/maps';

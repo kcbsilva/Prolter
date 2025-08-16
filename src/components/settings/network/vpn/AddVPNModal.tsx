@@ -9,10 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from '@/components/shared/ui/dialog';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
+import { Label } from '@/components/shared/ui/label';
 import { toast } from '@/hooks/use-toast';
 
 type Props = {

@@ -7,7 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/shared/ui/dialog';
 import PoPProfile from './PoPProfile';
 import type { PopData } from '@/types/pops';
 

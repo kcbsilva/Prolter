@@ -1,8 +1,8 @@
 // /src/components/flow/nodes/ConditionNode.tsx
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/shared/ui/card';
 import { AlertTriangle } from 'lucide-react';
 import { Handle, NodeProps, Position } from 'reactflow';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/shared/ui/input';
 
 export function ConditionNode({ id, data, selected }: NodeProps) {
   return (

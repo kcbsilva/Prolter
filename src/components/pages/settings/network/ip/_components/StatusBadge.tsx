@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/shared/ui/badge";
 import { CheckCircle2, XCircle, Info } from "lucide-react";
 import type { IPBlockStatus } from "@/components/pages/settings/network/ip/_lib/types";
 

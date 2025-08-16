@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { VPNConnection } from '@/types/vpn';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/shared/ui/card';
 import {
   Table,
   TableBody,
@@ -11,15 +11,15 @@ import {
   TableHeader,
   TableRow,
   TableCell,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@/components/shared/ui/table';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 import { UpdateVPNModal } from './UpdateVPNModal';
 import { RemoveVPNModal } from './RemoveVPNModal';
 import { DownloadConfigButton } from './DownloadConfigButton';
-import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/shared/ui/switch';
+import { Button } from '@/components/shared/ui/button';
 import { Eye, EyeOff } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/shared/ui/input';
 import { toast } from '@/hooks/use-toast';
 
 type Props = {

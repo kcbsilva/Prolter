@@ -4,10 +4,10 @@
 import * as React from 'react';
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow
-} from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/shared/ui/table';
+import { Card, CardContent } from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
 import { Edit, Trash2 } from 'lucide-react';
 import { useLocale, dateLocales } from '@/contexts/LocaleContext';
 import { format } from 'date-fns';

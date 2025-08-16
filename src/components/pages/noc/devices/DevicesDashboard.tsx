@@ -3,10 +3,10 @@
 
 import * as React from 'react';
 import { PlusCircle, Router } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { useLocale } from '@/contexts/LocaleContext';
 import { toast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 import { AddDeviceModal } from '@/components/settings/network/devices/AddDeviceModal';
 import { UpdateDeviceModal } from '@/components/settings/network/devices/UpdateDeviceModal';

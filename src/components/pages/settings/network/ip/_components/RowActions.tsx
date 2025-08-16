@@ -1,8 +1,8 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shared/ui/button";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/shared/ui/dropdown-menu";
 import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 export function RowActions({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {

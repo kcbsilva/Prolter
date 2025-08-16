@@ -8,9 +8,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { ChevronDown, ChevronLeft, ChevronRight, type LucideIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/shared/ui/tooltip";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shared/ui/button";
 
 const sidebarVariants = cva(
   "group/sidebar peer relative flex flex-col text-card-foreground transition-[width] duration-300 ease-in-out",
@@ -97,10 +97,10 @@ function assignRef<T>(ref: React.Ref<T> | undefined, value: T | null) {
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> &
-    Pick<SidebarProps, "variant" | "side"> & {
-      defaultOpenMobile?: boolean;
-      defaultCollapsedDesktop?: boolean;
-    }
+  Pick<SidebarProps, "variant" | "side"> & {
+    defaultOpenMobile?: boolean;
+    defaultCollapsedDesktop?: boolean;
+  }
 >(
   (
     {
@@ -217,15 +217,15 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(({ className, childr
   const { variant, side, isMobile, isOpenMobile, setIsOpenMobile, isCollapsed, sidebarNodeRef } =
     useSidebar();
 
-  const mergedRef = React.useCallback(
-    (node: HTMLElement | null) => {
-      if (sidebarNodeRef) {
-        sidebarNodeRef.current = node;
-      }
-      assignRef(ref, node);
-    },
-    [ref, sidebarNodeRef]
-  );
+    const mergedRef = React.useCallback(
+      (node: HTMLElement | null) => {
+        if (sidebarNodeRef && "current" in sidebarNodeRef) {
+          (sidebarNodeRef as React.MutableRefObject<HTMLElement | null>).current = node;
+        }
+        assignRef(ref, node);
+      },
+      [ref, sidebarNodeRef]
+    );
 
   const commonProps = {
     "data-sidebar": "sidebar",

@@ -2,8 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/shared/ui/card";
+import { Button } from "@/components/shared/ui/button";
 import { Plus } from "lucide-react";
 import { AddGatewayModal } from "./AddGatewayModal";
 import { ListGateways } from "./ListGateways";

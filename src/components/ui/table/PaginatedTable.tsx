@@ -9,12 +9,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/table';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { Button } from '@/components/shared/ui/button';
 import { RefreshCcw, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/shared/ui/card';
 
 interface Props<T> {
   columns: { key: string; label: string; className?: string }[];

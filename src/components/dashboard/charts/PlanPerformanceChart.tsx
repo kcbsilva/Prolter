@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 import AlertsTimeline from '@/components/dashboard/widgets/AlertsTimeline';
 
 const planData = [

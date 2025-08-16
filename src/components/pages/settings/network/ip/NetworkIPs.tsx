@@ -4,18 +4,18 @@ import * as React from 'react';
 import { useMemo, useState, useEffect } from 'react';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
 import {
   Dialog, DialogTrigger, Dialog as _D,
-} from '@/components/ui/dialog';
+} from '@/components/shared/ui/dialog';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+} from '@/components/shared/ui/dropdown-menu';
+import { Badge } from '@/components/shared/ui/badge';
+import { Separator } from '@/components/shared/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { useLocale } from '@/contexts/LocaleContext';

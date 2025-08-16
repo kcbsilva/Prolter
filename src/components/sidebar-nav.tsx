@@ -11,7 +11,7 @@ import {
   SidebarMenuSubContent,
   SidebarMenuSubTrigger,
   SidebarSeparator,
-} from '@/components/ui/sidebar';
+} from '@/components/shared/ui/sidebar';
 import { useLocale } from '@/contexts/LocaleContext';
 
 interface SidebarNavProps {

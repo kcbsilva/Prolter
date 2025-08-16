@@ -9,11 +9,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@/components/shared/ui/table";
+import { Button } from "@/components/shared/ui/button";
 import { Edit, Trash2 } from 'lucide-react';
-import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Skeleton } from "@/components/ui/skeleton";
+import { AlertDialog, AlertDialogTrigger } from "@/components/shared/ui/alert-dialog";
+import { Skeleton } from "@/components/shared/ui/skeleton";
 import { EntryCategory } from './types'; // You'll define this in a shared type file
 import { useLocale } from '@/contexts/LocaleContext';
 

@@ -4,7 +4,7 @@
 import React from 'react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle
-} from '@/components/ui/dialog';
+} from '@/components/shared/ui/dialog';
 
 interface Props {
   open: boolean;

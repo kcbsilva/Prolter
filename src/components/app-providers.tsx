@@ -7,8 +7,8 @@ import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LocaleProvider } from '@/contexts/LocaleContext';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/shared/ui/tooltip';
+import { Toaster } from '@/components/shared/ui/toaster';
 
 // Create a single instance of QueryClient at the module level
 const queryClient = new QueryClient();

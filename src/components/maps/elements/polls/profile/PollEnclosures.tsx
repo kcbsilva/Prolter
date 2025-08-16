@@ -2,10 +2,10 @@
 'use client';
 
 import * as React from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/shared/ui/tabs';
+import { Badge } from '@/components/shared/ui/badge';
+import { Button } from '@/components/shared/ui/button';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 import { MapPin } from 'lucide-react';
 
 interface Enclosure {

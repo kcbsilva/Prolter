@@ -7,12 +7,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '@/components/shared/ui/card';
 import { Cpu, MemoryStick, HardDrive, Database, Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/shared/ui/progress';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 
 interface SystemMetric {
   nameKey: string;

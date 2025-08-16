@@ -7,13 +7,13 @@ import { useLocale } from '@/contexts/LocaleContext';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { ProlterLogo } from '@/components/prolter-logo';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/shared/ui/button';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 import { useAuth } from '@/contexts/AuthContext';
 import { Menu as MenuIcon } from 'lucide-react';
 
 import { SearchPopover } from './header/search-popover';
-import { ThemeToggle } from './ui/theme-toggle';
+import { ThemeToggle } from './shared/ui/theme-toggle';
 import { UserMenu } from './header/user-menu';
 import { ChangelogMenu } from './header/changelog-menu';
 

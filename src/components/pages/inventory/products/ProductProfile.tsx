@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card';
 import { Product } from '@/types/inventory';
 import { inventoryCategories, manufacturers, suppliers } from '@/data/inventory';
 import { useLocale } from '@/contexts/LocaleContext';

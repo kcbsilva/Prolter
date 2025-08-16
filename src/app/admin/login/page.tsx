@@ -9,9 +9,9 @@ import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLocale } from "@/contexts/LocaleContext";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/shared/ui/button";
+import { Input } from "@/components/shared/ui/input";
+import { Label } from "@/components/shared/ui/label";
 import {
   Card,
   CardContent,
@@ -19,8 +19,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/components/shared/ui/card";
+import { Skeleton } from "@/components/shared/ui/skeleton";
 import { Loader2 } from "lucide-react";
 import { ProlterLogo } from '@/components/prolter-logo';
 

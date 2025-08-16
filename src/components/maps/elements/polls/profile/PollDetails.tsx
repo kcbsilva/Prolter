@@ -3,11 +3,11 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Badge } from '@/components/shared/ui/badge';
+import { Switch } from '@/components/shared/ui/switch';
+import { Button } from '@/components/shared/ui/button';
 import { HydroPoll } from '../types';
 import { PollMiniMap } from './PollMiniMap';
 

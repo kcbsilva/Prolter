@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/shared/ui/dialog';
 import PoPProfile from './PoPProfile';
 import type { PopData } from '@/types/pops';
 

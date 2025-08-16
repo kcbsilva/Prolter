@@ -3,9 +3,9 @@
 
 import * as React from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/shared/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/shared/ui/table';
 import type { Pop } from '@/types/pops';
 
 interface PoPListProps {

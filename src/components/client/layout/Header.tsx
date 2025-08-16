@@ -3,9 +3,9 @@
 
 import Link from 'next/link';
 import { Home, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/shared/ui/button';
+import { ThemeToggle } from '@/components/shared/ui/theme-toggle';
+import { Separator } from '@/components/shared/ui/separator';
 
 export default function Header() {
   return (

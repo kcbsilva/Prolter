@@ -2,9 +2,9 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { TableRow, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/shared/ui/button';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { TableRow, TableCell } from '@/components/shared/ui/table';
 import { Edit, Trash2 } from 'lucide-react';
 import { Product } from '@/types/inventory';
 import { useLocale } from '@/contexts/LocaleContext';

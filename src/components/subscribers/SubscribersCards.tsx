@@ -2,8 +2,8 @@
 'use client'
 
 import * as React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/shared/ui/card'
+import { Skeleton } from '@/components/shared/ui/skeleton'
 import { Users, Wifi, DollarSign, AlertCircle } from 'lucide-react'
 
 interface Props {

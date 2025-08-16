@@ -3,11 +3,11 @@
 
 import * as React from 'react';
 import { Eye, Trash2, Edit } from 'lucide-react';
-import { TableCell, TableRow } from '@/components/ui/table';
+import { TableCell, TableRow } from '@/components/shared/ui/table';
 import { usePagination } from '@/hooks/usePagination';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
+import { Button } from '@/components/shared/ui/button';
 import { PaginatedTable } from '@/components/ui/table/PaginatedTable';
 import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';
 

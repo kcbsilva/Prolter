@@ -1,10 +1,10 @@
 // src/components/dashboard/views/GeneralDashboardView.tsx
 import * as React from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shared/ui/card';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 import { Users, DollarSign, Network, MessageSquareWarning, ArrowUpRight, ArrowDownRight, Activity } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/shared/ui/badge';
 import { SubscriberChart } from '@/components/dashboard/subscriber-chart';
 
 type Props = {

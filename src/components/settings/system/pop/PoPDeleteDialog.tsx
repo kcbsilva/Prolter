@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogCancel, AlertDialogAction } from '@/components/ui/alert-dialog';
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogCancel, AlertDialogAction } from '@/components/shared/ui/alert-dialog';
 import type { PopData } from '@/types/pops';
 
 interface PoPDeleteDialogProps {

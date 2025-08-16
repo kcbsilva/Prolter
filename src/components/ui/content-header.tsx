@@ -3,9 +3,9 @@
 
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/shared/ui/card';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
 import { Plus, Search, Trash2 } from 'lucide-react';
 import { sidebarNav } from '@/config/sidebarNav';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -16,7 +16,7 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-} from '@/components/ui/tooltip';
+} from '@/components/shared/ui/tooltip';
 
 function singularize(word: string) {
   if (word.endsWith('ies')) return word.replace(/ies$/, 'y');

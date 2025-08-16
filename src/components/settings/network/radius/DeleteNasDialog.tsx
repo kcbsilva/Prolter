@@ -1,8 +1,8 @@
 // src/components/network-radius/DeleteNasDialog.tsx
 'use client';
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
 import { NasType } from './NasTable';
 
 type Props = {

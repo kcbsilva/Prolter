@@ -4,18 +4,18 @@
 import { useState, useEffect } from 'react';
 import {
   Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter, DialogClose,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/dialog';
+import { Button } from '@/components/shared/ui/button';
 import { Edit } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form, FormField, FormItem, FormLabel, FormControl, FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+} from '@/components/shared/ui/form';
+import { Input } from '@/components/shared/ui/input';
+import { Switch } from '@/components/shared/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/shared/ui/select';
 import { updateVlan, fetchPops, fetchParticipants, fetchNasByPopId, fetchInterfacesByNas } from './actions';
 import { Vlan } from '@/types/vlan';
 import { toast } from '@/hooks/use-toast';

@@ -3,7 +3,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardTitle, CardHeader } from "@/components/shared/ui/card";
 import {
   Table,
   TableBody,
@@ -11,8 +11,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+} from "@/components/shared/ui/table";
+import { Button } from "@/components/shared/ui/button";
 import {
   User,
   Building,
@@ -28,7 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/shared/ui/input";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -36,12 +36,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/shared/ui/dropdown-menu";
 import { useLocale } from "@/contexts/LocaleContext";
 import { useToast } from "@/hooks/use-toast";
 import type { Subscriber, SubscriberStatus } from "@/types/subscribers";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/shared/ui/skeleton";
+import { Badge } from "@/components/shared/ui/badge";
 import { cn } from "@/lib/utils";
 import { listSubscribers } from "@/services/postgres/subscribers";
 import {

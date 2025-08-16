@@ -9,20 +9,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/table';
+import { Badge } from '@/components/shared/ui/badge';
+import { Button } from '@/components/shared/ui/button';
 import { Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { MapProject } from '@/types/maps';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/shared/ui/skeleton';
+import { Input } from '@/components/shared/ui/input';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select';
+} from '@/components/shared/ui/select';
 
 interface ListProjectsProps {
   projects: MapProject[] | null;

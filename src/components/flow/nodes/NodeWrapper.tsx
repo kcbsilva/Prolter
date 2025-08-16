@@ -1,9 +1,9 @@
 // /src/components/flow/nodes/NodeWrapper.tsx
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/shared/ui/card';
 import { Trash2, Move } from 'lucide-react';
 import { Handle, Position } from 'reactflow';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
 import { cn } from '@/lib/utils';
 import React from 'react';
 

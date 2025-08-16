@@ -4,11 +4,11 @@
 import * as React from 'react';
 import { APIProvider, Map, AdvancedMarker, InfoWindow, Pin, useMap, useMapsLibrary } from '@vis.gl/react-google-maps';
 import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/shared/ui/input';
 import { Search } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './shared/ui/button';
 
 interface MapComponentProps {
   apiKey: string | undefined;

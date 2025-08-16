@@ -1,5 +1,5 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/shared/ui/card";
 
 export function StatCard({ label, value }: { label: string; value: number | string }) {
   return (

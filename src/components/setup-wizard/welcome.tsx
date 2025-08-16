@@ -8,8 +8,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/select';
+import { Button } from '@/components/shared/ui/button';
 import { type Locale, useLocale } from '@/contexts/LocaleContext';
 import { ProlterLogo } from '@/components/prolter-logo';
 

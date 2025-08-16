@@ -12,8 +12,8 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/alert-dialog';
+import { Button } from '@/components/shared/ui/button';
 import { Trash2 } from 'lucide-react';
 
 export interface RemoveEntityDialogProps {

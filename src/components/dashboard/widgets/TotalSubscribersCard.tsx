@@ -1,6 +1,6 @@
 // src/components/dashboard/widgets/TotalSubscribersCard.tsx
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 import { Users, ArrowUpRight } from 'lucide-react';
 
 export default function TotalSubscribersCard() {

@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Skeleton } from '@/components/ui/skeleton';
+} from '@/components/shared/ui/table';
+import { Skeleton } from '@/components/shared/ui/skeleton';
 
 interface Props {
   history?: HydroPoll['history'];

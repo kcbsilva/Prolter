@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 import { ChevronDown } from 'lucide-react';
 import { SignedFormBadge } from '@/components/client/contracts/SignedFormBadge';
 import { Contract } from '@/types/client/contracts';

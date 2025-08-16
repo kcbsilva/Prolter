@@ -2,7 +2,7 @@
 'use client'
 
 import * as React from 'react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/shared/ui/tabs'
 import { ListUsers } from '@/components/settings/users/ListUsers'
 import { UsersCards } from '@/components/settings/users/UsersCards'
 

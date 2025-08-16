@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
 import { SatelliteDish, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import Link from 'next/link';

@@ -2,8 +2,8 @@
 'use client'
 
 import React from 'react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { Input } from '@/components/shared/ui/input'
+import { Button } from '@/components/shared/ui/button'
 import { Plus } from 'lucide-react'
 
 interface ClientBarProps {

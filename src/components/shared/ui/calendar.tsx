@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker, type SelectSingleEventHandler } from "react-day-picker" // Import SelectSingleEventHandler
 
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/shared/ui/button"
 
 export type CalendarProps = Omit<React.ComponentProps<typeof DayPicker>, 'onSelect'> & {
   onSelect?: SelectSingleEventHandler; // Use the correct type

@@ -8,8 +8,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+} from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
 import {
   Table,
   TableBody,
@@ -17,9 +17,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from '@/components/ui/input';
+} from "@/components/shared/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/shared/ui/tabs";
+import { Input } from '@/components/shared/ui/input';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -27,8 +27,8 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from '@/components/ui/badge';
+} from "@/components/shared/ui/dropdown-menu";
+import { Badge } from '@/components/shared/ui/badge';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
 import { LayoutDashboard as ServiceDashboardIcon, Wrench, CheckCircle, Clock, ListChecks, Search, Filter as FilterIcon, PlusCircle } from 'lucide-react';

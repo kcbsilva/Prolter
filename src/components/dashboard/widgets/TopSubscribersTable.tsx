@@ -2,7 +2,7 @@
 'use client';
 
 import * as React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/shared/ui/card';
 
 const topSubscribers = [
   { name: 'Alice Costa', plan: 'Enterprise', usage: '890GB', mrr: '$390' },

@@ -10,14 +10,14 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose
-} from '@/components/ui/dialog';
+} from '@/components/shared/ui/dialog';
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent
-} from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/tabs';
+import { Button } from '@/components/shared/ui/button';
 import { Edit, Trash2, MapPin, Save, X, Info, Cable, Boxes, History } from 'lucide-react';
 import { HydroPoll } from './types';
 
@@ -25,7 +25,7 @@ import { PollDetails } from './profile/PollDetails';
 import { PollCables } from './profile/PollCables';
 import { PollEnclosures } from './profile/PollEnclosures';
 import { PollHistory } from './profile/PollHistory';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/shared/ui/badge';
 
 interface PollProfileProps {
   poll: HydroPoll | null;

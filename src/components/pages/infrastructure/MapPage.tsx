@@ -15,14 +15,14 @@ import {
   Building,
   Settings,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/shared/ui/card';
+import { Button } from '@/components/shared/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
   TooltipProvider,
-} from '@/components/ui/tooltip';
+} from '@/components/shared/ui/tooltip';
 import {
   Dialog,
   DialogContent,
@@ -30,8 +30,8 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
+} from '@/components/shared/ui/dialog';
+import { Input } from '@/components/shared/ui/input';
 import { useLocale } from '@/contexts/LocaleContext';
 import { MapComponent } from '@/components/map-component';
 

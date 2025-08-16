@@ -12,12 +12,12 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
   AlertDialogAction,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/alert-dialog';
+import { Button } from '@/components/shared/ui/button';
 import { Trash2 } from 'lucide-react';
 import { EntryCategory } from './types';
 import { useLocale } from '@/contexts/LocaleContext';
-import { buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/shared/ui/button';
 
 type Props = {
   category: EntryCategory;

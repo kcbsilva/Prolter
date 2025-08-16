@@ -4,8 +4,8 @@
 import * as React from 'react';
 import { FileCode, PlusCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/shared/ui/button';
+import { Card, CardContent } from '@/components/shared/ui/card';
 import { AddProjectModal } from '@/components/maps/projects/AddProjectModal';
 import { UpdateProjectModal } from '@/components/maps/projects/UpdateProjectModal';
 import { ListProjects } from '@/components/maps/projects/ListProjects';

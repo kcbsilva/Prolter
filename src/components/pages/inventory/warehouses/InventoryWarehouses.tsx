@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
   CardFooter,
-} from "@/components/ui/card";
+} from "@/components/shared/ui/card";
 import {
   Table,
   TableBody,
@@ -17,9 +17,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@/components/shared/ui/table";
+import { Button } from "@/components/shared/ui/button";
+import { Input } from "@/components/shared/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -29,7 +29,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "@/components/shared/ui/dialog";
 import {
     Form,
     FormControl,
@@ -37,7 +37,7 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
+} from "@/components/shared/ui/form";
 import { PlusCircle, Edit, Trash2, Loader2, RefreshCw, Search, Home } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
@@ -54,9 +54,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { buttonVariants } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/shared/ui/alert-dialog";
+import { buttonVariants } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
 
 const warehouseSchema = z.object({
   name: z.string().min(1, "Warehouse name is required."),

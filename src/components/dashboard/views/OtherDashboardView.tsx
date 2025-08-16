@@ -1,7 +1,7 @@
 // src/components/dashboard/views/OtherDashboardView.tsx
 import * as React from 'react';
 import { useLocale } from '@/contexts/LocaleContext';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/shared/ui/card';
 
 type Props = {
   currentView: 'Network' | 'Technician';

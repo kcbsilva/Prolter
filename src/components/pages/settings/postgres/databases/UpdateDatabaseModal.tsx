@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { Eye } from 'lucide-react';
 
 interface Props {

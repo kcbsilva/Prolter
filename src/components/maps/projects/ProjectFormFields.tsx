@@ -2,15 +2,15 @@
 'use client';
 
 import * as React from 'react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
 import {
   Select,
   SelectTrigger,
   SelectContent,
   SelectItem,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/shared/ui/select';
 import type { Pop } from '@/types/maps';
 
 interface ProjectFormFieldsProps {

@@ -1,8 +1,8 @@
 // src/app/client/[id]/profile/page.tsx
 'use client';
 
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '@/components/shared/ui/input';
+import { Button } from '@/components/shared/ui/button';
 
 export default function ProfilePage() {
   return (

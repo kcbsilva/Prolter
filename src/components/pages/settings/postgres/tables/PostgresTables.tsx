@@ -9,15 +9,15 @@ import {
   CardHeader,
   CardTitle,
   CardDescription
-} from "@/components/ui/card";
-import { Button } from '@/components/ui/button';
+} from "@/components/shared/ui/card";
+import { Button } from '@/components/shared/ui/button';
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem
-} from '@/components/ui/select';
+} from '@/components/shared/ui/select';
 import { Table2, PlusCircle } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { PaginatedSkeletonTable } from '@/components/ui/paginated-skeleton-table';

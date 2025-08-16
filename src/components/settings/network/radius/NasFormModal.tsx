@@ -9,10 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+} from '@/components/shared/ui/dialog';
+import { Input } from '@/components/shared/ui/input';
+import { Label } from '@/components/shared/ui/label';
+import { Button } from '@/components/shared/ui/button';
 import { Pop } from '@/types/pops';
 import { NasType } from './NasTable';
 import {
@@ -21,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/shared/ui/select';
 import { Plus } from 'lucide-react';
 import { PopFormModal } from '@/components/settings/system/pop/PopFormModal';
 

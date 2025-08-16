@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
   Card,
   CardContent,
-} from "@/components/ui/card";
+} from "@/components/shared/ui/card";
 import {
   Table,
   TableBody,
@@ -15,9 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/shared/ui/table";
+import { Button, buttonVariants } from '@/components/shared/ui/button';
+import { Badge } from '@/components/shared/ui/badge';
 import { PlusCircle, Workflow, Edit, Trash2, Loader2 } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +30,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "@/components/shared/ui/dialog";
 import {
     Form,
     FormControl,
@@ -38,17 +38,17 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form";
-import { Input } from '@/components/ui/input';
+} from "@/components/shared/ui/form";
+import { Input } from '@/components/shared/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from '@/components/ui/checkbox';
-import { Switch } from '@/components/ui/switch';
+} from "@/components/shared/ui/select";
+import { Checkbox } from '@/components/shared/ui/checkbox';
+import { Switch } from '@/components/shared/ui/switch';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,11 +59,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from "@/components/shared/ui/alert-dialog";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/shared/ui/scroll-area';
 
 interface DaySchedule {
   enabled: boolean;

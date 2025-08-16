@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/shared/ui/button';
 import { ServerCog } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
