@@ -1,4 +1,4 @@
-# **App Name**: NetHub Manager
+# **App Name**: Prolter
 
 ## Core Features:
 
